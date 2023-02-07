@@ -201,5 +201,96 @@
     "title": "In Class Exercise 2: Geospatial Data Wrangling",
     "section": "6.3 Visualing attributes by using statistical graph",
     "text": "6.3 Visualing attributes by using statistical graph\n\n\nShow code\nggplot(data = NGA_wp,\n       aes(x = total_wp)) +\n  geom_histogram(bins = 20, \n                 color = \"black\",\n                 fill =\"light blue\") +\n  geom_vline(aes(xintercept=mean(total_wp, na.rm=T)),\n             color = \"red\", linetype=\"dashed\", size = 0.8) +\n  xlab(\"No of water points\") +\n  ylab(\"No. of\\nLGAs\") +\n  theme(axis.title.y = element_text(angle = 0))\n\n\n\n\n\n\n\nShow code\nwrite_rds(NGA_wp, \"data/rds/NGA_wp.rds\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html",
+    "title": "Take Home Exercise 1",
+    "section": "",
+    "text": "Water is an important resource to mankind. Clean and accessible water is critical to human health. It provides a healthy environment, a sustainable economy, reduces poverty and ensures peace and security. Yet over 40% of the global population does not have access to sufficient clean water. By 2025, 1.8 billion people will be living in countries or regions with absolute water scarcity, according to UN-Water. The lack of water poses a major threat to several sectors, including food security. Agriculture uses about 70% of the world’s accessible freshwater.\nDeveloping countries are most affected by water shortages and poor water quality. Up to 80% of illnesses in the developing world are linked to inadequate water and sanitation. Despite technological advancement, providing clean water to the rural community is still a major development issues in many countries globally, especially countries in the Africa continent.\nTo address the issue of providing clean and sustainable water supply to the rural community, a global Water Point Data Exchange (WPdx) project has been initiated. The main aim of this initiative is to collect water point related data from rural areas at the water point or small water scheme level and share the data via WPdx Data Repository, a cloud-based data library. What is so special of this project is that data are collected based on WPDx Data Standard.\nThe data we will be using here are:\n\nAspatial Data\n\nWPdx Global Data Repositories: WPdx+ data set\n\nGeospatial Data\n\nState Boundary GIS: geoBoundaries data set"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#load-geospatial-data-in",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#load-geospatial-data-in",
+    "title": "Take Home Exercise 1",
+    "section": "3.1 Load Geospatial data in",
+    "text": "3.1 Load Geospatial data in\n\ngeoNGA <- st_read(\"data/geospatial\", layer = \"geoBoundaries-NGA-ADM1\")\n\nReading layer `geoBoundaries-NGA-ADM1' from data source \n  `/Users/junhaoteo/Documents/junhao2309/IS415/Take-Home_Ex/Take-Home_Ex01/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 37 features and 6 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2.692613 ymin: 4.271484 xmax: 14.67797 ymax: 13.88571\nGeodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#load-aspatial-data-in",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#load-aspatial-data-in",
+    "title": "Take Home Exercise 1",
+    "section": "3.2 Load Aspatial Data in",
+    "text": "3.2 Load Aspatial Data in\n\nwp_nga <- read_csv(\"data/aspatial/WPDX.csv\") %>%\n  filter(`#clean_country_name` == \"Nigeria\", `#clean_adm1` ==\"Osun\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-duplicates",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-duplicates",
+    "title": "Take Home Exercise 1",
+    "section": "4.1 Check duplicates",
+    "text": "4.1 Check duplicates\nWe have to check the data for any duplicated names. After checking, we can see that there are no duplicates and thus it is safe to proceed\n\ngeoNGA$shapeName[duplicated(geoNGA$shapeName) == TRUE]\n\ncharacter(0)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-crs-of-geonga-and-transform",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-crs-of-geonga-and-transform",
+    "title": "Take Home Exercise 1",
+    "section": "4.2 Check CRS of geoNGA and transform",
+    "text": "4.2 Check CRS of geoNGA and transform\n\nst_crs(geoNGA)\n\nCoordinate Reference System:\n  User input: WGS 84 \n  wkt:\nGEOGCRS[\"WGS 84\",\n    ENSEMBLE[\"World Geodetic System 1984 ensemble\",\n        MEMBER[\"World Geodetic System 1984 (Transit)\"],\n        MEMBER[\"World Geodetic System 1984 (G730)\"],\n        MEMBER[\"World Geodetic System 1984 (G873)\"],\n        MEMBER[\"World Geodetic System 1984 (G1150)\"],\n        MEMBER[\"World Geodetic System 1984 (G1674)\"],\n        MEMBER[\"World Geodetic System 1984 (G1762)\"],\n        MEMBER[\"World Geodetic System 1984 (G2139)\"],\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n            LENGTHUNIT[\"metre\",1]],\n        ENSEMBLEACCURACY[2.0]],\n    PRIMEM[\"Greenwich\",0,\n        ANGLEUNIT[\"degree\",0.0174532925199433]],\n    CS[ellipsoidal,2],\n        AXIS[\"geodetic latitude (Lat)\",north,\n            ORDER[1],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        AXIS[\"geodetic longitude (Lon)\",east,\n            ORDER[2],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n    USAGE[\n        SCOPE[\"Horizontal component of 3D system.\"],\n        AREA[\"World.\"],\n        BBOX[-90,-180,90,180]],\n    ID[\"EPSG\",4326]]\n\n\nWe can see here that currently geoNGA is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.\n\ngeoNGA <- geoNGA %>%\n  st_transform(crs= 26392)\nosun <- geoNGA %>%\n  filter(shapeName == \"Osun\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#plot-geospatial-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#plot-geospatial-data",
+    "title": "Take Home Exercise 1",
+    "section": "4.3 Plot Geospatial Data",
+    "text": "4.3 Plot Geospatial Data\n\nplot(osun)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-simple-feature-on-wp_nga",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-simple-feature-on-wp_nga",
+    "title": "Take Home Exercise 1",
+    "section": "5.1 Create simple feature on wp_nga",
+    "text": "5.1 Create simple feature on wp_nga\nUsing what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.\n\nwp_nga_sf <- st_as_sf(wp_nga, coords = c(\"#lon_deg\", \"#lat_deg\"), crs = 4326) %>%\n  st_transform(crs = 26392)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#cleaning-up-na-entries-in-aspatial-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#cleaning-up-na-entries-in-aspatial-data",
+    "title": "Take Home Exercise 1",
+    "section": "5.2 Cleaning up NA entries in aspatial data",
+    "text": "5.2 Cleaning up NA entries in aspatial data\nBy using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.\n\nwp_nga_sf <- wp_nga_sf %>%\n  rename(status_clean = `#status_clean`) %>% \n  select(status_clean) %>%\n  mutate(status_clean = replace_na(\n    status_clean, \"unknown\"))"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#filter-out-functional-and-non-functional-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#filter-out-functional-and-non-functional-data",
+    "title": "Take Home Exercise 1",
+    "section": "5.3 Filter out functional and non-functional data",
+    "text": "5.3 Filter out functional and non-functional data\nBy using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.\n\nwp_functional <- wp_nga_sf %>%\n    filter(status_clean %in%\n           c(\"Functional\",\n             \"Functional but not in use\",\n             \"Functional but needs repair\"))\n\nwp_nonfunctional <- wp_nga_sf %>%\n  filter(status_clean %in% \n           c(\"Abandoned/Decommissioned\",\n             \"Abandoned\",\n             \"Non-Functional due to dry season\",\n             \"Non-Functional\",\n             \"Non functional due to dry season\"))"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#converting-object-to-relevant-datatype",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#converting-object-to-relevant-datatype",
+    "title": "Take Home Exercise 1",
+    "section": "6.1 Converting object to relevant datatype",
+    "text": "6.1 Converting object to relevant datatype\nWe have to convert sf to sp then to ppp so that it is readable by the spatstat package ### Convert sf to sp Spatial class\n\nosun_spatial <- as(osun, \"Spatial\")\n\nwp_functional_spatial <- as(wp_functional, \"Spatial\")\nwp_nonfunctional_spatial <- as(wp_nonfunctional, \"Spatial\")\n\n\n6.1.1 Converting the Spatial point data frame into generic SP format\n\nosun_sp <- as(osun_spatial, \"SpatialPolygons\")\nwp_func_sp <- as(wp_functional_spatial, \"SpatialPoints\")\nwp_nonfunc_sp <- as(wp_nonfunctional_spatial, \"SpatialPoints\")\n\n\n\n6.1.2 Convert sp to spatstat ppp format\n\nwp_func_ppp <- as(wp_func_sp, \"ppp\")\nwp_nonfunc_ppp <- as(wp_nonfunc_sp, \"ppp\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-owin-object",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-owin-object",
+    "title": "Take Home Exercise 1",
+    "section": "6.2 Create owin object",
+    "text": "6.2 Create owin object\n\nosun_owin <- as(osun_sp, \"owin\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#combine-waterpoints-and-study-area-together",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#combine-waterpoints-and-study-area-together",
+    "title": "Take Home Exercise 1",
+    "section": "6.3 Combine waterpoints and study area together",
+    "text": "6.3 Combine waterpoints and study area together\n\nosun_wpfunc <- wp_func_ppp[osun_owin]\n\nosun_wpnonfunc <- wp_nonfunc_ppp[osun_owin]"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#rescaling",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#rescaling",
+    "title": "Take Home Exercise 1",
+    "section": "6.4 Rescaling",
+    "text": "6.4 Rescaling\nBefore we go on to calculate the kernal density, we should rescale the data as taught in Hands-on Ex 4 Chapter 5.\n\nosun_wpfunc_km <- rescale(osun_wpfunc, 1000, \"km\")\nosun_wpnonfunc_km <- rescale(osun_wpnonfunc, 1000, \"km\")"
   }
 ]

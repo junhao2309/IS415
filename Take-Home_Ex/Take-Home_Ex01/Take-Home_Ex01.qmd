@@ -1,0 +1,198 @@
+---
+title: "Take Home Exercise 1"
+date: "30 January 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Setting the Scene
+
+Water is an important resource to mankind. Clean and accessible water is critical to human health. It provides a healthy environment, a sustainable economy, reduces poverty and ensures peace and security. Yet over 40% of the global population does not have access to sufficient clean water. By 2025, 1.8 billion people will be living in countries or regions with absolute water scarcity, according to UN-Water. The lack of water poses a major threat to several sectors, including food security. Agriculture uses about 70% of the world's accessible freshwater.
+
+Developing countries are most affected by water shortages and poor water quality. Up to 80% of illnesses in the developing world are linked to inadequate water and sanitation. Despite technological advancement, providing clean water to the rural community is still a major development issues in many countries globally, especially countries in the Africa continent.
+
+To address the issue of providing clean and sustainable water supply to the rural community, a global Water Point Data Exchange (WPdx) project has been initiated. The main aim of this initiative is to collect water point related data from rural areas at the water point or small water scheme level and share the data via WPdx Data Repository, a cloud-based data library. What is so special of this project is that data are collected based on WPDx Data Standard.
+
+The data we will be using here are:
+
+-   Aspatial Data
+
+    -   WPdx Global Data Repositories: [WPdx+](https://data.waterpointdata.org/dataset/Water-Point-Data-Exchange-Plus-WPdx-/eqje-vguj/data) data set
+
+-   Geospatial Data
+
+    -   State Boundary GIS: [geoBoundaries](https://www.geoboundaries.org/) data set
+
+# Install & Load Packages
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, funModeling)
+```
+
+# Load Data into Rstudio
+
+## Load Geospatial data in
+
+```{r}
+geoNGA <- st_read("data/geospatial", layer = "geoBoundaries-NGA-ADM1")
+```
+
+## Load Aspatial Data in
+
+```{r}
+wp_nga <- read_csv("data/aspatial/WPDX.csv") %>%
+  filter(`#clean_country_name` == "Nigeria", `#clean_adm1` =="Osun")
+```
+
+# Geospatial Data wrangling
+
+## Check duplicates
+
+We have to check the data for any duplicated names. After checking, we can see that there are no duplicates and thus it is safe to proceed
+
+```{r}
+geoNGA$shapeName[duplicated(geoNGA$shapeName) == TRUE]
+```
+
+## Check CRS of geoNGA and transform
+
+```{r}
+st_crs(geoNGA)
+```
+
+We can see here that currently geoNGA is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.
+
+```{r}
+geoNGA <- geoNGA %>%
+  st_transform(crs= 26392)
+osun <- geoNGA %>%
+  filter(shapeName == "Osun")
+```
+
+## Plot Geospatial Data
+
+```{r}
+plot(osun)
+```
+
+# Aspatial Data wrangling
+
+## Create simple feature on wp_nga
+
+Using what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.
+
+```{r}
+wp_nga_sf <- st_as_sf(wp_nga, coords = c("#lon_deg", "#lat_deg"), crs = 4326) %>%
+  st_transform(crs = 26392)
+```
+
+## Cleaning up NA entries in aspatial data
+
+By using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.
+
+```{r}
+wp_nga_sf <- wp_nga_sf %>%
+  rename(status_clean = `#status_clean`) %>% 
+  select(status_clean) %>%
+  mutate(status_clean = replace_na(
+    status_clean, "unknown"))
+```
+
+## Filter out functional and non-functional data
+
+By using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.
+
+```{r}
+wp_functional <- wp_nga_sf %>%
+    filter(status_clean %in%
+           c("Functional",
+             "Functional but not in use",
+             "Functional but needs repair"))
+
+wp_nonfunctional <- wp_nga_sf %>%
+  filter(status_clean %in% 
+           c("Abandoned/Decommissioned",
+             "Abandoned",
+             "Non-Functional due to dry season",
+             "Non-Functional",
+             "Non functional due to dry season"))
+```
+
+# Kernel Density Analysis
+
+## Converting object to relevant datatype
+
+We have to convert sf to sp then to ppp so that it is readable by the spatstat package \### Convert sf to sp Spatial class
+
+```{r}
+osun_spatial <- as(osun, "Spatial")
+
+wp_functional_spatial <- as(wp_functional, "Spatial")
+wp_nonfunctional_spatial <- as(wp_nonfunctional, "Spatial")
+```
+
+### Converting the Spatial point data frame into generic SP format
+
+```{r}
+osun_sp <- as(osun_spatial, "SpatialPolygons")
+wp_func_sp <- as(wp_functional_spatial, "SpatialPoints")
+wp_nonfunc_sp <- as(wp_nonfunctional_spatial, "SpatialPoints")
+```
+
+### Convert sp to spatstat ppp format
+
+```{r}
+wp_func_ppp <- as(wp_func_sp, "ppp")
+wp_nonfunc_ppp <- as(wp_nonfunc_sp, "ppp")
+```
+
+## Create owin object
+
+```{r}
+osun_owin <- as(osun_sp, "owin")
+```
+
+## Combine waterpoints and study area together
+
+```{r}
+osun_wpfunc <- wp_func_ppp[osun_owin]
+
+osun_wpnonfunc <- wp_nonfunc_ppp[osun_owin]
+```
+
+## Rescaling
+
+Before we go on to calculate the kernal density, we should rescale the data as taught in Hands-on Ex 4 Chapter 5.
+
+```{r}
+osun_wpfunc_km <- rescale(osun_wpfunc, 1000, "km")
+osun_wpnonfunc_km <- rescale(osun_wpnonfunc, 1000, "km")
+```
+
+# Creating Kernal Density Estimate
+
+```{r}
+kde_func<-density(osun_wpfunc_km,
+                  sigma=bw.diggle,
+                  edge=TRUE,
+                  kernel="gaussian")
+
+kde_nonfunc <- density(osun_wpnonfunc_km,
+                       sigma=bw.diggle,
+                       edge= TRUE,
+                       kernel = "gaussian")
+
+par(mfrow = c(1,2))
+plot(kde_func, main = "Functional Water Points")
+plot(kde_nonfunc, main = "Non-Functional Water Points")
+```
+
+# Convert KDE objects into gridded
+
+For mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster
