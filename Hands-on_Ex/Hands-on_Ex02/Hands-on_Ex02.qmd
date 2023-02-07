@@ -1,0 +1,119 @@
+---
+title: "Hands-on_Ex02"
+subtitle: "Choropleth Mapping with R"
+---
+
+# Getting Started
+
+Load packages
+
+```{r}
+pacman::p_load(tmap, tidyverse, sf)
+```
+
+# Importing Geospatial Data into R
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")
+
+mpsz
+```
+
+# Importing Attribute Data into R
+
+```{r}
+popdata <- read_csv("data/aspatial/respopagesexfa2011to2020.csv")
+```
+
+# Data Preparation
+
+Context: Before a thematic map can be prepared, you are required to prepare a data table with year 2020 values. The data table should include the variables PA, SZ, YOUNG, ECONOMY ACTIVE, AGED, TOTAL, DEPENDENCY.
+
+YOUNG: age group 0 to 4 until age groyup 20 to 24, ECONOMY ACTIVE: age group 25-29 until age group 60-64, AGED: age group 65 and above, TOTAL: all age group, and DEPENDENCY: the ratio between young and aged against economy active group
+
+```{r}
+popdata2020 <- popdata %>%
+  filter(Time == 2020) %>%
+  group_by(PA, SZ, AG) %>%
+  summarise(`POP` = sum(`Pop`)) %>%
+  ungroup() %>%
+  pivot_wider(names_from=AG, 
+              values_from=POP) %>%
+  mutate(YOUNG = rowSums(.[3:6])
+         +rowSums(.[12]), 
+         ECONOMY_ACTIVE = rowSums(.[7:11]) +
+           rowSums(.[13:15]), 
+         AGED = rowSums(.[16:21]),
+  #Column 3 to 6 and column 12 are under 24 yrs old
+  #Column 7 to 11 and 13 - 15 are between 25 - 64
+  #Column 16 to 21 are 65 and above
+         TOTAL = rowSums(.[3:21]),
+         DEPENDENCY = (YOUNG + AGED)
+         /ECONOMY_ACTIVE) %>%
+  select(PA, SZ, 
+         YOUNG, ECONOMY_ACTIVE, AGED,
+         TOTAL, DEPENDENCY)
+#rowSums() tallies the sum of values in the columns specified
+  
+```
+
+Joining the attribute data and geospatial data
+
+```{r}
+popdata2020 <- popdata2020 %>%
+  mutate_at(.vars = vars(PA,SZ),
+            .funs = funs(toupper)) |>
+  filter(ECONOMY_ACTIVE > 0)
+
+popdata2020
+# mutate_at(.vars = , .funs =) : vars() selects columns. funs() applies a function on all records
+#toupper converts from lower case to uppercase as a default
+```
+
+Use left_join() to combine geospatial data and attribute table by mpsz.SUBZONE_N and popdata2020.SZ as common identifier
+
+```{r}
+mpsz_pop2020 <- left_join(mpsz, popdata2020, by = c("SUBZONE_N" = "SZ"))
+```
+
+```{r}
+write_rds(mpsz_pop2020, "data/rds/mpszpop2020")
+```
+
+# Choropleth Mapping Geospatial Data Using tmap
+
+Plotting a choropleth map quickly using qtm()
+
+```{r}
+tmap_mode("plot")
+qtm(mpsz_pop2020,
+    fill = "DEPENDENCY")
+```
+
+Notes:
+
+-   tmap_mode() with "plot" produces a static map whereas "view" produces an interactive mode
+
+-   fill maps the variable attribute
+
+Creating a choropleth map by using tmaps element: Similar to ggplot2, use "+" as its adding on layers to the plot
+
+```{r}
+tm_shape(mpsz_pop2020) +
+  tm_fill("DEPENDENCY",
+        style = "quantile",
+        palette = "Blues",
+        title = "Dependency ratio") +
+  tm_layout(main.title = "Distribution of Dependency Ratio by planning subzone",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45, 
+            legend.width = 0.35,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+  tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS", 
+             position = c("left", "bottom"))
+```
