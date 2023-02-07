@@ -1,0 +1,237 @@
+---
+title: "In Class Exercise 2: Geospatial Data Wrangling"
+date: "16 January 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Scenario:
+
+Water is an important resource to mankind. Clean and accessible water is critical to human health. It provides a healthy environment, a sustainable economy, reduces poverty and ensures peace and security. Yet over 40% of the global population does not have access to sufficient clean water. By 2025, 1.8 billion people will be living in countries or regions with absolute water scarcity, according to UN-Water. The lack of water poses a major threat to several sectors, including food security. Agriculture uses about 70% of the world's accessible freshwater.
+
+Developing countries are most affected by water shortages and poor water quality. Up to 80% of illnesses in the developing world are linked to inadequate water and sanitation. Despite technological advancement, providing clean water to the rural community is still a major development issues in many countries globally, especially countries in the Africa continent.
+
+To address the issue of providing clean and sustainable water supply to the rural community, a global [Water Point Data Exchange (WPdx)](https://www.waterpointdata.org/about/) project has been initiated. The main aim of this initiative is to collect water point related data from rural areas at the water point or small water scheme level and share the data via WPdx Data Repository, a cloud-based data library. What is so special of this project is that data are collected based on [WPDx Data Standard](https://www.waterpointdata.org/wp-content/uploads/2021/04/WPDx_Data_Standard.pdf).
+
+## The Task:
+
+The specific tasks of this take-home exercise are as follows:
+
+-   Using appropriate sf method, import the shapefile into R and save it in a simple feature data frame format. Note that there are three Projected Coordinate Systems of Nigeria, they are: EPSG: 26391, 26392, and 26303. You can use any one of them.
+
+-   Using appropriate tidyr and dplyr methods, derive the proportion of functional and non-functional water point at LGA level.
+
+-   Combining the geospatial and aspatial data frame into simple feature data frame.
+
+-   Visualising the distribution of water point by using appropriate analytical visualisation methods.
+
+# Getting Started: Load packages
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+pacman::p_load(sf, tidyverse, funModeling)
+```
+
+# Handling Geospatial Data
+
+##Importing Geospatial
+
+geoBoundaries Data set
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+geo_nga <- st_read(dsn = "data/geospatial", layer = "geoBoundaries-NGA-ADM2") |>
+  st_transform(crs = 26392)
+```
+
+NGA Data Set
+
+```{r}
+NGA <- st_read("data/geospatial/",
+               layer = "nga_admbnda_adm2_osgof_20190417") %>%
+  st_transform(crs = 26392)
+
+```
+
+## Importing Aspatial data
+
+Use filter to extract only "Nigeria"
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+wp_nga <- read_csv(file = "data/aspatial/WPdx.csv") |>
+  filter(`#clean_country_name` == "Nigeria")
+```
+
+# Converting Aspatial Data into Geospatial
+
+Changes only the "New Georeferenced Column" but maintains wp_nga as a tibble dataframe Method in Hands-On_Ex1 also works
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
+
+wp_nga
+```
+
+Convert wp_NGA into an sf data.frame and transforming it into the Nigeria projected coordinate system
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+wp_sf <- st_sf(wp_nga, crs = 4326) |>
+  st_transform(crs = 26392)
+wp_sf
+```
+
+# Geospatial Data Cleaning
+
+##Exclude redundent fields
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+NGA <- NGA %>%
+  select(c(3:4, 8:9))
+```
+
+## Checking duplicate name and amending them
+
+```{r}
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN) == TRUE]
+```
+
+Correct the areas as they are located in different states
+
+```{r}
+NGA$ADM2_EN[94] <- "Bassa, Kogi"
+NGA$ADM2_EN[95] <- "Bassa, Plateau"
+NGA$ADM2_EN[304] <- "Ifelodun, Kwara"
+NGA$ADM2_EN[305] <- "Ifelodun, Osun"
+NGA$ADM2_EN[355] <- "Irepodun, Kwara"
+NGA$ADM2_EN[356] <- "Irepodun, Osun"
+NGA$ADM2_EN[519] <- "Nasarawa, Kano"
+NGA$ADM2_EN[520] <- "Nasarawa, Nasarawa"
+NGA$ADM2_EN[546] <- "Obi, Benue"
+NGA$ADM2_EN[547] <- "Obi, Nasarawa"
+NGA$ADM2_EN[693] <- "Surulere, Lagos"
+NGA$ADM2_EN[694] <- "Surulere, Oyo"
+```
+
+Rerun code to check
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN) == TRUE]
+```
+
+# Data Wrangling for Water Point Data
+
+freq() showcase the distribution of waterpoint status visually.
+
+```{r}
+freq(data = wp_sf,
+     input = '#status_clean')
+```
+
+replace_na(status_clean, "unknown") : replaces all NA to unknown within status_clean variable
+
+```{r}
+wp_sf_nga <- wp_sf %>%
+  rename(status_clean = '#status_clean') %>%
+  select(status_clean) %>%
+  mutate(status_clean = replace_na(
+    status_clean, 'unknown'))
+
+```
+
+## Extracting Water Point Data
+
+Filter based on functional, non_functional and unknown respectively.
+
+```{r}
+wp_functional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Functional",
+             "Functional but not in use",
+             "Functional but needs repair"))
+```
+
+```{r}
+
+wp_nonfunctional <- wp_sf_nga %>% 
+  filter(status_clean %in% 
+           c("Abandoned/Decommissioned",
+             "Abandoned",
+             "Non-Functional due to dry season",
+             "Non-Functional",
+             "Non functional due to dry season"))
+```
+
+```{r}
+wp_unknown <- wp_sf_nga %>%
+  filter(status_clean %in% "unknown")
+```
+
+```{r}
+freq(data = wp_functional,
+     input = 'status_clean')
+```
+
+```{r}
+freq(data = wp_nonfunctional,
+     input = 'status_clean')
+```
+
+```{r}
+freq(data = wp_unknown,
+     input = 'status_clean')
+```
+
+## Performing Point-in-Polygon Count
+
+```{r}
+NGA_wp <- NGA %>%
+  mutate(`total_wp` = lengths(
+    st_intersects(NGA, wp_sf_nga))) %>%
+  mutate(`wp_functional` = lengths(
+    st_intersects(NGA, wp_functional))) %>%
+  mutate(`wp_nonfunctional` = lengths(
+    st_intersects(NGA, wp_nonfunctional))) %>%
+  mutate(`wp_unknown` = lengths(
+    st_intersects(NGA, wp_unknown)))
+```
+
+## Visualing attributes by using statistical graph
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+ggplot(data = NGA_wp,
+       aes(x = total_wp)) +
+  geom_histogram(bins = 20, 
+                 color = "black",
+                 fill ="light blue") +
+  geom_vline(aes(xintercept=mean(total_wp, na.rm=T)),
+             color = "red", linetype="dashed", size = 0.8) +
+  xlab("No of water points") +
+  ylab("No. of\nLGAs") +
+  theme(axis.title.y = element_text(angle = 0))
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+write_rds(NGA_wp, "data/rds/NGA_wp.rds")
+```

@@ -1,0 +1,98 @@
+<div>
+
+---
+title: "Advanced Spatial Point Patterns Analysis: Local Co-Location Quotient"
+---
+
+</div>
+
+# Install and load Relevant Data
+
+```{r}
+pacman::p_load(sfdep, sf, tidyverse, tmap)
+```
+
+New package used is sfdep, used mainly for Local Co-Location Quotient
+
+# Importing Data
+
+The national projection system of Taiwan is EPSG::3829
+
+```{r}
+studyArea <- st_read(dsn = "data/", 
+                     layer = "study_area") %>%
+  st_transform(crs = 3829)
+
+stores <- st_read(dsn = "data/", 
+                  layer = "stores") %>%
+  st_transform(crs = 3829)
+```
+
+# Visualising sf layers
+
+```{r}
+tmap_mode("view")
+tm_shape(studyArea) +
+  tm_polygons() +
+tm_shape(stores) +
+  tm_dots(col = "Name",
+          size = 0.01,
+          border.col="black",
+          border.lwd= 0.5) +
+  tm_view(set.zoom.limits = c(12,16))
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+local_colocation(A, B, nb, wt, nsim), where - A
+
+# Local Colocation Quotients (LCLQ)
+
+```{r}
+nb <- include_self(
+  st_knn(st_geometry(stores), 6))
+# The number 6 indicates getting the 6 nearest stores (nearest neighbor)
+
+# List of lengths in nb showcases the numbers of the neighbors of a particular point
+wt <- st_kernel_weights(nb,
+                        stores,
+                        "gaussian",
+                        adaptive = TRUE)
+# List of lengths in wt showcases the weights: 
+# The closer, the higher the weight, the further, the lower the weight
+
+FamilyMart <- stores %>%
+  filter(Name == "Family Mart")
+A<- FamilyMart$Name
+
+SevenEleven <- stores %>%
+  filter(Name == "7-Eleven")
+B<- SevenEleven$Name
+
+LCLQ <- local_colocation(A, B, nb, wt, 49)
+
+LCLQ_stores <- cbind(stores, LCLQ) %>%
+  na.exclude()
+
+
+# Place stores first as the function takes on the structure of the first input.
+```
+
+```{r}
+tmap_mode("view")
+tm_shape(studyArea) +
+  tm_polygons() +
+tm_shape(LCLQ_stores) +
+  tm_dots(col = "X7.Eleven",
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5) +
+tm_shape(LCLQ_stores) +
+  tm_dots(col = "p_sim_7.Eleven",
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5)
+  tm_view(set.zoom.limits = c(12,16))
+```

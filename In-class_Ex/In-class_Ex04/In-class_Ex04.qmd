@@ -1,0 +1,91 @@
+---
+title: "In class exercise 4"
+date: '30 January 2023'
+date-modified: 'r Sys.date()'
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# Getting started
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap)
+```
+
+# Importing Data
+
+```{r}
+childcare_sf <- st_read("data/child-care-services-geojson.geojson") %>% 
+  st_transform(crs = 3414)
+```
+
+```{r}
+
+sg_sf <- st_read(dsn = "data", layer="CostalOutline")
+
+```
+
+```{r}
+mpsz_sf <- st_read(dsn = "data", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+```{r}
+childcare <- as_Spatial(childcare_sf)
+mpsz <- as_Spatial(mpsz_sf)
+sg <- as_Spatial(sg_sf)
+```
+
+# Visualising sf dataframe
+
+```{r}
+tmap_mode("view")
+tm_shape(childcare) +
+  tm_dots(alpha = 0.4,
+          size = 0.01) +
+  tm_view(set.zoom.limits = c(11,14))
+```
+
+tm_view(set.zoom.limits = c(x,y)), where x is the zoom-out limit and y is the zoom-in limit
+
+```{r}
+tmap_mode("plot")
+```
+
+# Geospatial Data Wrangling
+
+```{r}
+childcare_sp <- as(childcare, "SpatialPoints")
+sg_sp <- as(sg, "SpatialPolygons")
+```
+
+```{r}
+childcare_ppp <- as(childcare_sp, "ppp")        
+plot(childcare_ppp)
+```
+
+## Handling duplicated point event
+
+```{r}
+childcare_ppp_jit <- rjitter(childcare_ppp,
+                             retry=TRUE,
+                             nsim =1,
+                             drop = TRUE)
+any(duplicated(childcare_ppp_jit))
+```
+
+## Creating an owin object
+
+```{r}
+sg_owin <- as(sg_sp, "owin")
+
+plot(sg_owin)
+```
+
+```{r}
+childcareSG_ppp <- childcare_ppp_jit[sg_owin]
+plot(childcareSG_ppp)
+```
