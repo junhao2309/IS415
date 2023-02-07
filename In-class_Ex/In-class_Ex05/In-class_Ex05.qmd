@@ -1,12 +1,17 @@
-<div>
-
 ---
-title: "Advanced Spatial Point Patterns Analysis: Local Co-Location Quotient"
+title: "In class exercise 5"
+date: '06 February 2023'
+date-modified: 'r Sys.date()'
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
 ---
 
-</div>
 
-# Install and load Relevant Data
+
+# Install and Load Packages
 
 ```{r}
 pacman::p_load(sfdep, sf, tidyverse, tmap)

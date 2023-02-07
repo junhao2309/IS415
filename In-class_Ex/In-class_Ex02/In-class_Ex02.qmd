@@ -12,7 +12,6 @@ editor: visual
 ---
 
 # Scenario:
-
 Water is an important resource to mankind. Clean and accessible water is critical to human health. It provides a healthy environment, a sustainable economy, reduces poverty and ensures peace and security. Yet over 40% of the global population does not have access to sufficient clean water. By 2025, 1.8 billion people will be living in countries or regions with absolute water scarcity, according to UN-Water. The lack of water poses a major threat to several sectors, including food security. Agriculture uses about 70% of the world's accessible freshwater.
 
 Developing countries are most affected by water shortages and poor water quality. Up to 80% of illnesses in the developing world are linked to inadequate water and sanitation. Despite technological advancement, providing clean water to the rural community is still a major development issues in many countries globally, especially countries in the Africa continent.
@@ -34,8 +33,6 @@ The specific tasks of this take-home exercise are as follows:
 # Getting Started: Load packages
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show code"
 pacman::p_load(sf, tidyverse, funModeling)
 ```
 

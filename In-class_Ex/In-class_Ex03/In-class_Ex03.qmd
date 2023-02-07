@@ -18,13 +18,12 @@ pacman::p_load(sf, tmap, tidyverse)
 ```
 
 ```{r}
-
 NGA_wp <- read_rds("data/rds/NGA_wp.rds")
 ```
 
 # Basic Choropleth Mapping
 
-## Visualising distribution of non-functional water point
+## Visualising distribution of non-functional Water Point
 
 ```{r}
 p1 <- tm_shape(NGA_wp) +

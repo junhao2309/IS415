@@ -9,7 +9,7 @@ execute:
 editor: visual
 ---
 
-# Getting started
+# Getting started : Load Packages
 
 ```{r}
 pacman::p_load(maptools, sf, raster, spatstat, tmap)
