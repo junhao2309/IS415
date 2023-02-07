@@ -1,0 +1,27 @@
+---
+title: "About Me"
+---
+
+# Self-Introduction
+
+Hi guys! I am Jun Hao, a second year SMU student, majoring in
+
+Quantitative Economics and Data Science Analytics.
+
+A hobby of mine is rock climbing and I have a SNCS Level 2 Certification.
+
+Fun Fact: I'm still afraid of heights
+
+# Purpose of Webpage
+
+This webpage showcases the work I have done for IS415: Geospatial Analytics and Applications!
+
+-   Hands On Exercises
+
+-   In class Exercises
+
+-   Take Home Assignments
+
+# Contact
+
+I can be contacted via email: junhao.teo.2021\@economics.smu.edu.sg, [linkedin](https://www.linkedin.com/in/jhteo2309/) or my tele, @JHTeo23!

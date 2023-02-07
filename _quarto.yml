@@ -1,0 +1,45 @@
+project:
+  type: website
+
+website:
+  title: "IS415-GAA"
+  navbar:
+    left:
+    - text: "Hands-on Exercise"
+      menu:
+      - text: "Hands-on Exercise 1"
+        href: "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html"
+      - text: "Hands-on Exercise 2"
+        href: "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html"
+      - text: "Hands-on Exercise 3"
+        href: "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html"
+    - text: "In-class Exercise"
+      menu:
+      - text: "In-class Exercise 2"
+        href: "In-class_Ex/In-class_Ex02/In-class_Ex02.html"
+      - text: "In-class Exercise 3"
+        href: "In-class_Ex/In-class_Ex03/In-class_Ex03.html"
+      - text: "In-class Exercise 4"
+        href: "In-class_Ex/In-class_Ex04/In-class_Ex04.html"
+      - text: "In-class Exercise 5"
+        href: "In-class_Ex/In-class_Ex05/In-class_Ex05.html"
+    - text: "Take-Home Exercise"
+      menu: 
+      - text: "Take-Home Exercise 1"
+        href: "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html"
+      - text: "Take-Home Exercise 2"
+      - text: "Take-Home Exercise 3"
+    right: 
+      - href: about.qmd
+        text: Home
+      - icon: github
+        href: https://github.com/junhao2309/IS415-GAA
+
+format:
+  html:
+    theme: journal
+    css: styles.css
+    toc: true
+
+editor: visual
+
