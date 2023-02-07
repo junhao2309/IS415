@@ -31,9 +31,9 @@ website:
       - text: "Take-Home Exercise 3"
     right: 
       - href: about.qmd
-        text: Home
+        text: About Me
       - icon: github
-        href: https://github.com/junhao2309/IS415-GAA
+        href: https://github.com/junhao2309/IS415
 
 format:
   html:

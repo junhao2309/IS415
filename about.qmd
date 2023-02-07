@@ -4,6 +4,8 @@ title: "About Me"
 
 # Self-Introduction
 
+![](picture.jpg){fig-align="left"}
+
 Hi guys! I am Jun Hao, a second year SMU student, majoring in
 
 Quantitative Economics and Data Science Analytics.
