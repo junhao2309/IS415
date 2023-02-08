@@ -9,8 +9,6 @@ execute:
 editor: visual
 ---
 
-
-
 # Install and Load Packages
 
 ```{r}

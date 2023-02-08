@@ -72,7 +72,7 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "IS415-GAA",
+    "title": "Jun Hao’s IS415-GAA Coursework",
     "section": "",
     "text": "Welcome to IS415 Geospatial Analytics and Applications\nThis is the course website of IS415 I study this term. you will find my course work on this website."
   },
@@ -292,5 +292,61 @@
     "title": "In Class Exercise 2: Geospatial Data Wrangling",
     "section": "6.3 Visualing attributes by using statistical graph",
     "text": "6.3 Visualing attributes by using statistical graph\n\n\nShow code\nggplot(data = NGA_wp,\n       aes(x = total_wp)) +\n  geom_histogram(bins = 20, \n                 color = \"black\",\n                 fill =\"light blue\") +\n  geom_vline(aes(xintercept=mean(total_wp, na.rm=T)),\n             color = \"red\", linetype=\"dashed\", size = 0.8) +\n  xlab(\"No of water points\") +\n  ylab(\"No. of\\nLGAs\") +\n  theme(axis.title.y = element_text(angle = 0))\n\n\n\n\n\n\n\nShow code\nwrite_rds(NGA_wp, \"data/rds/NGA_wp.rds\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#creating-kernal-density-estimate",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#creating-kernal-density-estimate",
+    "title": "Take Home Exercise 1",
+    "section": "6.5 Creating Kernal Density Estimate",
+    "text": "6.5 Creating Kernal Density Estimate\n\nkde_func<-density(osun_wpfunc_km,\n                  sigma=bw.diggle,\n                  edge=TRUE,\n                  kernel=\"gaussian\")\n\nkde_nonfunc <- density(osun_wpnonfunc_km,\n                       sigma=bw.diggle,\n                       edge= TRUE,\n                       kernel = \"gaussian\")\n\npar(mfrow = c(1,2))\nplot(kde_func, main = \"Functional Water Points\")\nplot(kde_nonfunc, main = \"Non-Functional Water Points\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-kde-output-into-gridded-objects",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-kde-output-into-gridded-objects",
+    "title": "Take Home Exercise 1",
+    "section": "6.6 Convert KDE output into gridded objects",
+    "text": "6.6 Convert KDE output into gridded objects\nFor mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster\n\ngridded_osun_wp <- as.SpatialGridDataFrame.im(kde_func)\ngridded_osun_nwp <-as.SpatialGridDataFrame.im(kde_nonfunc)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-gridded-object-into-raster",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-gridded-object-into-raster",
+    "title": "Take Home Exercise 1",
+    "section": "6.7 Convert gridded object into raster",
+    "text": "6.7 Convert gridded object into raster\nAfter converting the KDE output into a gridded object, we can use raster() from the raster package to then convert it into raster.\n\nosun_wp_raster <- raster(gridded_osun_wp)\nosun_nwp_raster <- raster(gridded_osun_nwp)\n\nosun_wp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8703851, 0.9616047  (x, y)\nextent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : NA \nsource     : memory\nnames      : v \nvalues     : -3.284724e-15, 28.42001  (min, max)\n\nosun_nwp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8703851, 0.9616047  (x, y)\nextent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : NA \nsource     : memory\nnames      : v \nvalues     : -4.451446e-15, 22.23681  (min, max)\n\n\nThe output of the above code chunk shows that crs in both raster object is NA. We have to input the crs = 26392 and ensure the measurements are in “km”.\n\nprojection(osun_wp_raster) <- CRS(\"+init=EPSG:26392 +units=km\")\nprojection(osun_nwp_raster) <- CRS(\"+init=EPSG:26392 +units=km\")\n\nosun_wp_raster ; osun_nwp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8703851, 0.9616047  (x, y)\nextent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : +init=EPSG:26392 +units=km \nsource     : memory\nnames      : v \nvalues     : -3.284724e-15, 28.42001  (min, max)\n\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8703851, 0.9616047  (x, y)\nextent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : +init=EPSG:26392 +units=km \nsource     : memory\nnames      : v \nvalues     : -4.451446e-15, 22.23681  (min, max)\n\n\nNow, we can see that the crs has been inputted in."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#visualising-the-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#visualising-the-data",
+    "title": "Take Home Exercise 1",
+    "section": "6.8 Visualising the data",
+    "text": "6.8 Visualising the data\nThe code chunk below visualises the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the map to the specific region, Osun.\n\ntmap_mode(\"view\") \ntm_basemap(server =\"OpenStreetMap\") + \n  tm_shape(osun_wp_raster) + \n  tm_raster(\"v\") +\n  tm_layout(title = \"Functional Waterpoints Density\", \n            legend.position = c(\"right\", \"Top\"), \n            frame = FALSE) +\n  tm_view(set.zoom.limits =c(9,14))\n\n\n\n\ntm_basemap(server =\"OpenStreetMap\") + \n  tm_shape(osun_nwp_raster) + \n  tm_raster(\"v\") + \n  tm_layout(title = \"Non-Functional Waterpoints Density\", \n            legend.position = c(\"right\", \"top\"), \n            frame = FALSE) +\n  tm_view(set.zoom.limits =c(9,14))"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#advantages-of-kernal-density-map-over-point-map",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#advantages-of-kernal-density-map-over-point-map",
+    "title": "Take Home Exercise 1",
+    "section": "6.9 Advantages of Kernal Density Map over Point Map",
+    "text": "6.9 Advantages of Kernal Density Map over Point Map"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#g-function",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#g-function",
+    "title": "Take Home Exercise 1",
+    "section": "7.1 G-function",
+    "text": "7.1 G-function\nThe nearest-neighbour distance is the measure of the distance between a point and its closest neighboring point.\nGest() of spatstat package is used to compute the G function\n\nG_FWP <- Gest(wp_func_ppp, correction = \"border\")\nG_NFWP <- Gest(wp_nonfunc_ppp, correction = \"border\")\npar(mfrow = c(2,1))\nplot(G_FWP, xlim = c(0,500)) ; plot(G_NFWP, xlim = c(0,500))"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#f-function",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#f-function",
+    "title": "Take Home Exercise 1",
+    "section": "7.2 F function",
+    "text": "7.2 F function\nUnlike the G function, the F function in Fest() is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:\n\n# Functional Water Point\nF_FWP<- Fest(wp_func_ppp)\nplot(F_FWP) \n\n\n\n\n\n# Non-Functional WaterPoints\nF_NFWP <- Fest(wp_nonfunc_ppp)\nplot(F_NFWP)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#l-function",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#l-function",
+    "title": "Take Home Exercise 1",
+    "section": "7.3 L Function",
+    "text": "7.3 L Function\n\nL_FWP <- Lest(wp_func_ppp, correction = \"Ripley\")\nplot(L_FWP, .-r ~r, ylab=\"L(d)-r\", xlab =\"d(m)\")\n\n\n\nL_NFWP <- Lest(wp_nonfunc_ppp, correction = \"Ripley\")\nplot(L_NFWP, .-r ~r, ylab=\"L(d)-r\", xlab =\"d(m)\")"
   }
 ]

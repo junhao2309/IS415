@@ -175,7 +175,7 @@ osun_wpfunc_km <- rescale(osun_wpfunc, 1000, "km")
 osun_wpnonfunc_km <- rescale(osun_wpnonfunc, 1000, "km")
 ```
 
-# Creating Kernal Density Estimate
+## Creating Kernal Density Estimate
 
 ```{r}
 kde_func<-density(osun_wpfunc_km,
@@ -193,6 +193,126 @@ plot(kde_func, main = "Functional Water Points")
 plot(kde_nonfunc, main = "Non-Functional Water Points")
 ```
 
-# Convert KDE objects into gridded
+## Convert KDE output into gridded objects
 
 For mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster
+
+```{r}
+gridded_osun_wp <- as.SpatialGridDataFrame.im(kde_func)
+gridded_osun_nwp <-as.SpatialGridDataFrame.im(kde_nonfunc)
+
+```
+
+## Convert gridded object into raster
+
+After converting the KDE output into a gridded object, we can use raster() from the raster package to then convert it into raster.
+
+```{r}
+osun_wp_raster <- raster(gridded_osun_wp)
+osun_nwp_raster <- raster(gridded_osun_nwp)
+
+osun_wp_raster
+osun_nwp_raster
+```
+
+The output of the above code chunk shows that crs in both raster object is NA. We have to input the crs = 26392 and ensure the measurements are in "km".
+
+```{r}
+projection(osun_wp_raster) <- CRS("+init=EPSG:26392 +units=km")
+projection(osun_nwp_raster) <- CRS("+init=EPSG:26392 +units=km")
+
+osun_wp_raster ; osun_nwp_raster
+```
+
+Now, we can see that the crs has been inputted in.
+
+## Visualising the data
+
+The code chunk below visualises the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the map to the specific region, Osun.
+
+```{r}
+tmap_mode("view") 
+tm_basemap(server ="OpenStreetMap") + 
+  tm_shape(osun_wp_raster) + 
+  tm_raster("v") +
+  tm_layout(title = "Functional Waterpoints Density", 
+            legend.position = c("right", "Top"), 
+            frame = FALSE) +
+  tm_view(set.zoom.limits =c(9,14))
+
+tm_basemap(server ="OpenStreetMap") + 
+  tm_shape(osun_nwp_raster) + 
+  tm_raster("v") + 
+  tm_layout(title = "Non-Functional Waterpoints Density", 
+            legend.position = c("right", "top"), 
+            frame = FALSE) +
+  tm_view(set.zoom.limits =c(9,14))
+```
+
+## Advantages of Kernal Density Map over Point Map
+
+# Second-Order Spatial Point Patterns Analysis
+
+## G-function
+
+The nearest-neighbour distance is the measure of the distance between a point and its closest neighboring point.
+
+Gest() of spatstat package is used to compute the G function
+
+```{r}
+G_FWP <- Gest(wp_func_ppp, correction = "border")
+G_NFWP <- Gest(wp_nonfunc_ppp, correction = "border")
+par(mfrow = c(2,1))
+plot(G_FWP, xlim = c(0,500)) ; plot(G_NFWP, xlim = c(0,500))
+```
+
+## F function
+
+Unlike the G function, the F function in Fest() is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:
+
+```{r}
+# Functional Water Point
+F_FWP<- Fest(wp_func_ppp)
+plot(F_FWP) 
+```
+
+```{r}
+# Non-Functional WaterPoints
+F_NFWP <- Fest(wp_nonfunc_ppp)
+plot(F_NFWP)
+```
+
+## L Function
+```{r}
+L_FWP <- Lest(wp_func_ppp, correction = "Ripley")
+plot(L_FWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
+
+L_NFWP <- Lest(wp_nonfunc_ppp, correction = "Ripley")
+plot(L_NFWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
+```
+
+# Performing Complete Spatial Randomness Test
+
+In running the test, we will be using envelope() from spatstat. 
+
+The null and alternative hypothesis are:
+
+Ho : The distribution of functional waterpoints in Osun State are randomly distributed
+
+H1 : The distribution of functional waterpoints in Osun State are not randomly distributed
+
+We will use the 95% confidence level in our test.
+
+The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
+
+```{r}
+L_FWP_test <- envelope(wp_func_ppp, Lest, nsim = 49, rank = 1, glocal= TRUE)
+
+plot(L_FWP_test, xlim = c(0,500))
+```
+Simulation shows that the black line is outside the 95% Confidence interval for all values of r. 
+We can thus reject the null hypothesis for all values of r. 
+
+This makes sense as (Need to find population density file)
+
+# 
