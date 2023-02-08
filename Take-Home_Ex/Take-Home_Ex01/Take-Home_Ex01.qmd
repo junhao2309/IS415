@@ -40,7 +40,7 @@ pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, funModeling)
 ## Load Geospatial data in
 
 ```{r}
-geoNGA <- st_read("data/geospatial", layer = "geoBoundaries-NGA-ADM1")
+geoNGA2 <- st_read(dsn = "data/geospatial", layer = "nga_admbnda_adm2_osgof_20190417")
 ```
 
 ## Load Aspatial Data in
@@ -54,25 +54,54 @@ wp_nga <- read_csv("data/aspatial/WPDX.csv") %>%
 
 ## Check duplicates
 
-We have to check the data for any duplicated names. After checking, we can see that there are no duplicates and thus it is safe to proceed
+We have to check the data for any duplicated names. After checking, there are several duplicates and thus we get their indices out and replace them with the corresponding names.
 
 ```{r}
-geoNGA$shapeName[duplicated(geoNGA$shapeName) == TRUE]
+geoNGA2$ADM2_EN[duplicated(geoNGA2$ADM2_EN) == TRUE]
 ```
 
-## Check CRS of geoNGA and transform
-
 ```{r}
-st_crs(geoNGA)
+duplicated_LGA <- geoNGA2$shapeName[duplicated(geoNGA2$shapeName) == TRUE]
+
+# Get all the indices with names that are included in the duplicated LGA names
+duplicated_indices <- which(geoNGA2$shapeName %in% duplicated_LGA)
+
+geoNGA2$ADM2_EN[94] <- "Bassa, Kogi"
+geoNGA2$ADM2_EN[95] <- "Bassa, Plateau"
+geoNGA2$ADM2_EN[304] <- "Ifelodun, Kwara"
+geoNGA2$ADM2_EN[305] <- "Ifelodun, Osun"
+geoNGA2$ADM2_EN[355] <- "Irepodun, Kwara"
+geoNGA2$ADM2_EN[356] <- "Irepodun, Osun"
+geoNGA2$ADM2_EN[519] <- "Nasarawa, Kano"
+geoNGA2$ADM2_EN[520] <- "Nasarawa, Nasarawa"
+geoNGA2$ADM2_EN[546] <- "Obi, Benue"
+geoNGA2$ADM2_EN[547] <- "Obi, Nasarawa"
+geoNGA2$ADM2_EN[693] <- "Surulere, Lagos"
+geoNGA2$ADM2_EN[694] <- "Surulere, Oyo"
 ```
 
-We can see here that currently geoNGA is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.
+The code chunk below filters out geoNGA2 into Osun state Local Government Area
+```{r}
+osun_LGA <- c("Aiyedade","Aiyedire","Atakumosa East",	"Atakumosa West",	
+              "Ede North",	"Ede South",	"Egbedore",	"Ejigbo",	"Ife Central",	
+              "Ife East",	"Ife North",	"Ife South",	"Ifedayo",	"Ila",
+              "Ifelodun, Osun","Irepodun, Osun","Ilesha East",	"Ilesha West",
+              "Irewole",	"Isokan",	"Iwo",	"Obokun",	"Odo-Otin",	"Ola-oluwa",	
+              "Olorunda",	"Oriade",	"Orolu",	"Osogbo", "Boripe", "Boluwaduro")
+osun <- geoNGA2 %>%
+  filter(ADM2_EN %in% osun_LGA)
+```
+
+We will use st_crs() to check the crs of geoNGA2
+```{r}
+st_crs(geoNGA2)
+```
+We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.
+
 
 ```{r}
-geoNGA <- geoNGA %>%
-  st_transform(crs= 26392)
-osun <- geoNGA %>%
-  filter(shapeName == "Osun")
+osun <- osun %>%
+  st_transform(crs = 26392)
 ```
 
 ## Plot Geospatial Data
@@ -122,6 +151,56 @@ wp_nonfunctional <- wp_nga_sf %>%
              "Non-Functional due to dry season",
              "Non-Functional",
              "Non functional due to dry season"))
+```
+## Population Data
+
+### Load Data in and select relevant columns
+```{r}
+nga_pop <- read_csv("data/pop_data_nga.csv")
+  
+osun_pop <- nga_pop %>% 
+  filter(nga_pop$`State    ` == "Osun") %>%
+  rename(ADM2_EN = `Local gov. area▲`, 
+         HASC = `HASC    `,
+         Capital = `Capital     `, 
+         Population = `Population    `)
+```
+
+### Ensure Names match with osun
+
+```{r}
+osun_pop[1,1] <- "Aiyedade"
+osun_pop[3,1] <- "Atakumosa East"
+osun_pop[4,1] <- "Atakumosa West"
+osun_pop[20,1] <- "Irepodun, Osun"
+osun_pop[16,1] <- "Ifelodun, Osun"
+```
+Once names have matched, we can merge the tibble as one dataset
+```{r}
+osun_pop_density <- osun %>%
+  left_join(osun_pop, by = "ADM2_EN")
+```
+
+We can then have the population density of Osun by its local government areas (LGA). 
+The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.
+```{r}
+tmap_mode("plot")
+tm_shape(osun_pop_density) +
+  tm_fill("Density",
+          style = "quantile",
+          palette = "Blues",
+          title = "Population Density") +
+  tm_layout(main.title = "Population Density of Osun LGA",
+            main.title.position = "center",
+            legend.height = 0.45, 
+            legend.width = 0.35,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_grid(alpha =0.2) +
+  tm_credits("Source: http://www.geo-ref.net/ph/nga.htm", 
+             position = c("left", "bottom"))
+    
 ```
 
 # Kernel Density Analysis
@@ -283,6 +362,7 @@ plot(F_NFWP)
 ```
 
 ## L Function
+
 ```{r}
 L_FWP <- Lest(wp_func_ppp, correction = "Ripley")
 plot(L_FWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
@@ -293,7 +373,7 @@ plot(L_NFWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
 
 # Performing Complete Spatial Randomness Test
 
-In running the test, we will be using envelope() from spatstat. 
+In running the test, we will be using envelope() from spatstat.
 
 The null and alternative hypothesis are:
 
@@ -310,9 +390,9 @@ L_FWP_test <- envelope(wp_func_ppp, Lest, nsim = 49, rank = 1, glocal= TRUE)
 
 plot(L_FWP_test, xlim = c(0,500))
 ```
-Simulation shows that the black line is outside the 95% Confidence interval for all values of r. 
-We can thus reject the null hypothesis for all values of r. 
 
-This makes sense as (Need to find population density file)
+Simulation shows that the black line is outside the 95% Confidence interval for all values of r. We can thus reject the null hypothesis for all values of r.
 
-# 
+This makes sense as 
+
+

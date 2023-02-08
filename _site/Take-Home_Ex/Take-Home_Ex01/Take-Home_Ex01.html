@@ -249,14 +249,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#geospatial-data-wrangling" id="toc-geospatial-data-wrangling" class="nav-link" data-scroll-target="#geospatial-data-wrangling"><span class="toc-section-number">4</span>  Geospatial Data wrangling</a>
   <ul class="collapse">
   <li><a href="#check-duplicates" id="toc-check-duplicates" class="nav-link" data-scroll-target="#check-duplicates"><span class="toc-section-number">4.1</span>  Check duplicates</a></li>
-  <li><a href="#check-crs-of-geonga-and-transform" id="toc-check-crs-of-geonga-and-transform" class="nav-link" data-scroll-target="#check-crs-of-geonga-and-transform"><span class="toc-section-number">4.2</span>  Check CRS of geoNGA and transform</a></li>
-  <li><a href="#plot-geospatial-data" id="toc-plot-geospatial-data" class="nav-link" data-scroll-target="#plot-geospatial-data"><span class="toc-section-number">4.3</span>  Plot Geospatial Data</a></li>
+  <li><a href="#plot-geospatial-data" id="toc-plot-geospatial-data" class="nav-link" data-scroll-target="#plot-geospatial-data"><span class="toc-section-number">4.2</span>  Plot Geospatial Data</a></li>
   </ul></li>
   <li><a href="#aspatial-data-wrangling" id="toc-aspatial-data-wrangling" class="nav-link" data-scroll-target="#aspatial-data-wrangling"><span class="toc-section-number">5</span>  Aspatial Data wrangling</a>
   <ul class="collapse">
   <li><a href="#create-simple-feature-on-wp_nga" id="toc-create-simple-feature-on-wp_nga" class="nav-link" data-scroll-target="#create-simple-feature-on-wp_nga"><span class="toc-section-number">5.1</span>  Create simple feature on wp_nga</a></li>
   <li><a href="#cleaning-up-na-entries-in-aspatial-data" id="toc-cleaning-up-na-entries-in-aspatial-data" class="nav-link" data-scroll-target="#cleaning-up-na-entries-in-aspatial-data"><span class="toc-section-number">5.2</span>  Cleaning up NA entries in aspatial data</a></li>
   <li><a href="#filter-out-functional-and-non-functional-data" id="toc-filter-out-functional-and-non-functional-data" class="nav-link" data-scroll-target="#filter-out-functional-and-non-functional-data"><span class="toc-section-number">5.3</span>  Filter out functional and non-functional data</a></li>
+  <li><a href="#population-data" id="toc-population-data" class="nav-link" data-scroll-target="#population-data"><span class="toc-section-number">5.4</span>  Population Data</a>
+  <ul class="collapse">
+  <li><a href="#load-data-in-and-select-relevant-columns" id="toc-load-data-in-and-select-relevant-columns" class="nav-link" data-scroll-target="#load-data-in-and-select-relevant-columns"><span class="toc-section-number">5.4.1</span>  Load Data in and select relevant columns</a></li>
+  <li><a href="#ensure-names-match-with-osun" id="toc-ensure-names-match-with-osun" class="nav-link" data-scroll-target="#ensure-names-match-with-osun"><span class="toc-section-number">5.4.2</span>  Ensure Names match with osun</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#kernel-density-analysis" id="toc-kernel-density-analysis" class="nav-link" data-scroll-target="#kernel-density-analysis"><span class="toc-section-number">6</span>  Kernel Density Analysis</a>
   <ul class="collapse">
@@ -281,7 +285,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#l-function" id="toc-l-function" class="nav-link" data-scroll-target="#l-function"><span class="toc-section-number">7.3</span>  L Function</a></li>
   </ul></li>
   <li><a href="#performing-complete-spatial-randomness-test" id="toc-performing-complete-spatial-randomness-test" class="nav-link" data-scroll-target="#performing-complete-spatial-randomness-test"><span class="toc-section-number">8</span>  Performing Complete Spatial Randomness Test</a></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="toc-section-number">9</span>  </a></li>
   </ul>
 </nav>
     </div>
@@ -345,15 +348,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="load-geospatial-data-in" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="load-geospatial-data-in"><span class="header-section-number">3.1</span> Load Geospatial data in</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>geoNGA <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial"</span>, <span class="at">layer =</span> <span class="st">"geoBoundaries-NGA-ADM1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>geoNGA2 <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, <span class="at">layer =</span> <span class="st">"nga_admbnda_adm2_osgof_20190417"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `geoBoundaries-NGA-ADM1' from data source 
+<pre><code>Reading layer `nga_admbnda_adm2_osgof_20190417' from data source 
   `/Users/junhaoteo/Documents/junhao2309/IS415/Take-Home_Ex/Take-Home_Ex01/data/geospatial' 
   using driver `ESRI Shapefile'
-Simple feature collection with 37 features and 6 fields
+Simple feature collection with 774 features and 16 fields
 Geometry type: MULTIPOLYGON
 Dimension:     XY
-Bounding box:  xmin: 2.692613 ymin: 4.271484 xmax: 14.67797 ymax: 13.88571
+Bounding box:  xmin: 2.668534 ymin: 4.273007 xmax: 14.67882 ymax: 13.89442
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
@@ -370,64 +373,78 @@ Geodetic CRS:  WGS 84</code></pre>
 <h1 data-number="4"><span class="header-section-number">4</span> Geospatial Data wrangling</h1>
 <section id="check-duplicates" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="check-duplicates"><span class="header-section-number">4.1</span> Check duplicates</h2>
-<p>We have to check the data for any duplicated names. After checking, we can see that there are no duplicates and thus it is safe to proceed</p>
+<p>We have to check the data for any duplicated names. After checking, there are several duplicates and thus we get their indices out and replace them with the corresponding names.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>geoNGA<span class="sc">$</span>shapeName[<span class="fu">duplicated</span>(geoNGA<span class="sc">$</span>shapeName) <span class="sc">==</span> <span class="cn">TRUE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="fu">duplicated</span>(geoNGA2<span class="sc">$</span>ADM2_EN) <span class="sc">==</span> <span class="cn">TRUE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>character(0)</code></pre>
+<pre><code>[1] "Bassa"    "Ifelodun" "Irepodun" "Nasarawa" "Obi"      "Surulere"</code></pre>
 </div>
 </div>
-</section>
-<section id="check-crs-of-geonga-and-transform" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="check-crs-of-geonga-and-transform"><span class="header-section-number">4.2</span> Check CRS of geoNGA and transform</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(geoNGA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>duplicated_LGA <span class="ot">&lt;-</span> geoNGA2<span class="sc">$</span>shapeName[<span class="fu">duplicated</span>(geoNGA2<span class="sc">$</span>shapeName) <span class="sc">==</span> <span class="cn">TRUE</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all the indices with names that are included in the duplicated LGA names</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>duplicated_indices <span class="ot">&lt;-</span> <span class="fu">which</span>(geoNGA2<span class="sc">$</span>shapeName <span class="sc">%in%</span> duplicated_LGA)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">94</span>] <span class="ot">&lt;-</span> <span class="st">"Bassa, Kogi"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">95</span>] <span class="ot">&lt;-</span> <span class="st">"Bassa, Plateau"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">304</span>] <span class="ot">&lt;-</span> <span class="st">"Ifelodun, Kwara"</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">305</span>] <span class="ot">&lt;-</span> <span class="st">"Ifelodun, Osun"</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">355</span>] <span class="ot">&lt;-</span> <span class="st">"Irepodun, Kwara"</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">356</span>] <span class="ot">&lt;-</span> <span class="st">"Irepodun, Osun"</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">519</span>] <span class="ot">&lt;-</span> <span class="st">"Nasarawa, Kano"</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">520</span>] <span class="ot">&lt;-</span> <span class="st">"Nasarawa, Nasarawa"</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">546</span>] <span class="ot">&lt;-</span> <span class="st">"Obi, Benue"</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">547</span>] <span class="ot">&lt;-</span> <span class="st">"Obi, Nasarawa"</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">693</span>] <span class="ot">&lt;-</span> <span class="st">"Surulere, Lagos"</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>geoNGA2<span class="sc">$</span>ADM2_EN[<span class="dv">694</span>] <span class="ot">&lt;-</span> <span class="st">"Surulere, Oyo"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The code chunk below filters out geoNGA2 into Osun state Local Government Area</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>osun_LGA <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Aiyedade"</span>,<span class="st">"Aiyedire"</span>,<span class="st">"Atakumosa East"</span>,   <span class="st">"Atakumosa West"</span>,   </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Ede North"</span>,  <span class="st">"Ede South"</span>,    <span class="st">"Egbedore"</span>, <span class="st">"Ejigbo"</span>,   <span class="st">"Ife Central"</span>,  </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Ife East"</span>,   <span class="st">"Ife North"</span>,    <span class="st">"Ife South"</span>,    <span class="st">"Ifedayo"</span>,  <span class="st">"Ila"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Ifelodun, Osun"</span>,<span class="st">"Irepodun, Osun"</span>,<span class="st">"Ilesha East"</span>,  <span class="st">"Ilesha West"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Irewole"</span>,    <span class="st">"Isokan"</span>,   <span class="st">"Iwo"</span>,  <span class="st">"Obokun"</span>,   <span class="st">"Odo-Otin"</span>, <span class="st">"Ola-oluwa"</span>,    </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Olorunda"</span>,   <span class="st">"Oriade"</span>,   <span class="st">"Orolu"</span>,    <span class="st">"Osogbo"</span>, <span class="st">"Boripe"</span>, <span class="st">"Boluwaduro"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>osun <span class="ot">&lt;-</span> geoNGA2 <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ADM2_EN <span class="sc">%in%</span> osun_LGA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will use st_crs() to check the crs of geoNGA2</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(geoNGA2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Coordinate Reference System:
   User input: WGS 84 
   wkt:
 GEOGCRS["WGS 84",
-    ENSEMBLE["World Geodetic System 1984 ensemble",
-        MEMBER["World Geodetic System 1984 (Transit)"],
-        MEMBER["World Geodetic System 1984 (G730)"],
-        MEMBER["World Geodetic System 1984 (G873)"],
-        MEMBER["World Geodetic System 1984 (G1150)"],
-        MEMBER["World Geodetic System 1984 (G1674)"],
-        MEMBER["World Geodetic System 1984 (G1762)"],
-        MEMBER["World Geodetic System 1984 (G2139)"],
+    DATUM["World Geodetic System 1984",
         ELLIPSOID["WGS 84",6378137,298.257223563,
-            LENGTHUNIT["metre",1]],
-        ENSEMBLEACCURACY[2.0]],
+            LENGTHUNIT["metre",1]]],
     PRIMEM["Greenwich",0,
         ANGLEUNIT["degree",0.0174532925199433]],
     CS[ellipsoidal,2],
-        AXIS["geodetic latitude (Lat)",north,
+        AXIS["latitude",north,
             ORDER[1],
             ANGLEUNIT["degree",0.0174532925199433]],
-        AXIS["geodetic longitude (Lon)",east,
+        AXIS["longitude",east,
             ORDER[2],
             ANGLEUNIT["degree",0.0174532925199433]],
-    USAGE[
-        SCOPE["Horizontal component of 3D system."],
-        AREA["World."],
-        BBOX[-90,-180,90,180]],
     ID["EPSG",4326]]</code></pre>
 </div>
 </div>
-<p>We can see here that currently geoNGA is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.</p>
+<p>We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>geoNGA <span class="ot">&lt;-</span> geoNGA <span class="sc">%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs=</span> <span class="dv">26392</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>osun <span class="ot">&lt;-</span> geoNGA <span class="sc">%&gt;%</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(shapeName <span class="sc">==</span> <span class="st">"Osun"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>osun <span class="ot">&lt;-</span> osun <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">26392</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plot-geospatial-data" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="plot-geospatial-data"><span class="header-section-number">4.3</span> Plot Geospatial Data</h2>
+<section id="plot-geospatial-data" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="plot-geospatial-data"><span class="header-section-number">4.2</span> Plot Geospatial Data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(osun)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(osun)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -438,39 +455,92 @@ GEOGCRS["WGS 84",
 <h2 data-number="5.1" class="anchored" data-anchor-id="create-simple-feature-on-wp_nga"><span class="header-section-number">5.1</span> Create simple feature on wp_nga</h2>
 <p>Using what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wp_nga_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(wp_nga, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"#lon_deg"</span>, <span class="st">"#lat_deg"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">26392</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>wp_nga_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(wp_nga, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"#lon_deg"</span>, <span class="st">"#lat_deg"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">26392</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="cleaning-up-na-entries-in-aspatial-data" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="cleaning-up-na-entries-in-aspatial-data"><span class="header-section-number">5.2</span> Cleaning up NA entries in aspatial data</h2>
 <p>By using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>wp_nga_sf <span class="ot">&lt;-</span> wp_nga_sf <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">status_clean =</span> <span class="st">`</span><span class="at">#status_clean</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(status_clean) <span class="sc">%&gt;%</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status_clean =</span> <span class="fu">replace_na</span>(</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    status_clean, <span class="st">"unknown"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>wp_nga_sf <span class="ot">&lt;-</span> wp_nga_sf <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">status_clean =</span> <span class="st">`</span><span class="at">#status_clean</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(status_clean) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status_clean =</span> <span class="fu">replace_na</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    status_clean, <span class="st">"unknown"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="filter-out-functional-and-non-functional-data" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="filter-out-functional-and-non-functional-data"><span class="header-section-number">5.3</span> Filter out functional and non-functional data</h2>
 <p>By using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>wp_functional <span class="ot">&lt;-</span> wp_nga_sf <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(status_clean <span class="sc">%in%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">"Functional"</span>,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Functional but not in use"</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Functional but needs repair"</span>))</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>wp_nonfunctional <span class="ot">&lt;-</span> wp_nga_sf <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status_clean <span class="sc">%in%</span> </span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">"Abandoned/Decommissioned"</span>,</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Abandoned"</span>,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Non-Functional due to dry season"</span>,</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Non-Functional"</span>,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Non functional due to dry season"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>wp_functional <span class="ot">&lt;-</span> wp_nga_sf <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(status_clean <span class="sc">%in%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">"Functional"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Functional but not in use"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Functional but needs repair"</span>))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>wp_nonfunctional <span class="ot">&lt;-</span> wp_nga_sf <span class="sc">%&gt;%</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status_clean <span class="sc">%in%</span> </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">"Abandoned/Decommissioned"</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Abandoned"</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Non-Functional due to dry season"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Non-Functional"</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Non functional due to dry season"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="population-data" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="population-data"><span class="header-section-number">5.4</span> Population Data</h2>
+<section id="load-data-in-and-select-relevant-columns" class="level3" data-number="5.4.1">
+<h3 data-number="5.4.1" class="anchored" data-anchor-id="load-data-in-and-select-relevant-columns"><span class="header-section-number">5.4.1</span> Load Data in and select relevant columns</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>nga_pop <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/pop_data_nga.csv"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>osun_pop <span class="ot">&lt;-</span> nga_pop <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(nga_pop<span class="sc">$</span><span class="st">`</span><span class="at">State&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Osun"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">ADM2_EN =</span> <span class="st">`</span><span class="at">Local gov. area▲</span><span class="st">`</span>, </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">HASC =</span> <span class="st">`</span><span class="at">HASC&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st">`</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">Capital =</span> <span class="st">`</span><span class="at">Capital&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st">`</span>, </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">Population =</span> <span class="st">`</span><span class="at">Population&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ensure-names-match-with-osun" class="level3" data-number="5.4.2">
+<h3 data-number="5.4.2" class="anchored" data-anchor-id="ensure-names-match-with-osun"><span class="header-section-number">5.4.2</span> Ensure Names match with osun</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>osun_pop[<span class="dv">1</span>,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">"Aiyedade"</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>osun_pop[<span class="dv">3</span>,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">"Atakumosa East"</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>osun_pop[<span class="dv">4</span>,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">"Atakumosa West"</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>osun_pop[<span class="dv">20</span>,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">"Irepodun, Osun"</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>osun_pop[<span class="dv">16</span>,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">"Ifelodun, Osun"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once names have matched, we can merge the tibble as one dataset</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>osun_pop_density <span class="ot">&lt;-</span> osun <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(osun_pop, <span class="at">by =</span> <span class="st">"ADM2_EN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then have the population density of Osun by its local government areas (LGA). The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(osun_pop_density) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"Density"</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"Population Density"</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Population Density of Osun LGA"</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.height =</span> <span class="fl">0.45</span>, </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.width =</span> <span class="fl">0.35</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">type=</span><span class="st">"8star"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_grid</span>(<span class="at">alpha =</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_credits</span>(<span class="st">"Source: http://www.geo-ref.net/ph/nga.htm"</span>, </span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 </section>
 </section>
 <section id="kernel-density-analysis" class="level1" data-number="6">
@@ -479,67 +549,67 @@ GEOGCRS["WGS 84",
 <h2 data-number="6.1" class="anchored" data-anchor-id="converting-object-to-relevant-datatype"><span class="header-section-number">6.1</span> Converting object to relevant datatype</h2>
 <p>We have to convert sf to sp then to ppp so that it is readable by the spatstat package ### Convert sf to sp Spatial class</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>osun_spatial <span class="ot">&lt;-</span> <span class="fu">as</span>(osun, <span class="st">"Spatial"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>wp_functional_spatial <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_functional, <span class="st">"Spatial"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>wp_nonfunctional_spatial <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_nonfunctional, <span class="st">"Spatial"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>osun_spatial <span class="ot">&lt;-</span> <span class="fu">as</span>(osun, <span class="st">"Spatial"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>wp_functional_spatial <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_functional, <span class="st">"Spatial"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>wp_nonfunctional_spatial <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_nonfunctional, <span class="st">"Spatial"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="converting-the-spatial-point-data-frame-into-generic-sp-format" class="level3" data-number="6.1.1">
 <h3 data-number="6.1.1" class="anchored" data-anchor-id="converting-the-spatial-point-data-frame-into-generic-sp-format"><span class="header-section-number">6.1.1</span> Converting the Spatial point data frame into generic SP format</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>osun_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(osun_spatial, <span class="st">"SpatialPolygons"</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>wp_func_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_functional_spatial, <span class="st">"SpatialPoints"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>wp_nonfunc_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_nonfunctional_spatial, <span class="st">"SpatialPoints"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>osun_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(osun_spatial, <span class="st">"SpatialPolygons"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>wp_func_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_functional_spatial, <span class="st">"SpatialPoints"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>wp_nonfunc_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_nonfunctional_spatial, <span class="st">"SpatialPoints"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="convert-sp-to-spatstat-ppp-format" class="level3" data-number="6.1.2">
 <h3 data-number="6.1.2" class="anchored" data-anchor-id="convert-sp-to-spatstat-ppp-format"><span class="header-section-number">6.1.2</span> Convert sp to spatstat ppp format</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>wp_func_ppp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_func_sp, <span class="st">"ppp"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>wp_nonfunc_ppp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_nonfunc_sp, <span class="st">"ppp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>wp_func_ppp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_func_sp, <span class="st">"ppp"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>wp_nonfunc_ppp <span class="ot">&lt;-</span> <span class="fu">as</span>(wp_nonfunc_sp, <span class="st">"ppp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="create-owin-object" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="create-owin-object"><span class="header-section-number">6.2</span> Create owin object</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>osun_owin <span class="ot">&lt;-</span> <span class="fu">as</span>(osun_sp, <span class="st">"owin"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>osun_owin <span class="ot">&lt;-</span> <span class="fu">as</span>(osun_sp, <span class="st">"owin"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="combine-waterpoints-and-study-area-together" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="combine-waterpoints-and-study-area-together"><span class="header-section-number">6.3</span> Combine waterpoints and study area together</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>osun_wpfunc <span class="ot">&lt;-</span> wp_func_ppp[osun_owin]</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>osun_wpnonfunc <span class="ot">&lt;-</span> wp_nonfunc_ppp[osun_owin]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>osun_wpfunc <span class="ot">&lt;-</span> wp_func_ppp[osun_owin]</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>osun_wpnonfunc <span class="ot">&lt;-</span> wp_nonfunc_ppp[osun_owin]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="rescaling" class="level2" data-number="6.4">
 <h2 data-number="6.4" class="anchored" data-anchor-id="rescaling"><span class="header-section-number">6.4</span> Rescaling</h2>
 <p>Before we go on to calculate the kernal density, we should rescale the data as taught in Hands-on Ex 4 Chapter 5.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>osun_wpfunc_km <span class="ot">&lt;-</span> <span class="fu">rescale</span>(osun_wpfunc, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>osun_wpnonfunc_km <span class="ot">&lt;-</span> <span class="fu">rescale</span>(osun_wpnonfunc, <span class="dv">1000</span>, <span class="st">"km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>osun_wpfunc_km <span class="ot">&lt;-</span> <span class="fu">rescale</span>(osun_wpfunc, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>osun_wpnonfunc_km <span class="ot">&lt;-</span> <span class="fu">rescale</span>(osun_wpnonfunc, <span class="dv">1000</span>, <span class="st">"km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="creating-kernal-density-estimate" class="level2" data-number="6.5">
 <h2 data-number="6.5" class="anchored" data-anchor-id="creating-kernal-density-estimate"><span class="header-section-number">6.5</span> Creating Kernal Density Estimate</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>kde_func<span class="ot">&lt;-</span><span class="fu">density</span>(osun_wpfunc_km,</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sigma=</span>bw.diggle,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">edge=</span><span class="cn">TRUE</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel=</span><span class="st">"gaussian"</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>kde_nonfunc <span class="ot">&lt;-</span> <span class="fu">density</span>(osun_wpnonfunc_km,</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sigma=</span>bw.diggle,</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">edge=</span> <span class="cn">TRUE</span>,</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_func, <span class="at">main =</span> <span class="st">"Functional Water Points"</span>)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_nonfunc, <span class="at">main =</span> <span class="st">"Non-Functional Water Points"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>kde_func<span class="ot">&lt;-</span><span class="fu">density</span>(osun_wpfunc_km,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sigma=</span>bw.diggle,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">edge=</span><span class="cn">TRUE</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel=</span><span class="st">"gaussian"</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>kde_nonfunc <span class="ot">&lt;-</span> <span class="fu">density</span>(osun_wpnonfunc_km,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sigma=</span>bw.diggle,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">edge=</span> <span class="cn">TRUE</span>,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_func, <span class="at">main =</span> <span class="st">"Functional Water Points"</span>)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_nonfunc, <span class="at">main =</span> <span class="st">"Non-Functional Water Points"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -547,65 +617,65 @@ GEOGCRS["WGS 84",
 <h2 data-number="6.6" class="anchored" data-anchor-id="convert-kde-output-into-gridded-objects"><span class="header-section-number">6.6</span> Convert KDE output into gridded objects</h2>
 <p>For mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>gridded_osun_wp <span class="ot">&lt;-</span> <span class="fu">as.SpatialGridDataFrame.im</span>(kde_func)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>gridded_osun_nwp <span class="ot">&lt;-</span><span class="fu">as.SpatialGridDataFrame.im</span>(kde_nonfunc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gridded_osun_wp <span class="ot">&lt;-</span> <span class="fu">as.SpatialGridDataFrame.im</span>(kde_func)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>gridded_osun_nwp <span class="ot">&lt;-</span><span class="fu">as.SpatialGridDataFrame.im</span>(kde_nonfunc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="convert-gridded-object-into-raster" class="level2" data-number="6.7">
 <h2 data-number="6.7" class="anchored" data-anchor-id="convert-gridded-object-into-raster"><span class="header-section-number">6.7</span> Convert gridded object into raster</h2>
 <p>After converting the KDE output into a gridded object, we can use raster() from the raster package to then convert it into raster.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>osun_wp_raster <span class="ot">&lt;-</span> <span class="fu">raster</span>(gridded_osun_wp)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>osun_nwp_raster <span class="ot">&lt;-</span> <span class="fu">raster</span>(gridded_osun_nwp)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>osun_wp_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>osun_wp_raster <span class="ot">&lt;-</span> <span class="fu">raster</span>(gridded_osun_wp)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>osun_nwp_raster <span class="ot">&lt;-</span> <span class="fu">raster</span>(gridded_osun_nwp)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>osun_wp_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>class      : RasterLayer 
 dimensions : 128, 128, 16384  (nrow, ncol, ncell)
-resolution : 0.8703851, 0.9616047  (x, y)
-extent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
 crs        : NA 
 source     : memory
 names      : v 
-values     : -3.284724e-15, 28.42001  (min, max)</code></pre>
+values     : -4.734822e-15, 25.49435  (min, max)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>osun_nwp_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>osun_nwp_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>class      : RasterLayer 
 dimensions : 128, 128, 16384  (nrow, ncol, ncell)
-resolution : 0.8703851, 0.9616047  (x, y)
-extent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
 crs        : NA 
 source     : memory
 names      : v 
-values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
+values     : -4.082312e-15, 20.49412  (min, max)</code></pre>
 </div>
 </div>
 <p>The output of the above code chunk shows that crs in both raster object is NA. We have to input the crs = 26392 and ensure the measurements are in “km”.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(osun_wp_raster) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">"+init=EPSG:26392 +units=km"</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(osun_nwp_raster) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">"+init=EPSG:26392 +units=km"</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>osun_wp_raster ; osun_nwp_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(osun_wp_raster) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">"+init=EPSG:26392 +units=km"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(osun_nwp_raster) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">"+init=EPSG:26392 +units=km"</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>osun_wp_raster ; osun_nwp_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>class      : RasterLayer 
 dimensions : 128, 128, 16384  (nrow, ncol, ncell)
-resolution : 0.8703851, 0.9616047  (x, y)
-extent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
 crs        : +init=EPSG:26392 +units=km 
 source     : memory
 names      : v 
-values     : -3.284724e-15, 28.42001  (min, max)</code></pre>
+values     : -4.734822e-15, 25.49435  (min, max)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>class      : RasterLayer 
 dimensions : 128, 128, 16384  (nrow, ncol, ncell)
-resolution : 0.8703851, 0.9616047  (x, y)
-extent     : 179.6345, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
 crs        : +init=EPSG:26392 +units=km 
 source     : memory
 names      : v 
-values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
+values     : -4.082312e-15, 20.49412  (min, max)</code></pre>
 </div>
 </div>
 <p>Now, we can see that the crs has been inputted in.</p>
@@ -614,28 +684,28 @@ values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
 <h2 data-number="6.8" class="anchored" data-anchor-id="visualising-the-data"><span class="header-section-number">6.8</span> Visualising the data</h2>
 <p>The code chunk below visualises the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the map to the specific region, Osun.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"view"</span>) </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_basemap</span>(<span class="at">server =</span><span class="st">"OpenStreetMap"</span>) <span class="sc">+</span> </span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(osun_wp_raster) <span class="sc">+</span> </span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="st">"v"</span>) <span class="sc">+</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Functional Waterpoints Density"</span>, </span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"right"</span>, <span class="st">"Top"</span>), </span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">14</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"view"</span>) </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_basemap</span>(<span class="at">server =</span><span class="st">"OpenStreetMap"</span>) <span class="sc">+</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(osun_wp_raster) <span class="sc">+</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="st">"v"</span>) <span class="sc">+</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Functional Waterpoints Density"</span>, </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"right"</span>, <span class="st">"Top"</span>), </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">14</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-248e579becce3f08d9be" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-248e579becce3f08d9be">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"minZoom":9,"maxZoom":14},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":9,"maxZoom":14,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHsAAACJCAYAAAAMnUdtAAAFa0lEQVR4nO2dv27UQBCHx4gygp6joMkD0ISWK3gW3oKCghdA4glSUPECkUhakCioT0hp/ACRrjcF8uFzbK93d2a9M/P7qih3ttf7eWb/eO1rCGxO1912/d9Ns2+kjiO2Y7CeoewxnPIhuxKWhBPxSIfsARzpNDZKQ5JD268pS7/dk5iNLRNT6anbDr/Xdbdd7DFjjjP1XbeRvabiliKx/yxWWOp2a8q2tN+m2TeQvYIUQXftDV0+f0W7i8uU4kWVqyfUhDwVK4khUqLw7e6dRFEmCZXvrr0hIrTZLti//IQOmgba42Hx85isA9kjxpUbqmxJPv/+uvh5bCcTHTTDjDtwiGxHQPYCW6ZwCVymcQ8pnOhxGncn26toogKyJ+doBe/ZxpTDKnP1K1rppe7TppbBIkv1KtZBm6rk9ng4dXpKSNhC9LhT109VliAUQGLRJXmfNudYVllTh1UMvUrcS7bM2mBhv+uFyi9HbEZkiex+ZUSs6Nw2PPfCipk04Zpg4dhP0+yblKZvszTeHg/07c8vOjzcn/5XOiusXVgwFDS8QCWPOUWq5NP2yUceEJLUHg+zJzle0RFabjP83FuTkduRZeuNp1b81IWQuwqzJEsXMje5sjfvja+pqFpFE+Wl5dIUkR3bxtUsdys4Zhyzhl5rpeRc/THiS6ZUjUxGdsowSoLYMvSizd2HZrqPEFxoHrM2GfAj+mAfZNYFp+zVHTQtqVFLOYnKl/VM9lJUo+OzTIq40sPOzcfZ3ExVYIkImhNXU6ZB50sBXO22ucgG85xkc0Z1TamrBFrO1+0dJC1sMvSSYKuICD0wZ5VNH8YvPZxrj4ezxRLeYHm/B5CBe239E4mdakBLp4qTU5utTfjr6y/0/vt18HtzUmufEZTwoXKcfdfe0NWLZ/Th6k3wu7VLLYnqGTTLixUQ2SOsipZCXHbJB9usINV/Up3GrSIlW3UaT8HjkKvHnWzP7Txm0CpDcr7D7QyaR9TOoIF43LXZNSMdcMnrxse92phnnS13kvp6STlHadnJkb27uKTDwz19/Pkj6sQsi75rb2h3cVmlaKIVj/+kknOFayQ3Y5WQPRnZHAf2Irkn96HCEsPfVVJzXqMB4ikyNx5i7q2FEM1LtbKBDBLCo3cI4eUQWXAIfBAtG9OqekFkOwKyK4a7f6RCds46tqVJDm+rVlTIzvkRU8wB/EeF7DFcEanhQuBM5ck9a4y3y4HXbIBoIFsBXFnUpWxvvfCeJNna22uNb1/gqPMqI1s68nKGcpqpUnbNQ6ISTcDcMXKjG7c4lZEzDKsyssE8OcEWJbt0VHvtNYdI9YBlScqJSetI48qJ+jVjiZ2CbQhFOSLbEKGAhGxHQLYjINsRm76CGvCxZgiWJRvPecWRM9W59CuKa0FkCyDynBbDPrPabES1LtBBY6bmx6Mg2xGQ7QjIdgRkM1Jze00E2a6AbEdANhO1p3AiyHYFZDOhYSUPZDsiKLvrbrsSVy2WDcuz2KnQkJpqovZOGtK4IyDbEWIvl/dKzakcke2I5B+EAY+pOaqJENls1C6aCLKTaY+H09yABtFEBWRbnSzRuNgSv5+diZaoJkpcN940+8bjhaFJ7BRRvfHxyXoTrl32WWTPydN+kuAfj9J4n6Ih+BwL9ZF1Ap7SuHvZRD6EWxBNhKc4F7EiuQczaDNYE00E2ZNYFE1UOI1rGKdbFU1UKLKbZt9MVaLliq0RlsqOmXVL2UdJLF+Aomk8puKG361FvDVEZOdGR789pPPCKttyCrQAi2xI1gHG2QOsX7Tmp0utC4zBdGRD9DlmZUP0Y9TKnpuVA/NUX1njsfacYI639oIKKPVCAADM8Bemaa1IIldT6wAAAABJRU5ErkJggg==",[[8.0969277429486,4.04929731656311],[6.96968506841757,5.0701755886364]],1,null,"tmap401","osun_wp_raster"]},{"method":"addLegend","args":[{"colors":["#FFFFBF","#E4F39A","#BFE47A","#92D067","#66BD63","#30A355"],"labels":["0 to 5","5 to 10","10 to 15","15 to 20","20 to 25","25 to 30"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"unknown","title":"v","extra":null,"layerId":"legend401","className":"info legend osun_wp_raster","group":"osun_wp_raster"}]},{"method":"addLayersControl","args":[[],"osun_wp_raster",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[6.96968506841757,8.0969277429486],"lng":[4.04929731656311,5.0701755886364]},"setView":[[7.53330640568308,4.55973645259976],9,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n\t\t\t\t\t\tfunction(el, x) {\n\t\t\t\t\t\t\tvar tldiv = document.getElementsByClassName(\"leaflet-top leaflet-left\")[0];\n\t\t\t\t\t\t\tvar titlediv = document.createElement('div');\n\t\t\t\t\t\t\ttitlediv.className = \"info legend leaflet-control\";\n\t\t\t\t\t\t\ttitlediv.innerHTML = \"<b>Functional Waterpoints Density<\/b>\";\n\t\t\t\t\t\t\ttldiv.insertBefore(titlediv, tldiv.childNodes[0]);\n\t\t\t\t\t\t}).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-0e3e03fb4484f950bb03" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-0e3e03fb4484f950bb03">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"minZoom":9,"maxZoom":14},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":9,"maxZoom":14,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH0AAACHCAYAAAA7iVZaAAAFmUlEQVR4nO2dPY7cRhCFi4LDBRxY2ShwMqEDJ3bqNeBb6CwOFPgCAgw4d6DIF9hgN5UABYoHBpTMAQRMPg4Mjmkuyf5hVXVV1/uABRb7Qzb79avqLjY5AwEzXK+P1/H7YbgfpM4jdmBQzlT0JbgGAkQ3REr0kb3iQ/QVakLt9fp4Hf92TcC1Y+UKXtOm+d9/VXKiCJR2fu3xU4Mj5zhbwm8dF06n+lya4+yR8+VEh7tjfSM3mLcvFWXg9AyWQv34sxynPp0f6Pj1t2LtKwWiF1ITjn86/CLRlGdste3p/HD7/oVKa5xyvpxaN4GI8tqRGoz3r367pQCIvoFUDuamdE4C0Qto4fzz5UR//f2x+v+XJqGYvZP8Mq0lS6LD6QEJL3rPLl8jtOgRBSdSzulLnSx5C7GkHT2y1rfNna4tQBTBt1CryLXq7Kgib0XQZk6flgW5hLleH6/zL47jljCu5ZfW9NNrliSVMlXyaUnnl+Z4S06WvJOWS07/mROdyLfwLcntN9HwXhJin84Pt5BoWUQrN2GmDMP9UGIUdtFz8yln53Es+0rac76cbl8a59ui5trZw3uNS8+XE7358J5+/eFHOn35fLv/XHJBlqODBHsGurroa5Od6cif/j7n4iwIrjmJM7kbtlaEpY7b2v+1d3OhRzhSmejsnUuMiOIuwVWyVi/O1E5gogvOCZvTLYkyDqzWhRJOOG9MZU2SajfVW8BClYwDddG5Tgbq4RR9M6evCW6xKjXHQxtHUm3l3nNQNZHTCJcconkSfgvuaOs2V6foJZePqIV3z6wJ3sr9lqJOt07vDVdOtzTCwb+Ii95TXk3hZYCbyOkt8+zbT+/YjudlgJsQvUVnjQ8GfvfyG/VztwYTOQeoFGeiCe4lF3NhIrzv5fs/f0/+zZawlnOxxGNf7sN7j7dRp0D0YEg93NlFeAdlrIre4hFioMPq7F0ivGs9wNcDaq/+jpbHLd9+lRT95vRoghO1n/G3qg9gP7lRVJwO4vCCCDP1aNyc3kr4aHVvCzwTes/DhyO5EyTLs+e97CkPSxvwWU7fc8I3H94XXWSvgltncSJXI/zh7kh//Px69feRCjNvP72jw92xeFBrpTrVx5p6DufcuFqyeb1vzc1e10rWTqo+22vrGbdIwkoj5faqg6KCp4eE8MXhHYL7J/uFwBC7H1B7N46E2bJFR32+H4qcbkX4reUQavlp3M3ea5eF3peTqi8amoMJXRuaij6n9SDw7uBcTIlO1F74CLh6EwXggdNYYUWPPMsPK/rh7uhOeC637xbdcz4/ffncuglNMD177/0x5Fr2TupMh/eaLUdacGz/SqUXqfSza8R4Du3e2eN2004HMlSPFrjcBjWOh9OdU2M+iN4BxZ9lq3UioIPYpypDcNukhEd4DwhED0j2Fmhgn9zlG5vTvd2x6olhuB9K1utwegP23jBJfSpm8vx7Tlz7v1GxsoUcTlfAitgjmL0HpEp0hHbfwOnCWAvtRMjpYlgUewRODwhEDwhEDwhEF8LyCgeiBwSiBwSiB6RIdKlPcZqD27SywOkBya4aWZ6NWsVqVS7L6RC8L1Tf9x4Jqy4nQk4XwbLgRAnR4fI+gdOZse5yImXRe11/j2+l8CA4kbLoVl8lEo3VkZmbz1Of6xIJL07fbOSWkPMLjCS6F3HXWN0jtyai9wsGiZw+Fbj0eame8R7VkrthIfRzvPcJa+O9OyCFd7FHUJzJpBfBifCwQ5KexB6B0wPSxOlL7rE4H+jR5USGnG5tSWipLdyoi57qzJ472wqsokNQH6jl9BLBI9f1NRBx3lQkLndrC99zVBJxes8d1gMozsyIMGBdXSB3iI8g8BJuLppD8KgizzFTnJEGgv+He9FzKnkQ/P+46ox5iM+p4UPwDtB6Rh6ArvgHfdze3l5TwW0AAAAASUVORK5CYII=",[[8.0969276180209,4.02096779404885],[6.97066149876609,5.07290480549669]],1,null,"tmap401","osun_wp_raster"]},{"method":"addLegend","args":[{"colors":["#FFFFBF","#E4F39A","#BFE47A","#92D067","#66BD63","#30A355"],"labels":["0 to 5","5 to 10","10 to 15","15 to 20","20 to 25","25 to 30"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"unknown","title":"v","extra":null,"layerId":"legend401","className":"info legend osun_wp_raster","group":"osun_wp_raster"}]},{"method":"addLayersControl","args":[[],"osun_wp_raster",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[6.97066149876609,8.0969276180209],"lng":[4.02096779404885,5.07290480549669]},"setView":[[7.5337945583935,4.54693629977277],9,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n\t\t\t\t\t\tfunction(el, x) {\n\t\t\t\t\t\t\tvar tldiv = document.getElementsByClassName(\"leaflet-top leaflet-left\")[0];\n\t\t\t\t\t\t\tvar titlediv = document.createElement('div');\n\t\t\t\t\t\t\ttitlediv.className = \"info legend leaflet-control\";\n\t\t\t\t\t\t\ttitlediv.innerHTML = \"<b>Functional Waterpoints Density<\/b>\";\n\t\t\t\t\t\t\ttldiv.insertBefore(titlediv, tldiv.childNodes[0]);\n\t\t\t\t\t\t}).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_basemap</span>(<span class="at">server =</span><span class="st">"OpenStreetMap"</span>) <span class="sc">+</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(osun_nwp_raster) <span class="sc">+</span> </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="st">"v"</span>) <span class="sc">+</span> </span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Non-Functional Waterpoints Density"</span>, </span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"right"</span>, <span class="st">"top"</span>), </span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">14</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_basemap</span>(<span class="at">server =</span><span class="st">"OpenStreetMap"</span>) <span class="sc">+</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(osun_nwp_raster) <span class="sc">+</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="st">"v"</span>) <span class="sc">+</span> </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Non-Functional Waterpoints Density"</span>, </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"right"</span>, <span class="st">"top"</span>), </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">14</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-a279293a55a6d725eae2" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-a279293a55a6d725eae2">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"minZoom":9,"maxZoom":14},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":9,"maxZoom":14,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHsAAACJCAYAAAAMnUdtAAAFO0lEQVR4nO2dv27UQBCHxxElIlBRgZCCFLp0tOhaxCvwDjwCPW/AA9DQRmlTA9WVKU6KFAmJKjpewBSJD9/F/3Z3Znd25vdVkXI++/bzzK5nvXZDoDhte9l2fzfNqpHaj9gXg+X0ZR/CKR+ylTAlnIhHOmT34EinoVE6J3lu+yXH0m13FLKxZUIaPXbb/ufa9rIN3WfIfoY+6zaylzTcVCR2/wsVFrvdkmOb+t6mWTWQvYAYQZvtmk6Oz2IObTGHwue6kEeiR2OEmCiUFt1n7vg22zURoc92weunnzBAC2GzXdPnH9+y73OOkKyDNL6Qk+Mz+vgm7z6vbm92+x4idJCJAdo9OQZUuTkcwCGN32NN9BCQPcGSPrMmXMpOLWjUirs+m1O05n5+qMImLnuwRis4ZxtyHFYZa1/RND7WwDkbPmbCoTb6Y4upQBKTPdfAOQSUkHw4qMsxyOu6krmMKZZOJedpU/aVwlgfraHvXtKGKmQTydws4IWlbcdeLkXj5yM0QFj67G4QlONuj9RtYuGaBOHow5tm1cRkwuJFlf6P15wV3j5/QkR3x5siLKVvj5W82z56zz04Jc3dbtP/f6mT4+L6nIiITp+9yDowSx3Isg3QpIVrivpSo+9U2cXT+BI0iSaqd4ZMpWxtcjXAUWJOuvSyWgWzymBka6knhx6DtfnnDq6Jo9kbzUPuTdaAhtIlJ6IL+7TL9AanbJUDNCBDVSnaK1zRjcgWRtOgEbKF0TRYhGxH7GSjv45nLlVrSeXFZ5DANLj0SmCzXe+mKL3hTjYR0Zdfv0sfwiwSqZ/l+R4pWCtvcsK9mAJ9tmK4Ze/SeIklOSlY73clfLjss72C2rhSENnK0VI8GQORrRCp8RMi2xGQ7QjIdkTxChrYR7LecSS9A6CHaitoIBz02YqQDrg92TmiW3vhwTJJkR3zWGaL05ndAv2UEzlHoAW9ZyKUi+tzev/qA8dXVUPs/Hwx2US4HAuF4yYMaeGLvhzi8yIlPeqlYEAWTIQ4Qiqogs8g69Hdjag1XDVwRzheCHOABslSBKdxlFXrBX22I6qQPVWZslx+5R4fVSH76vZmVKrlPpYbPOObAcklTO5XcWpL3ZLZhfWZsBoOAkyDB+iAYCC7AKHdEFcWdSd79f1r8RWgpa4gomRL99eSA7B3Lx/Tzz9/1Q3y5uBoc3WXXjkmIrQ/7WHs+My9SUCzBKL0F8IsYawNUoMMU5yVkRLd6iIbTJMSbLgtqVJiIhyyKydEOtJ45QS9zVjiS0EZ5qIckW2IuYCEbEdANhM1lF8hmwntlT8iRtk1nNmWWfJubSwSyEhKqXPqLYqL9x+zMzCN1oUUyWkc6bsekmRfXJ9XMTDJidaoJkIaZ0ezbFx6OQKyHQHZjGhO4USQ7QrIdgRkM6E9hRNBtisgm4ka6hCQ7YhZ2W172da8tgv8Z3JQUUNq0oT2QRrSuCMg2xGiD5f3iOZUjsh2xIOzEFEdj+aoJkJks6FdNBFks1CDaCLIdgVelp5ILVFNFLlIoGlWjccToyaxQwSNxg9/rDfhtcvei+wxebX/SHDHgwFaJ7ZbKJZbtNYZMAsnfNIP8JTG3csm8iHcgmgiLNmdxIrkDhRVRrAmmgiyB7EomihzGq/hOt2qaKJMkT12CWe5YTXC0tghVbeY78iJ5RNQNI2HNFz/s1rEW0NEdmp0dNtDOi+ssi2nQAuwyIbkOsB1dg/rJ635cql1gSGYjmyI3sesbIh+SLWyS9xYUTvqG+vwWntMMMdTe4ECcjwQAABT/AN19JfmpmPATAAAAABJRU5ErkJggg==",[[8.0969277429486,4.04929731656311],[6.96968506841757,5.0701755886364]],1,null,"tmap401","osun_nwp_raster"]},{"method":"addLegend","args":[{"colors":["#FFFFBF","#DCF090","#B5DF73","#7FC865","#40AA59"],"labels":["0 to 5","5 to 10","10 to 15","15 to 20","20 to 25"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"unknown","title":"v","extra":null,"layerId":"legend401","className":"info legend osun_nwp_raster","group":"osun_nwp_raster"}]},{"method":"addLayersControl","args":[[],"osun_nwp_raster",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[6.96968506841757,8.0969277429486],"lng":[4.04929731656311,5.0701755886364]},"setView":[[7.53330640568308,4.55973645259976],9,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n\t\t\t\t\t\tfunction(el, x) {\n\t\t\t\t\t\t\tvar tldiv = document.getElementsByClassName(\"leaflet-top leaflet-left\")[0];\n\t\t\t\t\t\t\tvar titlediv = document.createElement('div');\n\t\t\t\t\t\t\ttitlediv.className = \"info legend leaflet-control\";\n\t\t\t\t\t\t\ttitlediv.innerHTML = \"<b>Non-Functional Waterpoints Density<\/b>\";\n\t\t\t\t\t\t\ttldiv.insertBefore(titlediv, tldiv.childNodes[0]);\n\t\t\t\t\t\t}).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-66d785208b8407026f2c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-66d785208b8407026f2c">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"minZoom":9,"maxZoom":14},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":9,"maxZoom":14,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH0AAACHCAYAAAA7iVZaAAAFcElEQVR4nO2dPW4TQRTHxyh9oEVCihQkkChScYC0Ua7AHWjoOQcHoKG13KYmncsUliylooqcCyxN1thmd+dj39fM+/+qEAXveH/73ryZnZ1dBGCGrrvr+p8Xi+sF13HYPhjkcyh9CKoLAdINEZPeM1c+pI9Qkmq77q7r/3ZM4NhnpQovadPp35/lHMgDuSe/9PNjF0fK50yJn/pcRHoo70tTIluC0/bFsgwiPYGhVN//LkX2ZrcOl+dXfA3MBNIzKYloKeFTbdvs1vufX4m0plIOT5RmG1LaEbsY37/+uu8CIH2CsQj9/vuncEumya1JIL2ALx8/iR7v4emx+P8OFaGo3oNu5c3NkHREukPcS0+NcgtFHRWu03vLab1HvU8fOsmctxBz2jEHa5MvPWPnVj29S0cbx/EsCp9CbEZOK5V6SOE9hxlnKoOKpVaJBQKWBA+lfKluIHYuRaTnyMiVryF6TF6JVOoLIeX8mZMeQh3iLZJ63lgLua6760qEWJa42i7NjdkXi+tFTqCQS+9FS4qjqAdSRPZ/c3l+lXz3i5uS706e3ufIXm2X4ebidv/vnC+k1bc/PD2GD2/eiQ/b5lzo6uP0Q24ubo+iJ1WkVnfQi+4jXwqTq2EpJUyt/7KwPk0aiq6MtXqnkuFR7hBUU9am0vsU3oVTQhbp1qScFoW1Q3ljKhrpMZnSw7MUNrt1+PDmnXYzzBK9eqwJTeVwTN0ClJE++UG1Cm8N6jUH1RRyJay2S+0mkEAdfEUPwIFpOG6hihZyIJ+x265WgHQhLBWUkO4QSCcklsKtpHjX0je7NWmFH0vhVlK8a+kPT4/h/s+zdjPEwZDNMP3Qj3pyhmSnI8ALZuScwfHY16B0jefL5mClKq4F9OmG4Qo+pHcGrGce3Fo1DFeko3o3CmdddZTeLS59soL1lJ3D/mqCbFuwRzqE+wLVu0NehVDfZAyYxz7SId4PR+ndg/gaqnBuD//16aUH3OzW5nZHHsLKQgZNROfeW3u+bAiKjQq4I73Zx5o0oXikSvVlfJCuh9pdtsMD5+5i5B2rRWORQES/HGIrZ6bwJNzinnEUmN6yCxiJdCALR7AlS0cB1w5ZkW5F/Fg/22L/y0F2etcWP/XsWatTrGI7UUg1oCU4N/EX22goBe2LgOJEW33xziGmpIegL94D2HPGIZSBBemKaI023EpfbZfh+tcP1b3mcusIqmifLZ27P+eKhpuL2/Dt89tw/+e5mU0GUzFdvXNX1bXuHzu3qDOf3jn7vcvzq2LhNd+Bm3XFYKimRzMv7gEyFF8tiHIblEQ8Ir1ySoIP0hsg+122UgcCMrC9VRnCbRMTj/TuEEgnpoYJG6T3hkgdvrFEeg1Xe0vkPm6GSFdg7g2Trrvr5nwG6ZCthrVmmmivJO4hS++r7RLCR7D2tC8mZwSwJDyEwkiH8LrBOJ0Za1EeQghn2g1oFYuyexDpDoF0h0C6QyCdCcsjHEh/wdP9Akh/wdNsIqQ7JEu61It9PKVaDUxGuqdUq0GydMvVKMgjSTqEtwW2/mYCc+/OsCw8hIh0RHmbINKJsR7lIUA6KTUIDwHSXTIqPbU/t7bSE8SZlDUl/lS0p6Kv9ot8dI3cmMTavzCI9OkWXs9l8eZL7VktuhpWO7It3nzRPidzIW187REQo3bZPRiyJdKK8BDwsEOUlmT3INIdohLpQ9FjsR5oMcpDMBTp1mb2LLWFGnHpsZPZ8sm2Aql0CK0DsT49a/cjx/P6ErBE3qEkquiWFt9yVmKJ9JZPWAtgcuYEDxdsVV+Q/O3CDgQPUc2XphDuVfIpZiZnuIHwf1QvPWUmD8KPqepknKb4lDl8CG8AqWfkAWiKvyjFwxfdSjRVAAAAAElFTkSuQmCC",[[8.0969276180209,4.02096779404885],[6.97066149876609,5.07290480549669]],1,null,"tmap401","osun_nwp_raster"]},{"method":"addLegend","args":[{"colors":["#FFFFBF","#DCF090","#B5DF73","#7FC865","#40AA59"],"labels":["0 to 5","5 to 10","10 to 15","15 to 20","20 to 25"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"unknown","title":"v","extra":null,"layerId":"legend401","className":"info legend osun_nwp_raster","group":"osun_nwp_raster"}]},{"method":"addLayersControl","args":[[],"osun_nwp_raster",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[6.97066149876609,8.0969276180209],"lng":[4.02096779404885,5.07290480549669]},"setView":[[7.5337945583935,4.54693629977277],9,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n\t\t\t\t\t\tfunction(el, x) {\n\t\t\t\t\t\t\tvar tldiv = document.getElementsByClassName(\"leaflet-top leaflet-left\")[0];\n\t\t\t\t\t\t\tvar titlediv = document.createElement('div');\n\t\t\t\t\t\t\ttitlediv.className = \"info legend leaflet-control\";\n\t\t\t\t\t\t\ttitlediv.innerHTML = \"<b>Non-Functional Waterpoints Density<\/b>\";\n\t\t\t\t\t\t\ttldiv.insertBefore(titlediv, tldiv.childNodes[0]);\n\t\t\t\t\t\t}).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
 </div>
 </div>
 </section>
@@ -650,12 +720,12 @@ values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
 <p>The nearest-neighbour distance is the measure of the distance between a point and its closest neighboring point.</p>
 <p>Gest() of spatstat package is used to compute the G function</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>G_FWP <span class="ot">&lt;-</span> <span class="fu">Gest</span>(wp_func_ppp, <span class="at">correction =</span> <span class="st">"border"</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>G_NFWP <span class="ot">&lt;-</span> <span class="fu">Gest</span>(wp_nonfunc_ppp, <span class="at">correction =</span> <span class="st">"border"</span>)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(G_FWP, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>)) ; <span class="fu">plot</span>(G_NFWP, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>G_FWP <span class="ot">&lt;-</span> <span class="fu">Gest</span>(wp_func_ppp, <span class="at">correction =</span> <span class="st">"border"</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>G_NFWP <span class="ot">&lt;-</span> <span class="fu">Gest</span>(wp_nonfunc_ppp, <span class="at">correction =</span> <span class="st">"border"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(G_FWP, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>)) ; <span class="fu">plot</span>(G_NFWP, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -663,34 +733,34 @@ values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
 <h2 data-number="7.2" class="anchored" data-anchor-id="f-function"><span class="header-section-number">7.2</span> F function</h2>
 <p>Unlike the G function, the F function in Fest() is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Functional Water Point</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>F_FWP<span class="ot">&lt;-</span> <span class="fu">Fest</span>(wp_func_ppp)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_FWP) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Functional Water Point</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>F_FWP<span class="ot">&lt;-</span> <span class="fu">Fest</span>(wp_func_ppp)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_FWP) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Non-Functional WaterPoints</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>F_NFWP <span class="ot">&lt;-</span> <span class="fu">Fest</span>(wp_nonfunc_ppp)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_NFWP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Non-Functional WaterPoints</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>F_NFWP <span class="ot">&lt;-</span> <span class="fu">Fest</span>(wp_nonfunc_ppp)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_NFWP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="l-function" class="level2" data-number="7.3">
 <h2 data-number="7.3" class="anchored" data-anchor-id="l-function"><span class="header-section-number">7.3</span> L Function</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>L_FWP <span class="ot">&lt;-</span> <span class="fu">Lest</span>(wp_func_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_FWP, .<span class="sc">-</span>r <span class="sc">~</span>r, <span class="at">ylab=</span><span class="st">"L(d)-r"</span>, <span class="at">xlab =</span><span class="st">"d(m)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>L_FWP <span class="ot">&lt;-</span> <span class="fu">Lest</span>(wp_func_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_FWP, .<span class="sc">-</span>r <span class="sc">~</span>r, <span class="at">ylab=</span><span class="st">"L(d)-r"</span>, <span class="at">xlab =</span><span class="st">"d(m)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>L_NFWP <span class="ot">&lt;-</span> <span class="fu">Lest</span>(wp_nonfunc_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_NFWP, .<span class="sc">-</span>r <span class="sc">~</span>r, <span class="at">ylab=</span><span class="st">"L(d)-r"</span>, <span class="at">xlab =</span><span class="st">"d(m)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>L_NFWP <span class="ot">&lt;-</span> <span class="fu">Lest</span>(wp_nonfunc_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_NFWP, .<span class="sc">-</span>r <span class="sc">~</span>r, <span class="at">ylab=</span><span class="st">"L(d)-r"</span>, <span class="at">xlab =</span><span class="st">"d(m)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-25-2.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-31-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -704,7 +774,7 @@ values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
 <p>We will use the 95% confidence level in our test.</p>
 <p>The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>L_FWP_test <span class="ot">&lt;-</span> <span class="fu">envelope</span>(wp_func_ppp, Lest, <span class="at">nsim =</span> <span class="dv">49</span>, <span class="at">rank =</span> <span class="dv">1</span>, <span class="at">glocal=</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>L_FWP_test <span class="ot">&lt;-</span> <span class="fu">envelope</span>(wp_func_ppp, Lest, <span class="at">nsim =</span> <span class="dv">49</span>, <span class="at">rank =</span> <span class="dv">1</span>, <span class="at">glocal=</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generating 49 simulations of CSR  ...
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
@@ -712,16 +782,13 @@ values     : -4.451446e-15, 22.23681  (min, max)</code></pre>
 
 Done.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_FWP_test, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_FWP_test, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex01_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Simulation shows that the black line is outside the 95% Confidence interval for all values of r. We can thus reject the null hypothesis for all values of r.</p>
-<p>This makes sense as (Need to find population density file)</p>
-</section>
-<section id="section" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> </h1>
+<p>This makes sense as</p>
 
 
 </section>
