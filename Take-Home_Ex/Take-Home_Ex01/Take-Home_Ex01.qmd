@@ -81,6 +81,7 @@ geoNGA2$ADM2_EN[694] <- "Surulere, Oyo"
 ```
 
 The code chunk below filters out geoNGA2 into Osun state Local Government Area
+
 ```{r}
 osun_LGA <- c("Aiyedade","Aiyedire","Atakumosa East",	"Atakumosa West",	
               "Ede North",	"Ede South",	"Egbedore",	"Ejigbo",	"Ife Central",	
@@ -93,11 +94,12 @@ osun <- geoNGA2 %>%
 ```
 
 We will use st_crs() to check the crs of geoNGA2
+
 ```{r}
 st_crs(geoNGA2)
 ```
-We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.
 
+We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.
 
 ```{r}
 osun <- osun %>%
@@ -152,9 +154,11 @@ wp_nonfunctional <- wp_nga_sf %>%
              "Non-Functional",
              "Non functional due to dry season"))
 ```
+
 ## Population Data
 
 ### Load Data in and select relevant columns
+
 ```{r}
 nga_pop <- read_csv("data/pop_data_nga.csv")
   
@@ -175,14 +179,16 @@ osun_pop[4,1] <- "Atakumosa West"
 osun_pop[20,1] <- "Irepodun, Osun"
 osun_pop[16,1] <- "Ifelodun, Osun"
 ```
+
 Once names have matched, we can merge the tibble as one dataset
+
 ```{r}
 osun_pop_density <- osun %>%
   left_join(osun_pop, by = "ADM2_EN")
 ```
 
-We can then have the population density of Osun by its local government areas (LGA). 
-The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.
+We can then have the population density of Osun by its local government areas (LGA). The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.
+
 ```{r}
 tmap_mode("plot")
 tm_shape(osun_pop_density) +
@@ -393,6 +399,72 @@ plot(L_FWP_test, xlim = c(0,500))
 
 Simulation shows that the black line is outside the 95% Confidence interval for all values of r. We can thus reject the null hypothesis for all values of r.
 
-This makes sense as 
+This makes sense as we've put together population density with the dot plots of where the functional water points are at.
 
+# Spatial Correlation Analysis
 
+```{r}
+pacman::p_load(sfdep)
+```
+
+## Local Colocation Quotients (LCLQ)
+
+### Preparing nearest neighbours list
+
+st_knn() of sfdep package is used to determine the 6 nearest neighbours for a given point geometry.
+
+```{r}
+nb <- include_self(
+  st_knn(st_geometry(wp_nga_sf),6))
+```
+
+Afterwhich, we will use st_kernel_weights() of sfdep package to derive a weights list by using a kernal function. We will be using the gaussian method and the mathematical equations is:
+
+![](images/image-1645366350.png)
+
+```{r}
+wt <- st_kernel_weights(nb,
+                        wp_nga_sf,
+                        "gaussian",
+                        adaptive = TRUE)
+```
+
+```{r}
+wp_functional$status_clean[1:length(wp_functional$status_clean)] <- "Functional" 
+wp_nonfunctional$status_clean[1:length(wp_nonfunctional$status_clean)] <- "Non-Functional"
+
+A <- wp_functional$status_clean
+
+B <- wp_nonfunctional$status_clean
+
+LCLQ <- local_colocation(A,B, nb, wt, 49)
+
+LCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%
+  na.exclude()
+```
+
+```{r}
+tmap_mode("view")
+tm_shape(osun) +
+  tm_polygons() +
+tm_shape(LCLQ_wp) +
+  tm_dots(col = "Non.Functional",
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5) +
+tm_shape(LCLQ_wp) +
+  tm_dots(col = "p_sim_Non.Functional",
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5)
+```
+
+```{r}
+head(LCLQ_wp, 5)
+```
+
+Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Since p-value is less than 0.05, we can say that Functional and Non-functional water points are independent from each other.
+
+```{r}
+pacman::p_load(spdep)
+```
