@@ -389,9 +389,9 @@ The nearest-neighbour distance is the measure of the distance between a point an
 Gest() of spatstat package is used to compute the G function
 
 ```{r}
-G_FWP <- Gest(wp_func_ppp, correction = "border")
-G_NFWP <- Gest(wp_nonfunc_ppp, correction = "border")
-par(mfrow = c(2,1))
+G_FWP <- Gest(osun_wpfunc, correction = "border")
+G_NFWP <- Gest(osun_wpnonfunc, correction = "border")
+par(mfrow = c(1,2))
 plot(G_FWP, xlim = c(0,500)) ; plot(G_NFWP, xlim = c(0,500))
 ```
 
@@ -401,26 +401,32 @@ Unlike the G function, the F function in Fest() is used to measure the distribut
 
 ```{r}
 # Functional Water Point
-F_FWP<- Fest(wp_func_ppp)
+F_FWP<- Fest(osun_wpfunc)
 plot(F_FWP) 
 ```
 
 ```{r}
 # Non-Functional WaterPoints
-F_NFWP <- Fest(wp_nonfunc_ppp)
+F_NFWP <- Fest(osun_wpnonfunc)
 plot(F_NFWP)
 ```
 
 ## L Function
 
-```{r}
-par(mfrow = c(1,2))
-L_FWP <- Lest(wp_func_ppp, correction = "Ripley")
-plot(L_FWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
 
-L_NFWP <- Lest(wp_nonfunc_ppp, correction = "Ripley")
+```{r, eval=FALSE}
+L_FWP <- Lest(osun_wpfunc, correction = "Ripley")
+plot(L_FWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
+```
+
+![](images/L_FWP.png)
+
+```{r, eval=FALSE}
+L_NFWP <- Lest(osun_wpnonfunc, correction = "Ripley")
 plot(L_NFWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
 ```
+
+![](images/L_NFWP.png)
 
 ## Performing Complete Spatial Randomness Test
 
@@ -435,18 +441,117 @@ H1 : The distribution of functional waterpoints in Osun State are not randomly d
 We will use the 95% confidence level in our test.
 
 The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
-
-```{r}
-L_FWP_test <- envelope(wp_func_ppp, Lest, nsim = 39, rank = 1, glocal= TRUE)
+```{r, eval=FALSE} 
+L_FWP_test <- envelope(osun_wpfunc, Lest, nsim = 39, rank = 1, glocal= TRUE)
 
 plot(L_FWP_test, xlim = c(0,500))
 ```
+
+![](images/Lcross_F.png)
+
+```{r, eval=FALSE}
+L_NFWP_test <- envelope(osun_wpnonfunc, Lest, nsim = 39, rank = 1, glocal= TRUE)
+
+plot(L_NFWP_test, xlim = c(0,500))
+```
+
+![](images/L_NFWP_test.png)
 
 Simulation shows that the black line is outside the 95% Confidence interval for all values of r. We can thus reject the null hypothesis for all values of r.
 
 This makes sense as we've put together population density with the dot plots of where the functional water points are at. From the population density map, we can see clustering of functional waterpoints on the more densely populated local government areas. A more densely populated region would have a greater need and usage of water and the L function helps to ascertain this claim. This is also evident in the non-functional point as well. As to why there are large clusters of non-functional in densely populated regions, one possible reason could be the inability to match number of usage to its maintenance work. However, more data would be required to ascertain this fact.
 
 # Spatial Correlation Analysis
+
+For spatial correlation analysis, we will be using the cross-validation approach to analysing spatial dependence between functional and non-functional waterpoints.
+
+## Creating multipoint ppp
+
+We can set the categorical value as functional and non-functional. The code chunk below replaces all values in status_clean as "Functional" and "Non-Functional" in their respective sf.
+
+```{r}
+wp_functional$status_clean[1:length(wp_functional$status_clean)] <- "Functional"
+wp_nonfunctional$status_clean[1:length(wp_nonfunctional$status_clean)] <- "Non-Functional"
+```
+
+Afterwhich, we can combine them together by using bind_rows from dplyr package.
+
+```{r}
+wp_combined <- bind_rows(wp_functional, wp_nonfunctional)
+wp_combined
+```
+
+Observe that status_clean is a chr type. We have to convert that into a factor type.
+
+```{r}
+wp_combined$status_clean <- as.factor(wp_combined$status_clean)
+wp_combined
+```
+
+Now we have status_clean as a factor, with categorical values, "Functional" and "Non-Functional".
+
+## Conversion of object type
+
+Same steps that were applied in Kernel Density Analysis are applied here. \### Convert sf to sp
+
+```{r}
+wp_combined_sp <- as(wp_combined, "Spatial")
+```
+
+### Convert sp to Spatial Points DF
+
+```{r}
+wp_combined_spdf <- as(wp_combined_sp, "SpatialPointsDataFrame")
+```
+
+### Convert Spatial Points DF to ppp
+
+```{r}
+wp_combined_ppp <- as(wp_combined_spdf, "ppp")
+```
+
+### Combine waterpoints and owin object
+
+```{r}
+wp_combined_owinppp <- wp_combined_ppp[osun_owin]
+```
+
+### Visualizing the data
+
+```{r}
+plot(wp_combined_owinppp, main = "WaterPoints by Category", which.marks = "status_clean")
+```
+
+From the analysis shown above, we can say that both functional and non-functional water points are not randomly distributed. From here, we would like to find out whether these two are dependent on eacho other. Hence, by performing a hypothesis testing, we can find out whether there is spatial dependence between these two categories.
+
+The null and alternative hypothesis are:
+
+Ho : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.
+
+H1 : The distribution of functional and non-functional waterpoints in Osun State are not independent.
+
+We will use the 95% confidence level in our test.
+
+The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
+
+### Cross L-Function Analysis
+
+```{r, eval=FALSE}
+Lcross_wp <- envelope(wp_combined_owinppp,
+                      Lcross,
+                      i = "Functional",
+                      j = "Non-Functional", 
+                      correction = "border",
+                      nsim = 39)
+plot(Lcross_wp, xlim = c(0,10000))
+
+```
+
+![](images/Lcross_wp.png)
+
+Referring to the plot above, we can clearly see that 0 \< r \< 5500 and r \> 6800, there is spatial dependence between the two types of waterpoints. At these values, the result is statistically significant as it is outside the 95% confidence interval, which is the grey envelope.
+
+As for 5500 \< r \< 6800, the L(obs) is within the 95% confidence interval and thus there is spatial independence.
 
 ```{r}
 pacman::p_load(sfdep)
@@ -465,8 +570,6 @@ nb <- include_self(
 
 Afterwhich, we will use st_kernel_weights() of sfdep package to derive a weights list by using a kernal function. We will be using the gaussian method and the mathematical equations is:
 
-![](images/image-1645366350.png)
-
 ```{r}
 wt <- st_kernel_weights(nb,
                         wp_nga_sf,
@@ -477,8 +580,8 @@ wt <- st_kernel_weights(nb,
 The codechunk below categorises all values in wp_functional and wp_nonfunctional to be under one categorical value "Functional" and "Non-Functional" respectively.
 
 ```{r}
-wp_functional[1:length(wp_functional$status_clean)] <- "Functional"
-wp_nonfunctional[1:length(wp_nonfunctional$status_clean)] <- "Non-Functional"
+wp_functional$status_clean[1:length(wp_functional$status_clean)] <- "Functional"
+wp_nonfunctional$status_clean[1:length(wp_nonfunctional$status_clean)] <- "Non-Functional"
 ```
 
 We can then separate out the area of interest, A as Functional and neighbours, B as Non-functional. By using local_colocation() from the sfdep package, we can obtain two new fields under LCLQ, the local colocation quotient and the corresponding p-value.
@@ -493,16 +596,6 @@ LCLQ <- local_colocation(A,B, nb, wt, 39)
 LCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%
   na.exclude()
 ```
-
-The null and alternative hypothesis are:
-
-Ho : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.
-
-H1 : The distribution of functional and non- functional waterpoints in Osun State are not independent.
-
-We will use the 95% confidence level in our test.
-
-The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
 
 ### Visualizing the Local Colocation Points
 
@@ -526,4 +619,4 @@ tm_shape(LCLQ_wp) +
 head(LCLQ_wp, 5)
 ```
 
-Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. The above code chunk outputs the first 5rows of LCLQ_wp. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other.
+Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. The above code chunk outputs the first 5rows of LCLQ_wp. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant.
