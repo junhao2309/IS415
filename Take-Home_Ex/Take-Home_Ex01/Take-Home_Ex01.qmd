@@ -49,10 +49,10 @@ geoNGA2 <- st_read(dsn = "data/geospatial", layer = "nga_admbnda_adm2_osgof_2019
 wp_nga <- read_csv("data/aspatial/WPDX.csv") %>%
   filter(`#clean_adm1` =="Osun")
 ```
+# Data Wrangling
+## Geospatial Data wrangling
 
-# Geospatial Data wrangling
-
-## Check duplicates
+### Check and Amend duplicates
 
 We have to check the data for any duplicated names. After checking, there are several duplicates and thus we get their indices out and replace them with the corresponding names.
 
@@ -93,28 +93,28 @@ osun <- geoNGA2 %>%
   filter(ADM2_EN %in% osun_LGA)
 ```
 
-We will use st_crs() to check the crs of geoNGA2
-
+### Changing Projection System
+We will use st_crs() from the sf package to check the crs of osun
 ```{r}
-st_crs(geoNGA2)
+st_crs(osun)
 ```
 
-We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.
+We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform from the sf package. The code chunk below transforms the data to crs = 26392.
 
 ```{r}
 osun <- osun %>%
   st_transform(crs = 26392)
 ```
 
-## Plot Geospatial Data
+### Plot Geospatial Data
 
 ```{r}
 plot(osun)
 ```
 
-# Aspatial Data wrangling
+## Aspatial Data wrangling
 
-## Create simple feature on wp_nga
+### Create simple feature on wp_nga
 
 Using what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.
 
@@ -123,7 +123,7 @@ wp_nga_sf <- st_as_sf(wp_nga, coords = c("#lon_deg", "#lat_deg"), crs = 4326) %>
   st_transform(crs = 26392)
 ```
 
-## Cleaning up NA entries in aspatial data
+### Cleaning up NA entries in aspatial data
 
 By using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.
 
@@ -135,7 +135,7 @@ wp_nga_sf <- wp_nga_sf %>%
     status_clean, "unknown"))
 ```
 
-## Filter out functional and non-functional data
+### Filter out functional and non-functional data
 
 By using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.
 
@@ -193,8 +193,9 @@ We can then have the population density of Osun by its local government areas (L
 tmap_mode("plot")
 tm_shape(osun_pop_density) +
   tm_fill("Density",
+          n = 8,
           style = "quantile",
-          palette = "Blues",
+          palette = "-Blues",
           title = "Population Density") +
   tm_layout(main.title = "Population Density of Osun LGA",
             main.title.position = "center",
@@ -204,18 +205,30 @@ tm_shape(osun_pop_density) +
   tm_borders(alpha = 0.5) +
   tm_compass(type="8star", size = 2) +
   tm_grid(alpha =0.2) +
-  tm_credits("Source: http://www.geo-ref.net/ph/nga.htm", 
-             position = c("left", "bottom")) +
 tm_shape(wp_functional) +
-  tm_dots(col = "status_clean")
-    
+  tm_dots(col="black",
+          size=0.01,
+          border.col="black",
+           border.lwd=0.5,
+          alpha=0.5)+
+  tm_shape(wp_nonfunctional) +
+  tm_dots(col="red",
+          size=0.01,
+          border.col="black",
+           border.lwd=0.5,
+          alpha=0.5)+
+  tm_credits("Source: http://www.geo-ref.net/ph/nga.htm", 
+             position = c("left", "bottom"))
+
 ```
 
 # Kernel Density Analysis
 
 ## Converting object to relevant datatype
 
-We have to convert sf to sp then to ppp so that it is readable by the spatstat package \### Convert sf to sp Spatial class
+We have to convert sf to sp then to ppp so that it is readable by the spatstat package 
+
+### Convert sf to sp Spatial class
 
 ```{r}
 osun_spatial <- as(osun, "Spatial")
@@ -379,7 +392,7 @@ L_NFWP <- Lest(wp_nonfunc_ppp, correction = "Ripley")
 plot(L_NFWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
 ```
 
-# Performing Complete Spatial Randomness Test
+## Performing Complete Spatial Randomness Test
 
 In running the test, we will be using envelope() from spatstat.
 
@@ -451,6 +464,17 @@ LCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%
   na.exclude()
 ```
 
+
+The null and alternative hypothesis are:
+
+Ho : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.
+
+H1 : The distribution of functional and non- functional waterpoints in Osun State are not independent.
+
+We will use the 95% confidence level in our test.
+
+The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
+
 ### Visualizing the Local Colocation Points
 
 ```{r}
@@ -473,24 +497,4 @@ tm_shape(LCLQ_wp) +
 head(LCLQ_wp, 5)
 ```
 
-Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. 
-Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other. 
-
-```{r}
-pacman::p_load(spdep)
-```
-
-A bonus analysis that is taught in Spatial Weights in Lesson 6 is by using the spdep package.
-
-The null and alternative hypothesis are:
-
-Ho : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.
-
-H1 : The distribution of functional and non- functional waterpoints in Osun State are not independent.
-
-We will use the 95% confidence level in our test.
-
-The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
-```{r}
-K_FWP <-Kest(wp_func_ppp)
-```
+Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other.

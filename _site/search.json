@@ -105,74 +105,123 @@
     "text": "3.2 Load Aspatial Data in\n\nwp_nga <- read_csv(\"data/aspatial/WPDX.csv\") %>%\n  filter(`#clean_adm1` ==\"Osun\")"
   },
   {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-duplicates",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-duplicates",
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#geospatial-data-wrangling",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#geospatial-data-wrangling",
     "title": "Take Home Exercise 1",
-    "section": "4.1 Check duplicates",
-    "text": "4.1 Check duplicates\nWe have to check the data for any duplicated names. After checking, there are several duplicates and thus we get their indices out and replace them with the corresponding names.\n\ngeoNGA2$ADM2_EN[duplicated(geoNGA2$ADM2_EN) == TRUE]\n\n[1] \"Bassa\"    \"Ifelodun\" \"Irepodun\" \"Nasarawa\" \"Obi\"      \"Surulere\"\n\n\n\nduplicated_LGA <- geoNGA2$shapeName[duplicated(geoNGA2$shapeName) == TRUE]\n\n# Get all the indices with names that are included in the duplicated LGA names\nduplicated_indices <- which(geoNGA2$shapeName %in% duplicated_LGA)\n\ngeoNGA2$ADM2_EN[94] <- \"Bassa, Kogi\"\ngeoNGA2$ADM2_EN[95] <- \"Bassa, Plateau\"\ngeoNGA2$ADM2_EN[304] <- \"Ifelodun, Kwara\"\ngeoNGA2$ADM2_EN[305] <- \"Ifelodun, Osun\"\ngeoNGA2$ADM2_EN[355] <- \"Irepodun, Kwara\"\ngeoNGA2$ADM2_EN[356] <- \"Irepodun, Osun\"\ngeoNGA2$ADM2_EN[519] <- \"Nasarawa, Kano\"\ngeoNGA2$ADM2_EN[520] <- \"Nasarawa, Nasarawa\"\ngeoNGA2$ADM2_EN[546] <- \"Obi, Benue\"\ngeoNGA2$ADM2_EN[547] <- \"Obi, Nasarawa\"\ngeoNGA2$ADM2_EN[693] <- \"Surulere, Lagos\"\ngeoNGA2$ADM2_EN[694] <- \"Surulere, Oyo\"\n\nThe code chunk below filters out geoNGA2 into Osun state Local Government Area\n\nosun_LGA <- c(\"Aiyedade\",\"Aiyedire\",\"Atakumosa East\",   \"Atakumosa West\",   \n              \"Ede North\",  \"Ede South\",    \"Egbedore\", \"Ejigbo\",   \"Ife Central\",  \n              \"Ife East\",   \"Ife North\",    \"Ife South\",    \"Ifedayo\",  \"Ila\",\n              \"Ifelodun, Osun\",\"Irepodun, Osun\",\"Ilesha East\",  \"Ilesha West\",\n              \"Irewole\",    \"Isokan\",   \"Iwo\",  \"Obokun\",   \"Odo-Otin\", \"Ola-oluwa\",    \n              \"Olorunda\",   \"Oriade\",   \"Orolu\",    \"Osogbo\", \"Boripe\", \"Boluwaduro\")\nosun <- geoNGA2 %>%\n  filter(ADM2_EN %in% osun_LGA)\n\nWe will use st_crs() to check the crs of geoNGA2\n\nst_crs(geoNGA2)\n\nCoordinate Reference System:\n  User input: WGS 84 \n  wkt:\nGEOGCRS[\"WGS 84\",\n    DATUM[\"World Geodetic System 1984\",\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n            LENGTHUNIT[\"metre\",1]]],\n    PRIMEM[\"Greenwich\",0,\n        ANGLEUNIT[\"degree\",0.0174532925199433]],\n    CS[ellipsoidal,2],\n        AXIS[\"latitude\",north,\n            ORDER[1],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        AXIS[\"longitude\",east,\n            ORDER[2],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n    ID[\"EPSG\",4326]]\n\n\nWe can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.\n\nosun <- osun %>%\n  st_transform(crs = 26392)"
+    "section": "4.1 Geospatial Data wrangling",
+    "text": "4.1 Geospatial Data wrangling\n\n4.1.1 Check and Amend duplicates\nWe have to check the data for any duplicated names. After checking, there are several duplicates and thus we get their indices out and replace them with the corresponding names.\n\ngeoNGA2$ADM2_EN[duplicated(geoNGA2$ADM2_EN) == TRUE]\n\n[1] \"Bassa\"    \"Ifelodun\" \"Irepodun\" \"Nasarawa\" \"Obi\"      \"Surulere\"\n\n\n\nduplicated_LGA <- geoNGA2$shapeName[duplicated(geoNGA2$shapeName) == TRUE]\n\n# Get all the indices with names that are included in the duplicated LGA names\nduplicated_indices <- which(geoNGA2$shapeName %in% duplicated_LGA)\n\ngeoNGA2$ADM2_EN[94] <- \"Bassa, Kogi\"\ngeoNGA2$ADM2_EN[95] <- \"Bassa, Plateau\"\ngeoNGA2$ADM2_EN[304] <- \"Ifelodun, Kwara\"\ngeoNGA2$ADM2_EN[305] <- \"Ifelodun, Osun\"\ngeoNGA2$ADM2_EN[355] <- \"Irepodun, Kwara\"\ngeoNGA2$ADM2_EN[356] <- \"Irepodun, Osun\"\ngeoNGA2$ADM2_EN[519] <- \"Nasarawa, Kano\"\ngeoNGA2$ADM2_EN[520] <- \"Nasarawa, Nasarawa\"\ngeoNGA2$ADM2_EN[546] <- \"Obi, Benue\"\ngeoNGA2$ADM2_EN[547] <- \"Obi, Nasarawa\"\ngeoNGA2$ADM2_EN[693] <- \"Surulere, Lagos\"\ngeoNGA2$ADM2_EN[694] <- \"Surulere, Oyo\"\n\nThe code chunk below filters out geoNGA2 into Osun state Local Government Area\n\nosun_LGA <- c(\"Aiyedade\",\"Aiyedire\",\"Atakumosa East\",   \"Atakumosa West\",   \n              \"Ede North\",  \"Ede South\",    \"Egbedore\", \"Ejigbo\",   \"Ife Central\",  \n              \"Ife East\",   \"Ife North\",    \"Ife South\",    \"Ifedayo\",  \"Ila\",\n              \"Ifelodun, Osun\",\"Irepodun, Osun\",\"Ilesha East\",  \"Ilesha West\",\n              \"Irewole\",    \"Isokan\",   \"Iwo\",  \"Obokun\",   \"Odo-Otin\", \"Ola-oluwa\",    \n              \"Olorunda\",   \"Oriade\",   \"Orolu\",    \"Osogbo\", \"Boripe\", \"Boluwaduro\")\nosun <- geoNGA2 %>%\n  filter(ADM2_EN %in% osun_LGA)\n\n\n\n4.1.2 Changing Projection System\nWe will use st_crs() from the sf package to check the crs of osun\n\nst_crs(osun)\n\nCoordinate Reference System:\n  User input: WGS 84 \n  wkt:\nGEOGCRS[\"WGS 84\",\n    DATUM[\"World Geodetic System 1984\",\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n            LENGTHUNIT[\"metre\",1]]],\n    PRIMEM[\"Greenwich\",0,\n        ANGLEUNIT[\"degree\",0.0174532925199433]],\n    CS[ellipsoidal,2],\n        AXIS[\"latitude\",north,\n            ORDER[1],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        AXIS[\"longitude\",east,\n            ORDER[2],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n    ID[\"EPSG\",4326]]\n\n\nWe can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform from the sf package. The code chunk below transforms the data to crs = 26392.\n\nosun <- osun %>%\n  st_transform(crs = 26392)\n\n\n\n4.1.3 Plot Geospatial Data\n\nplot(osun)"
   },
   {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-crs-of-geonga-and-transform",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#check-crs-of-geonga-and-transform",
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#aspatial-data-wrangling",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#aspatial-data-wrangling",
     "title": "Take Home Exercise 1",
-    "section": "4.2 Check CRS of geoNGA and transform",
-    "text": "4.2 Check CRS of geoNGA and transform\n\nst_crs(geoNGA)\n\nCoordinate Reference System:\n  User input: WGS 84 \n  wkt:\nGEOGCRS[\"WGS 84\",\n    ENSEMBLE[\"World Geodetic System 1984 ensemble\",\n        MEMBER[\"World Geodetic System 1984 (Transit)\"],\n        MEMBER[\"World Geodetic System 1984 (G730)\"],\n        MEMBER[\"World Geodetic System 1984 (G873)\"],\n        MEMBER[\"World Geodetic System 1984 (G1150)\"],\n        MEMBER[\"World Geodetic System 1984 (G1674)\"],\n        MEMBER[\"World Geodetic System 1984 (G1762)\"],\n        MEMBER[\"World Geodetic System 1984 (G2139)\"],\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n            LENGTHUNIT[\"metre\",1]],\n        ENSEMBLEACCURACY[2.0]],\n    PRIMEM[\"Greenwich\",0,\n        ANGLEUNIT[\"degree\",0.0174532925199433]],\n    CS[ellipsoidal,2],\n        AXIS[\"geodetic latitude (Lat)\",north,\n            ORDER[1],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        AXIS[\"geodetic longitude (Lon)\",east,\n            ORDER[2],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n    USAGE[\n        SCOPE[\"Horizontal component of 3D system.\"],\n        AREA[\"World.\"],\n        BBOX[-90,-180,90,180]],\n    ID[\"EPSG\",4326]]\n\n\nWe can see here that currently geoNGA is in EPSG:4326. We have to convert to 26392 by using st_transform. The code chunk below transforms the data to crs = 26392 and is filtered by shapeName to our study area, Osun.\n\ngeoNGA <- geoNGA %>%\n  st_transform(crs= 26392)\nosun <- geoNGA %>%\n  filter(shapeName == \"Osun\")"
+    "section": "4.2 Aspatial Data wrangling",
+    "text": "4.2 Aspatial Data wrangling\n\n4.2.1 Create simple feature on wp_nga\nUsing what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.\n\nwp_nga_sf <- st_as_sf(wp_nga, coords = c(\"#lon_deg\", \"#lat_deg\"), crs = 4326) %>%\n  st_transform(crs = 26392)\n\n\n\n4.2.2 Cleaning up NA entries in aspatial data\nBy using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.\n\nwp_nga_sf <- wp_nga_sf %>%\n  rename(status_clean = `#status_clean`) %>% \n  dplyr::select(status_clean) %>%\n  mutate(status_clean = replace_na(\n    status_clean, \"unknown\"))\n\n\n\n4.2.3 Filter out functional and non-functional data\nBy using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.\n\nwp_functional <- wp_nga_sf %>%\n    filter(status_clean %in%\n           c(\"Functional\",\n             \"Functional but not in use\",\n             \"Functional but needs repair\"))\n\nwp_nonfunctional <- wp_nga_sf %>%\n  filter(status_clean %in% \n           c(\"Abandoned/Decommissioned\",\n             \"Abandoned\",\n             \"Non-Functional due to dry season\",\n             \"Non-Functional\",\n             \"Non functional due to dry season\"))"
   },
   {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#plot-geospatial-data",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#plot-geospatial-data",
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#population-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#population-data",
     "title": "Take Home Exercise 1",
-    "section": "4.2 Plot Geospatial Data",
-    "text": "4.2 Plot Geospatial Data\n\nplot(osun)"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-simple-feature-on-wp_nga",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-simple-feature-on-wp_nga",
-    "title": "Take Home Exercise 1",
-    "section": "5.1 Create simple feature on wp_nga",
-    "text": "5.1 Create simple feature on wp_nga\nUsing what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.\n\nwp_nga_sf <- st_as_sf(wp_nga, coords = c(\"#lon_deg\", \"#lat_deg\"), crs = 4326) %>%\n  st_transform(crs = 26392)"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#cleaning-up-na-entries-in-aspatial-data",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#cleaning-up-na-entries-in-aspatial-data",
-    "title": "Take Home Exercise 1",
-    "section": "5.2 Cleaning up NA entries in aspatial data",
-    "text": "5.2 Cleaning up NA entries in aspatial data\nBy using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.\n\nwp_nga_sf <- wp_nga_sf %>%\n  rename(status_clean = `#status_clean`) %>% \n  dplyr::select(status_clean) %>%\n  mutate(status_clean = replace_na(\n    status_clean, \"unknown\"))"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#filter-out-functional-and-non-functional-data",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#filter-out-functional-and-non-functional-data",
-    "title": "Take Home Exercise 1",
-    "section": "5.3 Filter out functional and non-functional data",
-    "text": "5.3 Filter out functional and non-functional data\nBy using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.\n\nwp_functional <- wp_nga_sf %>%\n    filter(status_clean %in%\n           c(\"Functional\",\n             \"Functional but not in use\",\n             \"Functional but needs repair\"))\n\nwp_nonfunctional <- wp_nga_sf %>%\n  filter(status_clean %in% \n           c(\"Abandoned/Decommissioned\",\n             \"Abandoned\",\n             \"Non-Functional due to dry season\",\n             \"Non-Functional\",\n             \"Non functional due to dry season\"))"
+    "section": "4.3 Population Data",
+    "text": "4.3 Population Data\n\n4.3.1 Load Data in and select relevant columns\n\nnga_pop <- read_csv(\"data/pop_data_nga.csv\")\n  \nosun_pop <- nga_pop %>% \n  filter(nga_pop$`State    ` == \"Osun\") %>%\n  rename(ADM2_EN = `Local gov. area▲`, \n         HASC = `HASC    `,\n         Capital = `Capital     `, \n         Population = `Population    `)\n\n\n\n4.3.2 Ensure Names match with osun\n\nosun_pop[1,1] <- \"Aiyedade\"\nosun_pop[3,1] <- \"Atakumosa East\"\nosun_pop[4,1] <- \"Atakumosa West\"\nosun_pop[20,1] <- \"Irepodun, Osun\"\nosun_pop[16,1] <- \"Ifelodun, Osun\"\n\nOnce names have matched, we can merge the tibble as one dataset\n\nosun_pop_density <- osun %>%\n  left_join(osun_pop, by = \"ADM2_EN\")\n\nWe can then have the population density of Osun by its local government areas (LGA). The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.\n\ntmap_mode(\"plot\")\ntm_shape(osun_pop_density) +\n  tm_fill(\"Density\",\n          n = 8,\n          style = \"quantile\",\n          palette = \"-Blues\",\n          title = \"Population Density\") +\n  tm_layout(main.title = \"Population Density of Osun LGA\",\n            main.title.position = \"center\",\n            legend.height = 0.45, \n            legend.width = 0.35,\n            frame = TRUE) +\n  tm_borders(alpha = 0.5) +\n  tm_compass(type=\"8star\", size = 2) +\n  tm_grid(alpha =0.2) +\ntm_shape(wp_functional) +\n  tm_dots(col=\"black\",\n          size=0.01,\n          border.col=\"black\",\n           border.lwd=0.5,\n          alpha=0.5)+\n  tm_shape(wp_nonfunctional) +\n  tm_dots(col=\"red\",\n          size=0.01,\n          border.col=\"black\",\n           border.lwd=0.5,\n          alpha=0.5)+\n  tm_credits(\"Source: http://www.geo-ref.net/ph/nga.htm\", \n             position = c(\"left\", \"bottom\"))"
   },
   {
     "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#converting-object-to-relevant-datatype",
     "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#converting-object-to-relevant-datatype",
     "title": "Take Home Exercise 1",
-    "section": "6.1 Converting object to relevant datatype",
-    "text": "6.1 Converting object to relevant datatype\nWe have to convert sf to sp then to ppp so that it is readable by the spatstat package ### Convert sf to sp Spatial class\n\nosun_spatial <- as(osun, \"Spatial\")\n\nwp_functional_spatial <- as(wp_functional, \"Spatial\")\nwp_nonfunctional_spatial <- as(wp_nonfunctional, \"Spatial\")\n\n\n6.1.1 Converting the Spatial point data frame into generic SP format\n\nosun_sp <- as(osun_spatial, \"SpatialPolygons\")\nwp_func_sp <- as(wp_functional_spatial, \"SpatialPoints\")\nwp_nonfunc_sp <- as(wp_nonfunctional_spatial, \"SpatialPoints\")\n\n\n\n6.1.2 Convert sp to spatstat ppp format\n\nwp_func_ppp <- as(wp_func_sp, \"ppp\")\nwp_nonfunc_ppp <- as(wp_nonfunc_sp, \"ppp\")"
+    "section": "5.1 Converting object to relevant datatype",
+    "text": "5.1 Converting object to relevant datatype\nWe have to convert sf to sp then to ppp so that it is readable by the spatstat package\n\n5.1.1 Convert sf to sp Spatial class\n\nosun_spatial <- as(osun, \"Spatial\")\n\nwp_functional_spatial <- as(wp_functional, \"Spatial\")\nwp_nonfunctional_spatial <- as(wp_nonfunctional, \"Spatial\")\n\n\n\n5.1.2 Converting the Spatial point data frame into generic SP format\n\nosun_sp <- as(osun_spatial, \"SpatialPolygons\")\nwp_func_sp <- as(wp_functional_spatial, \"SpatialPoints\")\nwp_nonfunc_sp <- as(wp_nonfunctional_spatial, \"SpatialPoints\")\n\n\n\n5.1.3 Convert sp to spatstat ppp format\n\nwp_func_ppp <- as(wp_func_sp, \"ppp\")\nwp_nonfunc_ppp <- as(wp_nonfunc_sp, \"ppp\")"
   },
   {
     "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-owin-object",
     "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-owin-object",
     "title": "Take Home Exercise 1",
-    "section": "6.2 Create owin object",
-    "text": "6.2 Create owin object\n\nosun_owin <- as(osun_sp, \"owin\")"
+    "section": "5.2 Create owin object",
+    "text": "5.2 Create owin object\n\nosun_owin <- as(osun_sp, \"owin\")"
   },
   {
     "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#combine-waterpoints-and-study-area-together",
     "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#combine-waterpoints-and-study-area-together",
     "title": "Take Home Exercise 1",
-    "section": "6.3 Combine waterpoints and study area together",
-    "text": "6.3 Combine waterpoints and study area together\n\nosun_wpfunc <- wp_func_ppp[osun_owin]\n\nosun_wpnonfunc <- wp_nonfunc_ppp[osun_owin]"
+    "section": "5.3 Combine waterpoints and study area together",
+    "text": "5.3 Combine waterpoints and study area together\n\nosun_wpfunc <- wp_func_ppp[osun_owin]\n\nosun_wpnonfunc <- wp_nonfunc_ppp[osun_owin]"
   },
   {
     "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#rescaling",
     "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#rescaling",
     "title": "Take Home Exercise 1",
-    "section": "6.4 Rescaling",
-    "text": "6.4 Rescaling\nBefore we go on to calculate the kernal density, we should rescale the data as taught in Hands-on Ex 4 Chapter 5.\n\nosun_wpfunc_km <- rescale(osun_wpfunc, 1000, \"km\")\nosun_wpnonfunc_km <- rescale(osun_wpnonfunc, 1000, \"km\")"
+    "section": "5.4 Rescaling",
+    "text": "5.4 Rescaling\nBefore we go on to calculate the kernal density, we should rescale the data as taught in Hands-on Ex 4 Chapter 5.\n\nosun_wpfunc_km <- rescale(osun_wpfunc, 1000, \"km\")\nosun_wpnonfunc_km <- rescale(osun_wpnonfunc, 1000, \"km\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#creating-kernal-density-estimate",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#creating-kernal-density-estimate",
+    "title": "Take Home Exercise 1",
+    "section": "5.5 Creating Kernal Density Estimate",
+    "text": "5.5 Creating Kernal Density Estimate\n\nkde_func<-density(osun_wpfunc_km,\n                  sigma=bw.diggle,\n                  edge=TRUE,\n                  kernel=\"gaussian\")\n\nkde_nonfunc <- density(osun_wpnonfunc_km,\n                       sigma=bw.diggle,\n                       edge= TRUE,\n                       kernel = \"gaussian\")\n\npar(mfrow = c(1,2))\nplot(kde_func, main = \"Functional Water Points\")\nplot(kde_nonfunc, main = \"Non-Functional Water Points\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-kde-output-into-gridded-objects",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-kde-output-into-gridded-objects",
+    "title": "Take Home Exercise 1",
+    "section": "5.6 Convert KDE output into gridded objects",
+    "text": "5.6 Convert KDE output into gridded objects\nFor mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster\n\ngridded_osun_wp <- as.SpatialGridDataFrame.im(kde_func)\ngridded_osun_nwp <-as.SpatialGridDataFrame.im(kde_nonfunc)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-gridded-object-into-raster",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-gridded-object-into-raster",
+    "title": "Take Home Exercise 1",
+    "section": "5.7 Convert gridded object into raster",
+    "text": "5.7 Convert gridded object into raster\nAfter converting the KDE output into a gridded object, we can use raster() from the raster package to then convert it into raster.\n\nosun_wp_raster <- raster(gridded_osun_wp)\nosun_nwp_raster <- raster(gridded_osun_nwp)\n\nosun_wp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : NA \nsource     : memory\nnames      : v \nvalues     : -4.734822e-15, 25.49435  (min, max)\n\nosun_nwp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : NA \nsource     : memory\nnames      : v \nvalues     : -4.082312e-15, 20.49412  (min, max)\n\n\nThe output of the above code chunk shows that crs in both raster object is NA. We have to input the crs = 26392 and ensure the measurements are in “km”.\n\nprojection(osun_wp_raster) <- CRS(\"+init=EPSG:26392 +units=km\")\nprojection(osun_nwp_raster) <- CRS(\"+init=EPSG:26392 +units=km\")\n\nosun_wp_raster ; osun_nwp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : +init=EPSG:26392 +units=km \nsource     : memory\nnames      : v \nvalues     : -4.734822e-15, 25.49435  (min, max)\n\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : +init=EPSG:26392 +units=km \nsource     : memory\nnames      : v \nvalues     : -4.082312e-15, 20.49412  (min, max)\n\n\nNow, we can see that the crs has been inputted in."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#visualising-the-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#visualising-the-data",
+    "title": "Take Home Exercise 1",
+    "section": "5.8 Visualising the data",
+    "text": "5.8 Visualising the data\nThe code chunk below visualises the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the map to the specific region, Osun.\n\ntmap_mode(\"view\") \ntm_basemap(server =\"OpenStreetMap\") + \n  tm_shape(osun_wp_raster) + \n  tm_raster(\"v\") +\n  tm_layout(title = \"Functional Waterpoints Density\", \n            legend.position = c(\"right\", \"Top\"), \n            frame = FALSE) +\n  tm_view(set.zoom.limits =c(9,14))\n\n\n\n\ntm_basemap(server =\"OpenStreetMap\") + \n  tm_shape(osun_nwp_raster) + \n  tm_raster(\"v\") + \n  tm_layout(title = \"Non-Functional Waterpoints Density\", \n            legend.position = c(\"right\", \"top\"), \n            frame = FALSE) +\n  tm_view(set.zoom.limits =c(9,14))"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#advantages-of-kernal-density-map-over-point-map",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#advantages-of-kernal-density-map-over-point-map",
+    "title": "Take Home Exercise 1",
+    "section": "5.9 Advantages of Kernal Density Map over Point Map",
+    "text": "5.9 Advantages of Kernal Density Map over Point Map"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#g-function",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#g-function",
+    "title": "Take Home Exercise 1",
+    "section": "6.1 G-function",
+    "text": "6.1 G-function\nThe nearest-neighbour distance is the measure of the distance between a point and its closest neighboring point.\nGest() of spatstat package is used to compute the G function\n\nG_FWP <- Gest(wp_func_ppp, correction = \"border\")\nG_NFWP <- Gest(wp_nonfunc_ppp, correction = \"border\")\npar(mfrow = c(2,1))\nplot(G_FWP, xlim = c(0,500)) ; plot(G_NFWP, xlim = c(0,500))"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#f-function",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#f-function",
+    "title": "Take Home Exercise 1",
+    "section": "6.2 F function",
+    "text": "6.2 F function\nUnlike the G function, the F function in Fest() is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:\n\n# Functional Water Point\nF_FWP<- Fest(wp_func_ppp)\nplot(F_FWP) \n\n\n\n\n\n# Non-Functional WaterPoints\nF_NFWP <- Fest(wp_nonfunc_ppp)\nplot(F_NFWP)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#l-function",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#l-function",
+    "title": "Take Home Exercise 1",
+    "section": "6.3 L Function",
+    "text": "6.3 L Function\n\nL_FWP <- Lest(wp_func_ppp, correction = \"Ripley\")\nplot(L_FWP, .-r ~r, ylab=\"L(d)-r\", xlab =\"d(m)\")\n\n\n\nL_NFWP <- Lest(wp_nonfunc_ppp, correction = \"Ripley\")\nplot(L_NFWP, .-r ~r, ylab=\"L(d)-r\", xlab =\"d(m)\")"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#performing-complete-spatial-randomness-test",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#performing-complete-spatial-randomness-test",
+    "title": "Take Home Exercise 1",
+    "section": "6.4 Performing Complete Spatial Randomness Test",
+    "text": "6.4 Performing Complete Spatial Randomness Test\nIn running the test, we will be using envelope() from spatstat.\nThe null and alternative hypothesis are:\nHo : The distribution of functional waterpoints in Osun State are randomly distributed\nH1 : The distribution of functional waterpoints in Osun State are not randomly distributed\nWe will use the 95% confidence level in our test.\nThe null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.\n\nL_FWP_test <- envelope(wp_func_ppp, Lest, nsim = 49, rank = 1, glocal= TRUE)\n\nGenerating 49 simulations of CSR  ...\n1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,\n41, 42, 43, 44, 45, 46, 47, 48,  49.\n\nDone.\n\nplot(L_FWP_test, xlim = c(0,500))\n\n\n\n\nSimulation shows that the black line is outside the 95% Confidence interval for all values of r. We can thus reject the null hypothesis for all values of r.\nThis makes sense as we’ve put together population density with the dot plots of where the functional water points are at."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#local-colocation-quotients-lclq",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#local-colocation-quotients-lclq",
+    "title": "Take Home Exercise 1",
+    "section": "7.1 Local Colocation Quotients (LCLQ)",
+    "text": "7.1 Local Colocation Quotients (LCLQ)\n\n7.1.1 Preparing nearest neighbours list\nst_knn() of sfdep package is used to determine the 6 nearest neighbours for a given point geometry.\n\nnb <- include_self(\n  st_knn(st_geometry(wp_nga_sf),6))\n\nAfterwhich, we will use st_kernel_weights() of sfdep package to derive a weights list by using a kernal function. We will be using the gaussian method and the mathematical equations is:\n\n\nwt <- st_kernel_weights(nb,\n                        wp_nga_sf,\n                        \"gaussian\",\n                        adaptive = TRUE)\n\nThe codechunk below categorises all values in wp_functional and wp_nonfunctional to be under one categorical value “Functional” and “Non-Functional” respectively.\n\nwp_functional[1:length(wp_functional$status_clean)] <- \"Functional\"\nwp_nonfunctional[1:length(wp_nonfunctional$status_clean)] <- \"Non-Functional\"\n\nWe can then separate out the area of interest, A as Functional and neighbours, B as Non-functional. By using local_colocation() from the sfdep package, we can obtain two new fields under LCLQ, the local colocation quotient and the corresponding p-value.\n\nA <- wp_functional$status_clean\n\nB <- wp_nonfunctional$status_clean\n\nLCLQ <- local_colocation(A,B, nb, wt, 49)\n\nLCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%\n  na.exclude()\n\nThe null and alternative hypothesis are:\nHo : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.\nH1 : The distribution of functional and non- functional waterpoints in Osun State are not independent.\nWe will use the 95% confidence level in our test.\nThe null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.\n\n\n7.1.2 Visualizing the Local Colocation Points\n\ntmap_mode(\"view\")\ntm_shape(osun) +\n  tm_polygons() +\ntm_shape(LCLQ_wp) +\n  tm_dots(col = \"Non.Functional\",\n          size = 0.01,\n          border.col = \"black\",\n          border.lwd = 0.5) +\ntm_shape(LCLQ_wp) +\n  tm_dots(col = \"p_sim_Non.Functional\",\n          size = 0.01,\n          border.col = \"black\",\n          border.lwd = 0.5)\n\n\n\n\n\n\n\nhead(LCLQ_wp, 5)\n\nSimple feature collection with 5 features and 3 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: 221313 ymin: 385885.5 xmax: 234473.1 ymax: 415812.3\nProjected CRS: Minna / Nigeria Mid Belt\n    status_clean Non.Functional p_sim_Non.Functional                  geometry\n63    Functional      0.9995411                 0.02 POINT (231125.9 393750.4)\n118   Functional      0.9995411                 0.02 POINT (222265.4 415305.4)\n119   Functional      0.9995411                 0.02 POINT (231020.5 415812.3)\n149   Functional      0.9995411                 0.02 POINT (234473.1 385885.5)\n263   Functional      0.9995411                 0.02   POINT (221313 415050.5)\n\n\nDue to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other."
   },
   {
     "objectID": "In-class_Ex/In-class_Ex03/In-class_Ex03.html",
@@ -292,75 +341,5 @@
     "title": "In Class Exercise 2: Geospatial Data Wrangling",
     "section": "6.3 Visualing attributes by using statistical graph",
     "text": "6.3 Visualing attributes by using statistical graph\n\n\nShow code\nggplot(data = NGA_wp,\n       aes(x = total_wp)) +\n  geom_histogram(bins = 20, \n                 color = \"black\",\n                 fill =\"light blue\") +\n  geom_vline(aes(xintercept=mean(total_wp, na.rm=T)),\n             color = \"red\", linetype=\"dashed\", size = 0.8) +\n  xlab(\"No of water points\") +\n  ylab(\"No. of\\nLGAs\") +\n  theme(axis.title.y = element_text(angle = 0))\n\n\n\n\n\n\n\nShow code\nwrite_rds(NGA_wp, \"data/rds/NGA_wp.rds\")"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#creating-kernal-density-estimate",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#creating-kernal-density-estimate",
-    "title": "Take Home Exercise 1",
-    "section": "6.5 Creating Kernal Density Estimate",
-    "text": "6.5 Creating Kernal Density Estimate\n\nkde_func<-density(osun_wpfunc_km,\n                  sigma=bw.diggle,\n                  edge=TRUE,\n                  kernel=\"gaussian\")\n\nkde_nonfunc <- density(osun_wpnonfunc_km,\n                       sigma=bw.diggle,\n                       edge= TRUE,\n                       kernel = \"gaussian\")\n\npar(mfrow = c(1,2))\nplot(kde_func, main = \"Functional Water Points\")\nplot(kde_nonfunc, main = \"Non-Functional Water Points\")"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-kde-output-into-gridded-objects",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-kde-output-into-gridded-objects",
-    "title": "Take Home Exercise 1",
-    "section": "6.6 Convert KDE output into gridded objects",
-    "text": "6.6 Convert KDE output into gridded objects\nFor mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster\n\ngridded_osun_wp <- as.SpatialGridDataFrame.im(kde_func)\ngridded_osun_nwp <-as.SpatialGridDataFrame.im(kde_nonfunc)"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-gridded-object-into-raster",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#convert-gridded-object-into-raster",
-    "title": "Take Home Exercise 1",
-    "section": "6.7 Convert gridded object into raster",
-    "text": "6.7 Convert gridded object into raster\nAfter converting the KDE output into a gridded object, we can use raster() from the raster package to then convert it into raster.\n\nosun_wp_raster <- raster(gridded_osun_wp)\nosun_nwp_raster <- raster(gridded_osun_nwp)\n\nosun_wp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : NA \nsource     : memory\nnames      : v \nvalues     : -4.734822e-15, 25.49435  (min, max)\n\nosun_nwp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : NA \nsource     : memory\nnames      : v \nvalues     : -4.082312e-15, 20.49412  (min, max)\n\n\nThe output of the above code chunk shows that crs in both raster object is NA. We have to input the crs = 26392 and ensure the measurements are in “km”.\n\nprojection(osun_wp_raster) <- CRS(\"+init=EPSG:26392 +units=km\")\nprojection(osun_nwp_raster) <- CRS(\"+init=EPSG:26392 +units=km\")\n\nosun_wp_raster ; osun_nwp_raster\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : +init=EPSG:26392 +units=km \nsource     : memory\nnames      : v \nvalues     : -4.734822e-15, 25.49435  (min, max)\n\n\nclass      : RasterLayer \ndimensions : 128, 128, 16384  (nrow, ncol, ncell)\nresolution : 0.8948485, 0.9616045  (x, y)\nextent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)\ncrs        : +init=EPSG:26392 +units=km \nsource     : memory\nnames      : v \nvalues     : -4.082312e-15, 20.49412  (min, max)\n\n\nNow, we can see that the crs has been inputted in."
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#visualising-the-data",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#visualising-the-data",
-    "title": "Take Home Exercise 1",
-    "section": "6.8 Visualising the data",
-    "text": "6.8 Visualising the data\nThe code chunk below visualises the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the map to the specific region, Osun.\n\ntmap_mode(\"view\") \ntm_basemap(server =\"OpenStreetMap\") + \n  tm_shape(osun_wp_raster) + \n  tm_raster(\"v\") +\n  tm_layout(title = \"Functional Waterpoints Density\", \n            legend.position = c(\"right\", \"Top\"), \n            frame = FALSE) +\n  tm_view(set.zoom.limits =c(9,14))\n\n\n\n\ntm_basemap(server =\"OpenStreetMap\") + \n  tm_shape(osun_nwp_raster) + \n  tm_raster(\"v\") + \n  tm_layout(title = \"Non-Functional Waterpoints Density\", \n            legend.position = c(\"right\", \"top\"), \n            frame = FALSE) +\n  tm_view(set.zoom.limits =c(9,14))"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#advantages-of-kernal-density-map-over-point-map",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#advantages-of-kernal-density-map-over-point-map",
-    "title": "Take Home Exercise 1",
-    "section": "6.9 Advantages of Kernal Density Map over Point Map",
-    "text": "6.9 Advantages of Kernal Density Map over Point Map"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#g-function",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#g-function",
-    "title": "Take Home Exercise 1",
-    "section": "7.1 G-function",
-    "text": "7.1 G-function\nThe nearest-neighbour distance is the measure of the distance between a point and its closest neighboring point.\nGest() of spatstat package is used to compute the G function\n\nG_FWP <- Gest(wp_func_ppp, correction = \"border\")\nG_NFWP <- Gest(wp_nonfunc_ppp, correction = \"border\")\npar(mfrow = c(2,1))\nplot(G_FWP, xlim = c(0,500)) ; plot(G_NFWP, xlim = c(0,500))"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#f-function",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#f-function",
-    "title": "Take Home Exercise 1",
-    "section": "7.2 F function",
-    "text": "7.2 F function\nUnlike the G function, the F function in Fest() is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:\n\n# Functional Water Point\nF_FWP<- Fest(wp_func_ppp)\nplot(F_FWP) \n\n\n\n\n\n# Non-Functional WaterPoints\nF_NFWP <- Fest(wp_nonfunc_ppp)\nplot(F_NFWP)"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#l-function",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#l-function",
-    "title": "Take Home Exercise 1",
-    "section": "7.3 L Function",
-    "text": "7.3 L Function\n\nL_FWP <- Lest(wp_func_ppp, correction = \"Ripley\")\nplot(L_FWP, .-r ~r, ylab=\"L(d)-r\", xlab =\"d(m)\")\n\n\n\nL_NFWP <- Lest(wp_nonfunc_ppp, correction = \"Ripley\")\nplot(L_NFWP, .-r ~r, ylab=\"L(d)-r\", xlab =\"d(m)\")"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#population-data",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#population-data",
-    "title": "Take Home Exercise 1",
-    "section": "5.4 Population Data",
-    "text": "5.4 Population Data\n\n5.4.1 Load Data in and select relevant columns\n\nnga_pop <- read_csv(\"data/pop_data_nga.csv\")\n  \nosun_pop <- nga_pop %>% \n  filter(nga_pop$`State    ` == \"Osun\") %>%\n  rename(ADM2_EN = `Local gov. area▲`, \n         HASC = `HASC    `,\n         Capital = `Capital     `, \n         Population = `Population    `)\n\n\n\n5.4.2 Ensure Names match with osun\n\nosun_pop[1,1] <- \"Aiyedade\"\nosun_pop[3,1] <- \"Atakumosa East\"\nosun_pop[4,1] <- \"Atakumosa West\"\nosun_pop[20,1] <- \"Irepodun, Osun\"\nosun_pop[16,1] <- \"Ifelodun, Osun\"\n\nOnce names have matched, we can merge the tibble as one dataset\n\nosun_pop_density <- osun %>%\n  left_join(osun_pop, by = \"ADM2_EN\")\n\nWe can then have the population density of Osun by its local government areas (LGA). The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.\n\ntmap_mode(\"plot\")\ntm_shape(osun_pop_density) +\n  tm_fill(\"Density\",\n          style = \"quantile\",\n          palette = \"Blues\",\n          title = \"Population Density\") +\n  tm_layout(main.title = \"Population Density of Osun LGA\",\n            main.title.position = \"center\",\n            legend.height = 0.45, \n            legend.width = 0.35,\n            frame = TRUE) +\n  tm_borders(alpha = 0.5) +\n  tm_compass(type=\"8star\", size = 2) +\n  tm_grid(alpha =0.2) +\n  tm_credits(\"Source: http://www.geo-ref.net/ph/nga.htm\", \n             position = c(\"left\", \"bottom\")) +\ntm_shape(wp_functional) +\n  tm_dots(col = \"status_clean\")"
-  },
-  {
-    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#local-colocation-quotients-lclq",
-    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#local-colocation-quotients-lclq",
-    "title": "Take Home Exercise 1",
-    "section": "9.1 Local Colocation Quotients (LCLQ)",
-    "text": "9.1 Local Colocation Quotients (LCLQ)\n\n9.1.1 Preparing nearest neighbours list\nst_knn() of sfdep package is used to determine the 6 nearest neighbours for a given point geometry.\n\nnb <- include_self(\n  st_knn(st_geometry(wp_nga_sf),6))\n\nAfterwhich, we will use st_kernel_weights() of sfdep package to derive a weights list by using a kernal function. We will be using the gaussian method and the mathematical equations is:\n\n\nwt <- st_kernel_weights(nb,\n                        wp_nga_sf,\n                        \"gaussian\",\n                        adaptive = TRUE)\n\nThe codechunk below categorises all values in wp_functional and wp_nonfunctional to be under one categorical value “Functional” and “Non-Functional” respectively.\n\nwp_functional[1:length(wp_functional$status_clean)] <- \"Functional\"\nwp_nonfunctional[1:length(wp_nonfunctional$status_clean)] <- \"Non-Functional\"\n\nWe can then separate out the area of interest, A as Functional and neighbours, B as Non-functional. By using local_colocation() from the sfdep package, we can obtain two new fields under LCLQ, the local colocation quotient and the corresponding p-value.\n\nA <- wp_functional$status_clean\n\nB <- wp_nonfunctional$status_clean\n\nLCLQ <- local_colocation(A,B, nb, wt, 49)\n\nLCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%\n  na.exclude()\n\n\n\n9.1.2 Visualizing the Local Colocation Points\n\ntmap_mode(\"view\")\ntm_shape(osun) +\n  tm_polygons() +\ntm_shape(LCLQ_wp) +\n  tm_dots(col = \"Non.Functional\",\n          size = 0.01,\n          border.col = \"black\",\n          border.lwd = 0.5) +\ntm_shape(LCLQ_wp) +\n  tm_dots(col = \"p_sim_Non.Functional\",\n          size = 0.01,\n          border.col = \"black\",\n          border.lwd = 0.5)\n\n\n\n\n\n\n\nhead(LCLQ_wp, 5)\n\nSimple feature collection with 5 features and 3 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: 221313 ymin: 385885.5 xmax: 234473.1 ymax: 415812.3\nProjected CRS: Minna / Nigeria Mid Belt\n    status_clean Non.Functional p_sim_Non.Functional                  geometry\n63    Functional      0.9995411                 0.02 POINT (231125.9 393750.4)\n118   Functional      0.9995411                 0.02 POINT (222265.4 415305.4)\n119   Functional      0.9995411                 0.02 POINT (231020.5 415812.3)\n149   Functional      0.9995411                 0.02 POINT (234473.1 385885.5)\n263   Functional      0.9995411                 0.02   POINT (221313 415050.5)\n\n\nDue to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other.\n\npacman::p_load(spdep)\n\nA bonus analysis that is taught in Spatial Weights in Lesson 6 is by using the spdep package.\nThe null and alternative hypothesis are:\nHo : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.\nH1 : The distribution of functional and non- functional waterpoints in Osun State are not independent.\nWe will use the 95% confidence level in our test.\nThe null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.\n\nK_FWP <-Kest(wp_func_ppp)"
   }
 ]
