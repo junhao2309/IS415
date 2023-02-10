@@ -49,7 +49,9 @@ geoNGA2 <- st_read(dsn = "data/geospatial", layer = "nga_admbnda_adm2_osgof_2019
 wp_nga <- read_csv("data/aspatial/WPDX.csv") %>%
   filter(`#clean_adm1` =="Osun")
 ```
+
 # Data Wrangling
+
 ## Geospatial Data wrangling
 
 ### Check and Amend duplicates
@@ -94,7 +96,9 @@ osun <- geoNGA2 %>%
 ```
 
 ### Changing Projection System
+
 We will use st_crs() from the sf package to check the crs of osun
+
 ```{r}
 st_crs(osun)
 ```
@@ -157,7 +161,13 @@ wp_nonfunctional <- wp_nga_sf %>%
 
 ## Population Data
 
-### Load Data in and select relevant columns
+We will load in the population density data of Nigeria. This data will be illustrated in the later sections to show a comparison between population density and the location of the water points.
+
+-   Data
+
+    -   http://www.geo-ref.net/ph/nga.htm
+
+### Load Data in and filter relevant rows to Study Area
 
 ```{r}
 nga_pop <- read_csv("data/pop_data_nga.csv")
@@ -170,7 +180,7 @@ osun_pop <- nga_pop %>%
          Population = `Population    `)
 ```
 
-### Ensure Names match with osun
+### Ensure names match with osun object
 
 ```{r}
 osun_pop[1,1] <- "Aiyedade"
@@ -191,6 +201,7 @@ We can then have the population density of Osun by its local government areas (L
 
 ```{r}
 tmap_mode("plot")
+
 tm_shape(osun_pop_density) +
   tm_fill("Density",
           n = 8,
@@ -206,13 +217,7 @@ tm_shape(osun_pop_density) +
   tm_compass(type="8star", size = 2) +
   tm_grid(alpha =0.2) +
 tm_shape(wp_functional) +
-  tm_dots(col="black",
-          size=0.01,
-          border.col="black",
-           border.lwd=0.5,
-          alpha=0.5)+
-  tm_shape(wp_nonfunctional) +
-  tm_dots(col="red",
+  tm_dots(col="green",
           size=0.01,
           border.col="black",
            border.lwd=0.5,
@@ -222,11 +227,36 @@ tm_shape(wp_functional) +
 
 ```
 
+```{r}
+tm_shape(osun_pop_density) +
+  tm_fill("Density",
+          n = 8,
+          style = "quantile",
+          palette = "-Blues",
+          title = "Population Density") +
+  tm_layout(main.title = "Population Density of Osun LGA",
+            main.title.position = "center",
+            legend.height = 0.45, 
+            legend.width = 0.35,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_grid(alpha =0.2) +
+  tm_shape(wp_nonfunctional) +
+  tm_dots(col="red",
+          size=0.01,
+          border.col="black",
+           border.lwd=0.5,
+          alpha=0.5)+
+  tm_credits("Source: http://www.geo-ref.net/ph/nga.htm", 
+             position = c("left", "bottom"))
+```
+
 # Kernel Density Analysis
 
 ## Converting object to relevant datatype
 
-We have to convert sf to sp then to ppp so that it is readable by the spatstat package 
+We have to convert sf to sp then to ppp so that it is readable by the spatstat package
 
 ### Convert sf to sp Spatial class
 
@@ -300,7 +330,6 @@ For mapping purposes, we can convert the KDE output into a grid object. To do so
 ```{r}
 gridded_osun_wp <- as.SpatialGridDataFrame.im(kde_func)
 gridded_osun_nwp <-as.SpatialGridDataFrame.im(kde_nonfunc)
-
 ```
 
 ## Convert gridded object into raster
@@ -385,6 +414,7 @@ plot(F_NFWP)
 ## L Function
 
 ```{r}
+par(mfrow = c(1,2))
 L_FWP <- Lest(wp_func_ppp, correction = "Ripley")
 plot(L_FWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
 
@@ -407,14 +437,14 @@ We will use the 95% confidence level in our test.
 The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
 
 ```{r}
-L_FWP_test <- envelope(wp_func_ppp, Lest, nsim = 49, rank = 1, glocal= TRUE)
+L_FWP_test <- envelope(wp_func_ppp, Lest, nsim = 39, rank = 1, glocal= TRUE)
 
 plot(L_FWP_test, xlim = c(0,500))
 ```
 
 Simulation shows that the black line is outside the 95% Confidence interval for all values of r. We can thus reject the null hypothesis for all values of r.
 
-This makes sense as we've put together population density with the dot plots of where the functional water points are at.
+This makes sense as we've put together population density with the dot plots of where the functional water points are at. From the population density map, we can see clustering of functional waterpoints on the more densely populated local government areas. A more densely populated region would have a greater need and usage of water and the L function helps to ascertain this claim. This is also evident in the non-functional point as well. As to why there are large clusters of non-functional in densely populated regions, one possible reason could be the inability to match number of usage to its maintenance work. However, more data would be required to ascertain this fact.
 
 # Spatial Correlation Analysis
 
@@ -458,12 +488,11 @@ A <- wp_functional$status_clean
 
 B <- wp_nonfunctional$status_clean
 
-LCLQ <- local_colocation(A,B, nb, wt, 49)
+LCLQ <- local_colocation(A,B, nb, wt, 39)
 
 LCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%
   na.exclude()
 ```
-
 
 The null and alternative hypothesis are:
 
@@ -497,4 +526,4 @@ tm_shape(LCLQ_wp) +
 head(LCLQ_wp, 5)
 ```
 
-Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other.
+Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. The above code chunk outputs the first 5rows of LCLQ_wp. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other.
