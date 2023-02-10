@@ -47,7 +47,7 @@ geoNGA2 <- st_read(dsn = "data/geospatial", layer = "nga_admbnda_adm2_osgof_2019
 
 ```{r}
 wp_nga <- read_csv("data/aspatial/WPDX.csv") %>%
-  filter(`#clean_country_name` == "Nigeria", `#clean_adm1` =="Osun")
+  filter(`#clean_adm1` =="Osun")
 ```
 
 # Geospatial Data wrangling
@@ -130,7 +130,7 @@ By using the functions in the dplyr package, we can use rename() to rename #stat
 ```{r}
 wp_nga_sf <- wp_nga_sf %>%
   rename(status_clean = `#status_clean`) %>% 
-  select(status_clean) %>%
+  dplyr::select(status_clean) %>%
   mutate(status_clean = replace_na(
     status_clean, "unknown"))
 ```
@@ -205,7 +205,9 @@ tm_shape(osun_pop_density) +
   tm_compass(type="8star", size = 2) +
   tm_grid(alpha =0.2) +
   tm_credits("Source: http://www.geo-ref.net/ph/nga.htm", 
-             position = c("left", "bottom"))
+             position = c("left", "bottom")) +
+tm_shape(wp_functional) +
+  tm_dots(col = "status_clean")
     
 ```
 
@@ -429,10 +431,16 @@ wt <- st_kernel_weights(nb,
                         adaptive = TRUE)
 ```
 
-```{r}
-wp_functional$status_clean[1:length(wp_functional$status_clean)] <- "Functional" 
-wp_nonfunctional$status_clean[1:length(wp_nonfunctional$status_clean)] <- "Non-Functional"
+The codechunk below categorises all values in wp_functional and wp_nonfunctional to be under one categorical value "Functional" and "Non-Functional" respectively.
 
+```{r}
+wp_functional[1:length(wp_functional$status_clean)] <- "Functional"
+wp_nonfunctional[1:length(wp_nonfunctional$status_clean)] <- "Non-Functional"
+```
+
+We can then separate out the area of interest, A as Functional and neighbours, B as Non-functional. By using local_colocation() from the sfdep package, we can obtain two new fields under LCLQ, the local colocation quotient and the corresponding p-value.
+
+```{r}
 A <- wp_functional$status_clean
 
 B <- wp_nonfunctional$status_clean
@@ -442,6 +450,8 @@ LCLQ <- local_colocation(A,B, nb, wt, 49)
 LCLQ_wp <- cbind(wp_nga_sf, LCLQ) %>%
   na.exclude()
 ```
+
+### Visualizing the Local Colocation Points
 
 ```{r}
 tmap_mode("view")
@@ -463,8 +473,24 @@ tm_shape(LCLQ_wp) +
 head(LCLQ_wp, 5)
 ```
 
-Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Since p-value is less than 0.05, we can say that Functional and Non-functional water points are independent from each other.
+Due to rounding, the graph shows Non.Functional local colocation as 1 but in fact it is less than one. Features of the category of interest (Functional Waterpoints) that have colocation quotients less than one are less likely to have category B (Non-functional) within their neighborhood. 
+Since p-value is less than 0.05, we can say that the result is statistically significant and that Functional and Non-functional water points are dependent from each other. 
 
 ```{r}
 pacman::p_load(spdep)
+```
+
+A bonus analysis that is taught in Spatial Weights in Lesson 6 is by using the spdep package.
+
+The null and alternative hypothesis are:
+
+Ho : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.
+
+H1 : The distribution of functional and non- functional waterpoints in Osun State are not independent.
+
+We will use the 95% confidence level in our test.
+
+The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
+```{r}
+K_FWP <-Kest(wp_func_ppp)
 ```
