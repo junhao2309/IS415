@@ -29,21 +29,47 @@ The data we will be using here are:
 
     -   State Boundary GIS: [geoBoundaries](https://www.geoboundaries.org/) data set
 
+-   Population Data
+
+    -   http://www.geo-ref.net/ph/nga.htm
+
 # Install & Load Packages
 
+R packages used for this analysis:
+
+-   sf: used for importing, managing and processing geospatial data
+
+-   raster: used for reading, writing, manipulating, analysing and modelling of spatial data
+
+-   spatstat: used for point pattern analysis
+
+-   tmap: used for creating thematic maps
+
+-   tidyverse: a collection of packages such as dplyr which is used for data wrangling
+
+-   sfdep: used for spatial dependence for Simple Features
+
+-   maptools: used for manipulating geographical data
+
+The code chunk below checks whether packages have been installed and load them, otherwise, it would install them first before loading it into Rstudio.
+
 ```{r}
-pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, funModeling)
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools)
 ```
 
 # Load Data into Rstudio
 
 ## Load Geospatial data in
 
+**st_read()** from sf package is used to read the geospatial data
+
 ```{r}
 geoNGA2 <- st_read(dsn = "data/geospatial", layer = "nga_admbnda_adm2_osgof_20190417")
 ```
 
 ## Load Aspatial Data in
+
+**read_csv()** from the tidyverse package is used to read csv type files. The data is then filtered to the studyArea, "Osun". This is done by using **filter()** from the dplyr package.
 
 ```{r}
 wp_nga <- read_csv("data/aspatial/WPDX.csv") %>%
@@ -97,13 +123,13 @@ osun <- geoNGA2 %>%
 
 ### Changing Projection System
 
-We will use st_crs() from the sf package to check the crs of osun
+We will use **st_crs()** from the sf package to check the crs of osun
 
 ```{r}
 st_crs(osun)
 ```
 
-We can see that currently geoNGA2 is in EPSG:4326. We have to convert to 26392 by using st_transform from the sf package. The code chunk below transforms the data to crs = 26392.
+We can see that currently geoNGA2 is in the projected coordinate systems, EPSG:4326. We have to convert it to Nigeria's Projected Coordinate System, 26392 by using **st_transform()** from the sf package. The code chunk below transforms the data to crs = 26392.
 
 ```{r}
 osun <- osun %>%
@@ -120,7 +146,7 @@ plot(osun)
 
 ### Create simple feature on wp_nga
 
-Using what we learn on Hands-on Exercise 1, we can create a simple feature using st_as_sf() from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.
+Using what we learn on Hands-on Exercise 1, we can create a simple feature using **st_as_sf()** from the sf package. We have to ensure that the file follows the same crs and therefore we use st_transform again to convert it into crs = 26392.
 
 ```{r}
 wp_nga_sf <- st_as_sf(wp_nga, coords = c("#lon_deg", "#lat_deg"), crs = 4326) %>%
@@ -129,7 +155,7 @@ wp_nga_sf <- st_as_sf(wp_nga, coords = c("#lon_deg", "#lat_deg"), crs = 4326) %>
 
 ### Cleaning up NA entries in aspatial data
 
-By using the functions in the dplyr package, we can use rename() to rename #status_clean to status_clean, select() to pick the required column variable and replacing NA to unknown.
+By using the functions in the dplyr package, we can use **rename()** to rename #status_clean to status_clean, **select()** to pick the required column variable and **replace_na()** for replacing NA to unknown.
 
 ```{r}
 wp_nga_sf <- wp_nga_sf %>%
@@ -141,7 +167,7 @@ wp_nga_sf <- wp_nga_sf %>%
 
 ### Filter out functional and non-functional data
 
-By using filter() from the dplyr package, we can filter out entries with functional and non-functional water points.
+By using **filter()** from the dplyr package, we can filter out entries with functional and non-functional water points.
 
 ```{r}
 wp_functional <- wp_nga_sf %>%
@@ -190,7 +216,7 @@ osun_pop[20,1] <- "Irepodun, Osun"
 osun_pop[16,1] <- "Ifelodun, Osun"
 ```
 
-Once names have matched, we can merge the tibble as one dataset
+Once names have matched, we can merge the tibble as one dataframe
 
 ```{r}
 osun_pop_density <- osun %>%
@@ -198,6 +224,8 @@ osun_pop_density <- osun %>%
 ```
 
 We can then have the population density of Osun by its local government areas (LGA). The code chunk below will generate the plot. Further down, we will discuss why having a population density mapping is important in formulating our hypothesis claim.
+
+The code chunk below will display the cartographic map using the tmap package.
 
 ```{r}
 tmap_mode("plot")
@@ -258,6 +286,8 @@ tm_shape(osun_pop_density) +
 
 We have to convert sf to sp then to ppp so that it is readable by the spatstat package
 
+The code chunks in this section using **as()** from the sf package to convert objects to their respective Spatial class.
+
 ### Convert sf to sp Spatial class
 
 ```{r}
@@ -271,7 +301,9 @@ wp_nonfunctional_spatial <- as(wp_nonfunctional, "Spatial")
 
 ```{r}
 osun_sp <- as(osun_spatial, "SpatialPolygons")
+
 wp_func_sp <- as(wp_functional_spatial, "SpatialPoints")
+
 wp_nonfunc_sp <- as(wp_nonfunctional_spatial, "SpatialPoints")
 ```
 
@@ -296,12 +328,13 @@ osun_wpfunc <- wp_func_ppp[osun_owin]
 osun_wpnonfunc <- wp_nonfunc_ppp[osun_owin]
 ```
 
-## Rescaling
+## Rescaling to "km
 
 Before we go on to calculate the kernal density, we should rescale the data as taught in Hands-on Ex 4 Chapter 5.
 
 ```{r}
 osun_wpfunc_km <- rescale(osun_wpfunc, 1000, "km")
+
 osun_wpnonfunc_km <- rescale(osun_wpnonfunc, 1000, "km")
 ```
 
@@ -325,7 +358,7 @@ plot(kde_nonfunc, main = "Non-Functional Water Points")
 
 ## Convert KDE output into gridded objects
 
-For mapping purposes, we can convert the KDE output into a grid object. To do so, we can use as.SpatialGridDataFrame.im() from raster
+For mapping purposes, we can convert the KDE output into a grid object. To do so, we can use **as.SpatialGridDataFrame.im()** from maptools package.
 
 ```{r}
 gridded_osun_wp <- as.SpatialGridDataFrame.im(kde_func)
@@ -334,7 +367,7 @@ gridded_osun_nwp <-as.SpatialGridDataFrame.im(kde_nonfunc)
 
 ## Convert gridded object into raster
 
-After converting the KDE output into a gridded object, we can use raster() from the raster package to then convert it into raster.
+After converting the KDE output into a gridded object, we can use **raster()** from the raster package to then convert it into raster.
 
 ```{r}
 osun_wp_raster <- raster(gridded_osun_wp)
@@ -344,7 +377,9 @@ osun_wp_raster
 osun_nwp_raster
 ```
 
-The output of the above code chunk shows that crs in both raster object is NA. We have to input the crs = 26392 and ensure the measurements are in "km".
+The output of the above code chunk shows that crs in both raster object is NA. We have to input the the Projected Coordinate System of Nigeria (crs = 26392) and ensure the measurements are in "km".
+
+This is done via the code chunk below.
 
 ```{r}
 projection(osun_wp_raster) <- CRS("+init=EPSG:26392 +units=km")
@@ -357,7 +392,7 @@ Now, we can see that the crs has been inputted in.
 
 ## Visualising the data
 
-The code chunk below visualises the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the map to the specific region, Osun.
+The code chunk below visualizes the raster onto the OpenStreetMap layout and by setting the zoom.limits to 9 and 14, it fixes the zoom limits of the map.
 
 ```{r}
 tmap_mode("view") 
@@ -368,17 +403,23 @@ tm_basemap(server ="OpenStreetMap") +
             legend.position = c("right", "Top"), 
             frame = FALSE) +
   tm_view(set.zoom.limits =c(9,14))
+```
 
+
+```{r}
+tmap_mode("view") 
 tm_basemap(server ="OpenStreetMap") + 
   tm_shape(osun_nwp_raster) + 
   tm_raster("v") + 
   tm_layout(title = "Non-Functional Waterpoints Density", 
-            legend.position = c("right", "top"), 
+            legend.position = c("right", "Bottom"), 
             frame = FALSE) +
   tm_view(set.zoom.limits =c(9,14))
 ```
 
 ## Advantages of Kernal Density Map over Point Map
+
+The advantage of Kernal Density Map is that it clearly shows the intensity of clustering at various points of the map. As compared to a point map, we may be able to identify clustering but to be comparing clusters might prove difficult to the human eye.
 
 # Second-Order Spatial Point Patterns Analysis
 
@@ -386,7 +427,7 @@ tm_basemap(server ="OpenStreetMap") +
 
 The nearest-neighbour distance is the measure of the distance between a point and its closest neighboring point.
 
-Gest() of spatstat package is used to compute the G function
+**Gest()** of spatstat package is used to compute the G function
 
 ```{r}
 G_FWP <- Gest(osun_wpfunc, correction = "border")
@@ -397,7 +438,7 @@ plot(G_FWP, xlim = c(0,500)) ; plot(G_NFWP, xlim = c(0,500))
 
 ## F function
 
-Unlike the G function, the F function in Fest() is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:
+Unlike the G function, the F function in **Fest()** is used to measure the distribution of nearest neighbour distances. The code chunk below showcases this:
 
 ```{r}
 # Functional Water Point
@@ -413,6 +454,11 @@ plot(F_NFWP)
 
 ## L Function
 
+The L can be obtained via the K function. Sometimes, due to the closeness of K and K(expected), it may be hard to see differences. When such an issue occur, L makes it easier to interpret the result.
+
+Below is the transformation of K to L function:
+
+![](images/L_formula.png)
 
 ```{r, eval=FALSE}
 L_FWP <- Lest(osun_wpfunc, correction = "Ripley")
@@ -428,9 +474,15 @@ plot(L_NFWP, .-r ~r, ylab="L(d)-r", xlab ="d(m)")
 
 ![](images/L_NFWP.png)
 
+From the two plots above, we can see that L line is above the L(pois) and thus this indicates clustering. As L line is well above 0 for all distance value, we can say that both functional and non-functional are clustered.
+
+Additional Notes (Not relating to the plot):
+
+If the L line \< 0, it would mean that there is dispersion.
+
 ## Performing Complete Spatial Randomness Test
 
-In running the test, we will be using envelope() from spatstat.
+For the purpose of performing the Complete Spatial Randomness Test, we will be using the L_function. we will be using **envelope()** from spatstat to run our simulation.
 
 The null and alternative hypothesis are:
 
@@ -440,8 +492,9 @@ H1 : The distribution of functional waterpoints in Osun State are not randomly d
 
 We will use the 95% confidence level in our test.
 
-The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
-```{r, eval=FALSE} 
+The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.05.
+
+```{r, eval=FALSE}
 L_FWP_test <- envelope(osun_wpfunc, Lest, nsim = 39, rank = 1, glocal= TRUE)
 
 plot(L_FWP_test, xlim = c(0,500))
@@ -467,7 +520,9 @@ For spatial correlation analysis, we will be using the cross-validation approach
 
 ## Creating multipoint ppp
 
-We can set the categorical value as functional and non-functional. The code chunk below replaces all values in status_clean as "Functional" and "Non-Functional" in their respective sf.
+We can set the categorical value as functional and non-functional. We standardize this as within the dataset, there are too many different types of categories.
+
+The code chunk below replaces all values in status_clean as "Functional" and "Non-Functional" in their respective sf.
 
 ```{r}
 wp_functional$status_clean[1:length(wp_functional$status_clean)] <- "Functional"
@@ -481,7 +536,9 @@ wp_combined <- bind_rows(wp_functional, wp_nonfunctional)
 wp_combined
 ```
 
-Observe that status_clean is a chr type. We have to convert that into a factor type.
+Observe that status_clean is a chr type. We have to convert that into a factor type. The reason for this is because a factor is a variable used to categorize and store data. This is necessary when doing multi-point correlation analysis.
+
+Use base R as.factor() to convert the variable type.
 
 ```{r}
 wp_combined$status_clean <- as.factor(wp_combined$status_clean)
@@ -492,7 +549,9 @@ Now we have status_clean as a factor, with categorical values, "Functional" and 
 
 ## Conversion of object type
 
-Same steps that were applied in Kernel Density Analysis are applied here. \### Convert sf to sp
+Same steps that were applied in Kernel Density Analysis are applied here.
+
+### Convert sf to sp
 
 ```{r}
 wp_combined_sp <- as(wp_combined, "Spatial")
@@ -522,17 +581,17 @@ wp_combined_owinppp <- wp_combined_ppp[osun_owin]
 plot(wp_combined_owinppp, main = "WaterPoints by Category", which.marks = "status_clean")
 ```
 
-From the analysis shown above, we can say that both functional and non-functional water points are not randomly distributed. From here, we would like to find out whether these two are dependent on eacho other. Hence, by performing a hypothesis testing, we can find out whether there is spatial dependence between these two categories.
+From the Second-Order Spatial Point Pattern analysis above, we can say that both functional and non-functional water points are not randomly distributed. From here, we would like to find out whether functional and non-functional water points are dependent on each other. Hence, by performing a hypothesis testing, we can find out whether there is spatial dependence between these two categories.
 
 The null and alternative hypothesis are:
 
-Ho : The distribution of functional and non-functional waterpoints in Osun State are independent from each other.
+Ho : The distribution of functional and non-functional water points in Osun State are independent from each other.
 
-H1 : The distribution of functional and non-functional waterpoints in Osun State are not independent.
+H1 : The distribution of functional and non-functional water points in Osun State are not independent from each other.
 
 We will use the 95% confidence level in our test.
 
-The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.005.
+The null hypothesis will be rejected if p-value is smaller than the alpha value, 0.05.
 
 ### Cross L-Function Analysis
 
@@ -540,11 +599,10 @@ The null hypothesis will be rejected if p-value is smaller than the alpha value,
 Lcross_wp <- envelope(wp_combined_owinppp,
                       Lcross,
                       i = "Functional",
-                      j = "Non-Functional", 
+                      j = "Non-Functional",
                       correction = "border",
                       nsim = 39)
 plot(Lcross_wp, xlim = c(0,10000))
-
 ```
 
 ![](images/Lcross_wp.png)
@@ -553,15 +611,13 @@ Referring to the plot above, we can clearly see that 0 \< r \< 5500 and r \> 680
 
 As for 5500 \< r \< 6800, the L(obs) is within the 95% confidence interval and thus there is spatial independence.
 
-```{r}
-pacman::p_load(sfdep)
-```
-
 ## Local Colocation Quotients (LCLQ)
 
 ### Preparing nearest neighbours list
 
-st_knn() of sfdep package is used to determine the 6 nearest neighbours for a given point geometry.
+st_knn() is used to determine the 6 nearest neighbours for a given point geometry.
+include_self() is used to include the region itself in its own list of neighbours.
+Both functions are from sfdep package.
 
 ```{r}
 nb <- include_self(
@@ -569,6 +625,8 @@ nb <- include_self(
 ```
 
 Afterwhich, we will use st_kernel_weights() of sfdep package to derive a weights list by using a kernal function. We will be using the gaussian method and the mathematical equations is:
+
+![](images/formula.png)
 
 ```{r}
 wt <- st_kernel_weights(nb,
