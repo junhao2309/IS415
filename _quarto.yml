@@ -3,6 +3,10 @@ project:
 
 website:
   title: "IS415-GAA"
+  sidebar: 
+    style: "docked"
+    search: true
+    border: true
   navbar:
     left:
     - text: "Hands-on Exercise"
