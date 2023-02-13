@@ -1,22 +1,20 @@
 ---
 title: "Take-Home Exercise 2"
+date: "13 February 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
 ---
 
 # Task
-Choropleth Mapping and Analysis
-Compute the monthly vaccination rate from July 2021 to June 2022 at sub-district (also known as kelurahan in Bahasa Indonesia) level,
-Prepare the monthly vaccination rate maps by using appropriate tmap functions,
-Describe the spatial patterns revealed by the choropleth maps (not more than 200 words).
-Local Gi* Analysis
-With reference to the vaccination rate maps prepared in ESDA:
 
-Compute local Gi* values of the monthly vaccination rate,
-Display the Gi* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value < 0.05)
-With reference to the analysis results, draw statistical conclusions (not more than 250 words).
-Emerging Hot Spot Analysis(EHSA)
-With reference to the local Gi* values of the vaccination rate maps prepared in the previous section:
+Choropleth Mapping and Analysis Compute the monthly vaccination rate from July 2021 to June 2022 at sub-district (also known as kelurahan in Bahasa Indonesia) level, Prepare the monthly vaccination rate maps by using appropriate tmap functions, Describe the spatial patterns revealed by the choropleth maps (not more than 200 words). Local Gi\* Analysis With reference to the vaccination rate maps prepared in ESDA:
 
-Perform Mann-Kendall Test by using the spatio-temporal local Gi* values,
-Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and
-Prepared a EHSA map of the Gi* values of vaccination rate. The maps should only display the significant (i.e. p-value < 0.05).
-With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).
+Compute local Gi\* values of the monthly vaccination rate, Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05) With reference to the analysis results, draw statistical conclusions (not more than 250 words). Emerging Hot Spot Analysis(EHSA) With reference to the local Gi\* values of the vaccination rate maps prepared in the previous section:
+
+Perform Mann-Kendall Test by using the spatio-temporal local Gi\* values, Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and Prepared a EHSA map of the Gi\* values of vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05). With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).

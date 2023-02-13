@@ -12,6 +12,7 @@ editor: visual
 ---
 
 # Load packages
+
 ```{r}
 pacman::p_load(sf, sfdep, tidyverse, tmap)
 ```
@@ -27,15 +28,7 @@ hunan <- st_read(dsn = "data/geospatial/",
 ```
 
 ## Importing Aspatial data
+
 ```{r}
 hunan_2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 ```
-
-
-
-
-
-
-
-
-
