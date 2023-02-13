@@ -1,0 +1,108 @@
+---
+title: "Hands-on Exercise 6: Spatial Weights and Application"
+date: "13 February 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# The Set Up
+
+## Packages used in this section
+Load packages into R
+```{r}
+pacman::p_load(sf, spdep, tidyverse, knitr, tmap)
+```
+
+## Import Data to be used
+
+### Import shapefile
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial/", 
+                 layer= "Hunan")
+```
+### Import csv file
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### Performing relational join
+The code chunk below joins hunan and hunan2012 via the left_join() of dplyr package. They are automatically joined by "County".
+```{r}
+hunan <- left_join(hunan, hunan2012) %>%
+  select(1:4, 7, 15)
+```
+
+## Visualising Regional Development Indicator
+```{r}
+basemap <- tm_shape(hunan) +
+  tm_polygons() + 
+  tm_text("NAME_3", size = 0.5)
+gdppc <- qtm(hunan, "GDPPC")
+tmap_arrange(basemap, gdppc, asp = 1, ncol = 2)
+```
+
+# Computing Contiguity Spatial Weights
+
+poly2nb() of spdep pacakage builds a neighbours list based on regions with contiguous boundaries. 
+Contiguous meaning that they are connected together and not separated by for example the sea. 
+Example of non-contiguous: Islands
+
+## Computing (QUEEN) contiguity based neighbours
+The code chunk below is used to compute Queen contiguity weight matrix.
+```{r}
+wm_q <- poly2nb(hunan, queen = TRUE)
+summary(wm_q)
+```
+The summary report above shows that there are 88 area units, with area unit no. 85 is connected to 11 other area unit. 
+
+For each polygon in our polygon object, wm_q lists all neighboring polygons and its corresponding links.
+```{r}
+wm_q[[1]]
+```
+Polygon 1 has 5 neighbors and the numbers represent the polygon IDs.
+
+```{r}
+hunan$County[1]
+```
+Output reveals that Polygon ID=1 is Anxiang
+
+To reveal the county names of the five neighboring polyons, the code chunk below does that.
+```{r}
+hunan$NAME_3[c(2,3,4,57,85)]
+```
+
+```{r}
+nb1 <- wm_q[[1]]
+nb1 <- hunan$GDPPC[nb1]
+nb1
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -355,5 +355,19 @@
     "title": "In Class Exercise 2: Geospatial Data Wrangling",
     "section": "6.3 Visualing attributes by using statistical graph",
     "text": "6.3 Visualing attributes by using statistical graph\n\n\nShow code\nggplot(data = NGA_wp,\n       aes(x = total_wp)) +\n  geom_histogram(bins = 20, \n                 color = \"black\",\n                 fill =\"light blue\") +\n  geom_vline(aes(xintercept=mean(total_wp, na.rm=T)),\n             color = \"red\", linetype=\"dashed\", size = 0.8) +\n  xlab(\"No of water points\") +\n  ylab(\"No. of\\nLGAs\") +\n  theme(axis.title.y = element_text(angle = 0))\n\n\n\n\n\n\n\nShow code\nwrite_rds(NGA_wp, \"data/rds/NGA_wp.rds\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html",
+    "href": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html",
+    "title": "Hands-on Exercise 6: Spatial Weights and Application",
+    "section": "",
+    "text": "Load packages into R\n\npacman::p_load(sf, spdep, tidyverse, knitr, tmap)\n\n\n\n\n\n\n\nhunan <- st_read(dsn = \"data/geospatial/\", \n                 layer= \"Hunan\")\n\nReading layer `Hunan' from data source \n  `/Users/junhaoteo/Documents/junhao2309/IS415/Hands-on_Ex/Hands-on_Ex06/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\n\n\n\n\n\n\nhunan2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")\n\n\n\n\nThe code chunk below joins hunan and hunan2012 via the left_join() of dplyr package. They are automatically joined by “County”.\n\nhunan <- left_join(hunan, hunan2012) %>%\n  select(1:4, 7, 15)\n\n\n\n\n\n\nbasemap <- tm_shape(hunan) +\n  tm_polygons() + \n  tm_text(\"NAME_3\", size = 0.5)\ngdppc <- qtm(hunan, \"GDPPC\")\ntmap_arrange(basemap, gdppc, asp = 1, ncol = 2)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html#computing-queen-contiguity-based-neighbours",
+    "href": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html#computing-queen-contiguity-based-neighbours",
+    "title": "Hands-on Exercise 6: Spatial Weights and Application",
+    "section": "2.1 Computing (QUEEN) contiguity based neighbours",
+    "text": "2.1 Computing (QUEEN) contiguity based neighbours\nThe code chunk below is used to compute Queen contiguity weight matrix.\n\nwm_q <- poly2nb(hunan, queen = TRUE)\nsummary(wm_q)\n\nNeighbour list object:\nNumber of regions: 88 \nNumber of nonzero links: 448 \nPercentage nonzero weights: 5.785124 \nAverage number of links: 5.090909 \nLink number distribution:\n\n 1  2  3  4  5  6  7  8  9 11 \n 2  2 12 16 24 14 11  4  2  1 \n2 least connected regions:\n30 65 with 1 link\n1 most connected region:\n85 with 11 links\n\n\nThe summary report above shows that there are 88 area units, with area unit no. 85 is connected to 11 other area unit.\nFor each polygon in our polygon object, wm_q lists all neighboring polygons and its corresponding links.\n\nwm_q[[1]]\n\n[1]  2  3  4 57 85\n\n\nPolygon 1 has 5 neighbors and the numbers represent the polygon IDs.\n\nhunan$County[1]\n\n[1] \"Anxiang\"\n\n\nOutput reveals that Polygon ID=1 is Anxiang\nTo reveal the county names of the five neighboring polyons, the code chunk below does that.\n\nhunan$NAME_3[c(2,3,4,57,85)]\n\n[1] \"Hanshou\" \"Jinshi\"  \"Li\"      \"Nan\"     \"Taoyuan\"\n\n\n\nnb1 <- wm_q[[1]]\nnb1 <- hunan$GDPPC[nb1]\nnb1\n\n[1] 20981 34592 24473 21311 22879"
   }
 ]
