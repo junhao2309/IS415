@@ -396,6 +396,27 @@
     "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#importing-aspatial-data",
     "title": "In-class Exercise 6",
     "section": "2.2 Importing Aspatial data",
-    "text": "2.2 Importing Aspatial data\n\nhunan_2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")"
+    "text": "2.2 Importing Aspatial data\n\nhunan_2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")\n\n\nhunan_GDPPC <- dplyr::left_join(hunan, hunan_2012) %>%\n  select(1:4, 7, 15)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#visualize-the-data-on-a-choropleth-map",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#visualize-the-data-on-a-choropleth-map",
+    "title": "In-class Exercise 6",
+    "section": "2.3 Visualize the data on a Choropleth Map",
+    "text": "2.3 Visualize the data on a Choropleth Map\n\ntmap_mode(\"plot\")\ntm_shape(hunan_GDPPC) +\n  tm_fill(\"GDPPC\",\n          style = \"quantile\",\n          palette = \"Blues\",\n          title = \"GDPPC\") +\n  tm_layout(main.title = \"Distribution of GDP per capita by district\",\n            main.title.position = \"center\",\n            main.title.size = 1.2,\n            legend.height = 0.45,\n            legend.width = 0.35,\n            frame = TRUE) +\n  tm_borders(alpha =0.5) +\n  tm_compass(type = \"8star\", size =2) +\n  tm_scale_bar() +\n  tm_grid(alpha = 0.2)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#contiguity-neighbours-method",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#contiguity-neighbours-method",
+    "title": "In-class Exercise 6",
+    "section": "3.1 Contiguity neighbours method",
+    "text": "3.1 Contiguity neighbours method\nIn the code chunk below, st_contiguity() is used to derive a contiguity neighbour list by using Queen’s method. By default, st_contiguity() uses queen = TRUE.\n\ncn_queen <- hunan_GDPPC %>%\n  mutate(nb= st_contiguity(geometry),\n         .before = 1)\n\nThe code chunk below uses st_contiguity() with queen = FALSE. This makes the contiguity neighbor list using the Rook’s method.\n\ncn_rook <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry, \n                            queen = FALSE),\n         .before = 1)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#computing-contiguity-weights",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#computing-contiguity-weights",
+    "title": "In-class Exercise 6",
+    "section": "3.2 Computing contiguity weights",
+    "text": "3.2 Computing contiguity weights\n\n3.2.1 Queen’s method\n\nwm_q <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         wt = st_weights(nb),\n         .before = 1)\n\n\n\n3.2.2 Rook’s method\n\nwm_q <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         queen = FALSE,\n         wt = st_weights(nb),\n         .before = 1)"
   }
 ]
