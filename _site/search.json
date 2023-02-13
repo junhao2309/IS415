@@ -369,5 +369,12 @@
     "title": "Hands-on Exercise 6: Spatial Weights and Application",
     "section": "2.1 Computing (QUEEN) contiguity based neighbours",
     "text": "2.1 Computing (QUEEN) contiguity based neighbours\nThe code chunk below is used to compute Queen contiguity weight matrix.\n\nwm_q <- poly2nb(hunan, queen = TRUE)\nsummary(wm_q)\n\nNeighbour list object:\nNumber of regions: 88 \nNumber of nonzero links: 448 \nPercentage nonzero weights: 5.785124 \nAverage number of links: 5.090909 \nLink number distribution:\n\n 1  2  3  4  5  6  7  8  9 11 \n 2  2 12 16 24 14 11  4  2  1 \n2 least connected regions:\n30 65 with 1 link\n1 most connected region:\n85 with 11 links\n\n\nThe summary report above shows that there are 88 area units, with area unit no. 85 is connected to 11 other area unit.\nFor each polygon in our polygon object, wm_q lists all neighboring polygons and its corresponding links.\n\nwm_q[[1]]\n\n[1]  2  3  4 57 85\n\n\nPolygon 1 has 5 neighbors and the numbers represent the polygon IDs.\n\nhunan$County[1]\n\n[1] \"Anxiang\"\n\n\nOutput reveals that Polygon ID=1 is Anxiang\nTo reveal the county names of the five neighboring polyons, the code chunk below does that.\n\nhunan$NAME_3[c(2,3,4,57,85)]\n\n[1] \"Hanshou\" \"Jinshi\"  \"Li\"      \"Nan\"     \"Taoyuan\"\n\n\n\nnb1 <- wm_q[[1]]\nnb1 <- hunan$GDPPC[nb1]\nnb1\n\n[1] 20981 34592 24473 21311 22879"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html",
+    "title": "In-class Exercise 6",
+    "section": "",
+    "text": "1 Load packages\n\npacman::p_load(sf, sfdep, tidyverse, tmap)"
   }
 ]

@@ -1,0 +1,18 @@
+---
+title: "In-class Exercise 6"
+date: "13 February 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Load packages
+```{r}
+pacman::p_load(sf, sfdep, tidyverse, tmap)
+```
+
