@@ -18,3 +18,32 @@ Choropleth Mapping and Analysis Compute the monthly vaccination rate from July 2
 Compute local Gi\* values of the monthly vaccination rate, Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05) With reference to the analysis results, draw statistical conclusions (not more than 250 words). Emerging Hot Spot Analysis(EHSA) With reference to the local Gi\* values of the vaccination rate maps prepared in the previous section:
 
 Perform Mann-Kendall Test by using the spatio-temporal local Gi\* values, Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and Prepared a EHSA map of the Gi\* values of vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05). With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).
+
+# Load packages
+
+```{r}
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools,readxl)
+```
+
+# Load Data in
+
+```{r}
+geoJAR <- st_read(dsn = "data/geospatial/",
+                  layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")                                        
+```
+
+# Load Aspatial
+
+```{r}
+df<- list()
+list <- list.files(path = "data/aspatial/", pattern = "*.xlsx")
+setwd("data/aspatial/")
+for (i in 1:length(list)){
+  
+  df[i] <- lapply(list[i], FUN= read_excel)
+}
+```
+
+```{r}
+
+```
