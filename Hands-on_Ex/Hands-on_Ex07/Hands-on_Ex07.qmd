@@ -12,6 +12,150 @@ editor: visual
 ---
 
 # Overview
+
 In this hands-on exercise, we are taught on the contents in Chapter 9: Global Measures of Spatial Autocorrelation. We will be using the spdep package amongst other packages used.
+
+# Getting Started
+
+## Analytical problem
+
+As mentioned in the course materials, in spatial policy, one of the main development objective of the local government is to ensure equal distribution of development with in the province. This helps policy makers to zoom in on any unequal distribution which can be seen clustering.
+
+## The Study Data
+
+## Load packages:
+
+```{r}
+pacman::p_load(sf,spdep,tmap,tidyverse)
+```
+
+## Load Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial",
+                 layer = "Hunan")
+```
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+## Performing relational join
+
+```{r}
+hunan <- left_join(hunan, hunan2012) %>%
+  select(1:4, 7, 15)
+```
+
+## Visualising Regional Development
+
+```{r}
+equal <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "equal") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal interval classification")
+
+quantile <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal quantile classification")
+
+tmap_arrange(equal, 
+             quantile, 
+             asp=1, 
+             ncol=2)
+```
+
+# Global Spatial Autocorrelation
+
+## Computing Contiguity Spatial Weights
+
+Before we compute the global spatial autocorrelation statistics, we need to construct the spatial weights of the study area. The spatial weights is used to define the neighbourhood relationships between the geographical units in the study area.
+
+By using the poly2nb() of spdep package, we can compute the coniguity weight matrices for the study area. There are two main modes, queen and rook. By using the arguments below: queen = TRUE : QUEEN queen = FALSE : ROOK
+
+```{r}
+wm_q <- poly2nb(hunan, 
+                queen= TRUE)
+summary(wm_q)
+```
+
+The summary reports above shows that there are 88 area units in Hunan and the most connected area unit has 11 neighbours.
+
+## Row-standardised weights matrix
+
+```{r}
+rswm_q <- nb2listw(wm_q,
+                   style ="W",
+                   zero.policy = TRUE)
+rswm_q
+```
+
+## Global Spatial Autocorrelation: Moran's I
+
+We will perform the Moran's I statistics testing by using moran.test() of spdep.
+
+### Moran's I Test
+
+```{r}
+moran.test(hunan$GDPPC,
+           listw = rswm_q,
+           zero.policy = TRUE,
+           na.action= na.omit)
+```
+
+By running the moran test, we look at the p value. If p value is less than alpha set, the result is significant.
+
+| Significance and z-value                                                 | Explanation                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|--------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| The p-value is *not* statistically significant.                          | You cannot reject the null hypothesis. It is quite possible that the spatial distribution of feature values is the result of random spatial processes. The observed spatial pattern of feature values could very well be one of many, many possible versions of complete spatial randomness (CSR).                                                                                                                                       |
+| The p-value *is* statistically significant, and the z-score is positive. | You may reject the null hypothesis. The spatial distribution of high values and/or low values in the dataset is more spatially clustered than would be expected if underlying spatial processes were random.                                                                                                                                                                                                                             |
+| The p-value *is* statistically significant, and the z-score is negative. | You may reject the null hypothesis. The spatial distribution of high values and low values in the dataset is more spatially dispersed than would be expected if underlying spatial processes were random. A dispersed spatial pattern often reflects some type of competitive process---a feature with a high value repels other features with high values; similarly, a feature with a low value repels other features with low values. |
+
+: Knowing how to read the Moran Test Statistic
+
+Credits: <https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm#:~:text=the%20null%20hypothesis.-,Interpretation,context%20of%20its%20null%20hypothesis.>
+
+### Computing Monte Carlo Moran's I
+The code chunk below performs the permutation test for Moran's I statistic by using moran.mc() of spdep. A total of 1000 simulation will be performed.
+```{r}
+set.seed(1234)
+bperm= moran.mc(hunan$GDPPC, 
+                listw=rswm_q, 
+                nsim=999, 
+                zero.policy = TRUE, 
+                na.action=na.omit)
+bperm
+```
+### Visualising Monte Carlo Moran's I
+
+```{r}
+mean(bperm$res[1:999])
+```
+```{r}
+var(bperm$res[1:999])
+```
+```{r}
+summary(bperm$res[1:999])
+```
+
+```{r}
+hist(bperm$res, 
+     freq=TRUE, 
+     breaks=20, 
+     xlab="Simulated Moran's I")
+abline(v=0, 
+       col="red") 
+```
+
+We can see here that the graph is skewed to the right but mainly falls around the negative range.
+
+## Global Spatial Autocorrelation: Geary's
+
+### 
 
 

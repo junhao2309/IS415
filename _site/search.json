@@ -67,7 +67,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html",
     "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
     "section": "",
-    "text": "1 Overview\nIn this hands-on exercise, we are taught on the contents in Chapter 9: Global Measures of Spatial Autocorrelation. We will be using the spdep package amongst other packages used."
+    "text": "In this hands-on exercise, we are taught on the contents in Chapter 9: Global Measures of Spatial Autocorrelation. We will be using the spdep package amongst other packages used."
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html",
@@ -432,5 +432,75 @@
     "title": "In-class Exercise 6",
     "section": "3.2 Computing contiguity weights",
     "text": "3.2 Computing contiguity weights\n\n3.2.1 Queen’s method\n\nwm_q <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         wt = st_weights(nb),\n         .before = 1)\n\n\n\n3.2.2 Rook’s method\n\nwm_q <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         queen = FALSE,\n         wt = st_weights(nb),\n         .before = 1)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#analytical-problem",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#analytical-problem",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "2.1 Analytical problem",
+    "text": "2.1 Analytical problem\nAs mentioned in the course materials, in spatial policy, one of the main development objective of the local government is to ensure equal distribution of development with in the province. This helps policy makers to zoom in on any unequal distribution which can be seen clustering."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#the-study-data",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#the-study-data",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "2.2 The Study Data",
+    "text": "2.2 The Study Data"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#load-packages",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#load-packages",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "2.3 Load packages:",
+    "text": "2.3 Load packages:\n\npacman::p_load(sf,spdep,tmap,tidyverse)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#load-data",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#load-data",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "2.4 Load Data",
+    "text": "2.4 Load Data\n\nhunan <- st_read(dsn = \"data/geospatial\",\n                 layer = \"Hunan\")\n\nReading layer `Hunan' from data source \n  `/Users/junhaoteo/Documents/junhao2309/IS415/Hands-on_Ex/Hands-on_Ex07/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\n\n\n\nhunan2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#performing-relational-join",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#performing-relational-join",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "2.5 Performing relational join",
+    "text": "2.5 Performing relational join\n\nhunan <- left_join(hunan, hunan2012) %>%\n  select(1:4, 7, 15)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#visualising-regional-development",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#visualising-regional-development",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "2.6 Visualising Regional Development",
+    "text": "2.6 Visualising Regional Development\n\nequal <- tm_shape(hunan) +\n  tm_fill(\"GDPPC\",\n          n = 5,\n          style = \"equal\") +\n  tm_borders(alpha = 0.5) +\n  tm_layout(main.title = \"Equal interval classification\")\n\nquantile <- tm_shape(hunan) +\n  tm_fill(\"GDPPC\",\n          n = 5,\n          style = \"quantile\") +\n  tm_borders(alpha = 0.5) +\n  tm_layout(main.title = \"Equal quantile classification\")\n\ntmap_arrange(equal, \n             quantile, \n             asp=1, \n             ncol=2)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#computing-contiguity-spatial-weights",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#computing-contiguity-spatial-weights",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "3.1 Computing Contiguity Spatial Weights",
+    "text": "3.1 Computing Contiguity Spatial Weights\nBefore we compute the global spatial autocorrelation statistics, we need to construct the spatial weights of the study area. The spatial weights is used to define the neighbourhood relationships between the geographical units in the study area.\nBy using the poly2nb() of spdep package, we can compute the coniguity weight matrices for the study area. There are two main modes, queen and rook. By using the arguments below: queen = TRUE : QUEEN queen = FALSE : ROOK\n\nwm_q <- poly2nb(hunan, \n                queen= TRUE)\nsummary(wm_q)\n\nNeighbour list object:\nNumber of regions: 88 \nNumber of nonzero links: 448 \nPercentage nonzero weights: 5.785124 \nAverage number of links: 5.090909 \nLink number distribution:\n\n 1  2  3  4  5  6  7  8  9 11 \n 2  2 12 16 24 14 11  4  2  1 \n2 least connected regions:\n30 65 with 1 link\n1 most connected region:\n85 with 11 links\n\n\nThe summary reports above shows that there are 88 area units in Hunan and the most connected area unit has 11 neighbours."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#row-standardised-weights-matrix",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#row-standardised-weights-matrix",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "3.2 Row-standardised weights matrix",
+    "text": "3.2 Row-standardised weights matrix\n\nrswm_q <- nb2listw(wm_q,\n                   style =\"W\",\n                   zero.policy = TRUE)\nrswm_q\n\nCharacteristics of weights list object:\nNeighbour list object:\nNumber of regions: 88 \nNumber of nonzero links: 448 \nPercentage nonzero weights: 5.785124 \nAverage number of links: 5.090909 \n\nWeights style: W \nWeights constants summary:\n   n   nn S0       S1       S2\nW 88 7744 88 37.86334 365.9147"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#global-spatial-autocorrelation-morans-i",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#global-spatial-autocorrelation-morans-i",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "3.3 Global Spatial Autocorrelation: Moran’s I",
+    "text": "3.3 Global Spatial Autocorrelation: Moran’s I\nWe will perform the Moran’s I statistics testing by using moran.test() of spdep.\n\n3.3.1 Moran’s I Test\n\nmoran.test(hunan$GDPPC,\n           listw = rswm_q,\n           zero.policy = TRUE,\n           na.action= na.omit)\n\n\n    Moran I test under randomisation\n\ndata:  hunan$GDPPC  \nweights: rswm_q    \n\nMoran I statistic standard deviate = 4.7351, p-value = 1.095e-06\nalternative hypothesis: greater\nsample estimates:\nMoran I statistic       Expectation          Variance \n      0.300749970      -0.011494253       0.004348351 \n\n\nBy running the moran test, we look at the p value. If p value is less than alpha set, the result is significant.\n\nKnowing how to read the Moran Test Statistic\n\n\n\n\n\n\nSignificance and z-value\nExplanation\n\n\n\n\nThe p-value is not statistically significant.\nYou cannot reject the null hypothesis. It is quite possible that the spatial distribution of feature values is the result of random spatial processes. The observed spatial pattern of feature values could very well be one of many, many possible versions of complete spatial randomness (CSR).\n\n\nThe p-value is statistically significant, and the z-score is positive.\nYou may reject the null hypothesis. The spatial distribution of high values and/or low values in the dataset is more spatially clustered than would be expected if underlying spatial processes were random.\n\n\nThe p-value is statistically significant, and the z-score is negative.\nYou may reject the null hypothesis. The spatial distribution of high values and low values in the dataset is more spatially dispersed than would be expected if underlying spatial processes were random. A dispersed spatial pattern often reflects some type of competitive process—a feature with a high value repels other features with high values; similarly, a feature with a low value repels other features with low values.\n\n\n\nCredits: https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm#:~:text=the%20null%20hypothesis.-,Interpretation,context%20of%20its%20null%20hypothesis.\n\n\n3.3.2 Computing Monte Carlo Moran’s I\nThe code chunk below performs the permutation test for Moran’s I statistic by using moran.mc() of spdep. A total of 1000 simulation will be performed.\n\nset.seed(1234)\nbperm= moran.mc(hunan$GDPPC, \n                listw=rswm_q, \n                nsim=999, \n                zero.policy = TRUE, \n                na.action=na.omit)\nbperm\n\n\n    Monte-Carlo simulation of Moran I\n\ndata:  hunan$GDPPC \nweights: rswm_q  \nnumber of simulations + 1: 1000 \n\nstatistic = 0.30075, observed rank = 1000, p-value = 0.001\nalternative hypothesis: greater\n\n\n\n\n3.3.3 Visualising Monte Carlo Moran’s I\n\nmean(bperm$res[1:999])\n\n[1] -0.01504572\n\n\n\nvar(bperm$res[1:999])\n\n[1] 0.004371574\n\n\n\nsummary(bperm$res[1:999])\n\n    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. \n-0.18339 -0.06168 -0.02125 -0.01505  0.02611  0.27593 \n\n\n\nhist(bperm$res, \n     freq=TRUE, \n     breaks=20, \n     xlab=\"Simulated Moran's I\")\nabline(v=0, \n       col=\"red\") \n\n\n\n\nWe can see here that the graph is skewed to the right but mainly falls around the negative range."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#global-spatial-autocorrelation-gearys",
+    "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html#global-spatial-autocorrelation-gearys",
+    "title": "Hands-On Exercise 7: Global Measures of Spatial Autocorrelation",
+    "section": "3.4 Global Spatial Autocorrelation: Geary’s",
+    "text": "3.4 Global Spatial Autocorrelation: Geary’s\n\n3.4.1"
   }
 ]
