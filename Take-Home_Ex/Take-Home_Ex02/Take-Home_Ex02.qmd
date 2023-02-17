@@ -1,5 +1,5 @@
 ---
-title: "Take-Home Exercise 2"
+title: "Take-Home Exercise 2: Spatio-temporal analysis of COVID-19 Vaccination Trends at the Sub-district Level, DKI Jarkarta"
 date: "13 February 2023"
 date-modified: "`r Sys.Date()`"
 number-sections: true
@@ -11,39 +11,396 @@ execute:
 editor: visual
 ---
 
-# Task
+# Context
 
-Choropleth Mapping and Analysis Compute the monthly vaccination rate from July 2021 to June 2022 at sub-district (also known as kelurahan in Bahasa Indonesia) level, Prepare the monthly vaccination rate maps by using appropriate tmap functions, Describe the spatial patterns revealed by the choropleth maps (not more than 200 words). Local Gi\* Analysis With reference to the vaccination rate maps prepared in ESDA:
+Since the outbreak of COVID-19, many countries have rushed to create a vaccine and ensure its population is well immunized against this novel coronavirus. On 13 January 2021, the mass immunisation program commenced and since then Indonesia ranks third in Asia and fifth in the world in terms of total doses given.
 
-Compute local Gi\* values of the monthly vaccination rate, Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05) With reference to the analysis results, draw statistical conclusions (not more than 250 words). Emerging Hot Spot Analysis(EHSA) With reference to the local Gi\* values of the vaccination rate maps prepared in the previous section:
+In this take-home assignment, we will be exploring vaccination rates in DKI Jarkarta, identifying sub-districts with relatively higher number of vaccination rate and how they changed over time.
 
-Perform Mann-Kendall Test by using the spatio-temporal local Gi\* values, Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and Prepared a EHSA map of the Gi\* values of vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05). With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).
+The tasks given to us is as follows:
 
-# Load packages
+**Choropleth Mapping and Analysis**
+
+-   Compute the monthly vaccination rate from July 2021 to June 2022 at sub-district (also known as kelurahan in Bahasa Indonesia) level,
+
+-   Prepare the monthly vaccination rate maps by using appropriate tmap functions,
+
+-   Describe the spatial patterns revealed by the choropleth maps (not more than 200 words).
+
+**Local Gi\* Analysis**
+
+With reference to the vaccination rate maps prepared in ESDA:
+
+-   Compute local Gi\* values of the monthly vaccination rate,
+
+-   Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05)
+
+-   With reference to the analysis results, draw statistical conclusions (not more than 250 words).
+
+**Emerging Hot Spot Analysis(EHSA)**
+
+With reference to the local Gi\* values of the vaccination rate maps prepared in the previous section:
+
+-   Perform Mann-Kendall Test by using the spatio-temporal local Gi\* values,
+
+-   Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and
+
+-   Prepared a EHSA map of the Gi\* values of vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05).
+
+-   With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).
+
+Throughout this page, each step will be explained and guided so that you can follow along.
+
+# The Set Up
+
+## Packages Used
+
+The R packages used for this analysis are:
+
+-   sf
+
+-   tidyverse
+
+-   spatstat
+
+-   tmap
+
+-   sfdep
+
+-   maptools
+
+-   readxl
+
+The code chunk below checks whether the packages have been installed, if not it will automatically install them and load the packages into Rstudio.
 
 ```{r}
-pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools,readxl)
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl)
 ```
 
-# Load Data in
+## The Data
+
+| Type       | Name                                                                                                                   | Format    | Description                                                                   |
+|-----------------|-----------------|-----------------|---------------------|
+| Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
+| Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
+
+-   Geospatial Data
+
+The link under Geospatial Data above brings you to a page where there are many download links sorted by province. Ensure that you are using **Shapefile (SHP) Batas Desa Provinsi DKI Jakarta.**
+
+-   Aspatial Data
+
+The link under Aspatial Data above brings you to a page where there are two types of data files you can use. Please choose **Data Vaksinasi Berbasis Kelurahan dan Kecamatan** and download a total of 12 files beginning July 2021 to June 2022.
+
+Do note that we will be using the beginning of each month for our download.
+
+# Data Wrangling
+
+## Geospatial Data
+
+### Import Geospatial Data
 
 ```{r}
-geoJAR <- st_read(dsn = "data/geospatial/",
-                  layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")                                        
+geoDKI <- st_read(dsn = "data/geospatial",
+                    layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")
 ```
 
-# Load Aspatial
+From the output above, we can see that the data set has a geometry type, Multipolygon, and has 269 features and 161 fields.
+
+### Check for invalid geometries
+
+Before we begin, we should check whether there are any invalid geometries by using the code chunk below:
 
 ```{r}
-df<- list()
-list <- list.files(path = "data/aspatial/", pattern = "*.xlsx")
+st_is_valid(geoDKI)
+```
+
+st_is_valid() from the sf package helps to check whether a geometry is valid. From the output, there are no invalid geometries.
+
+### Check for Missing values
+
+The code chunk below uses is.na() from base R checks whether the data set has NA values. which() from base R takes the indices of these values and lastly length() helps us calculate the length of the data objects.
+
+```{r}
+length(which(is.na(geoDKI) == TRUE))
+```
+
+In the above output, there are 14 NA values within the jakarta data set.
+
+To remove them, we can simply use na.exclude to delete the rows with NA values
+
+```{r}
+geoDKI <- na.omit(geoDKI)
+```
+
+We can run the same code to see whether all NA values have been removed.
+
+```{r}
+length(which(is.na(geoDKI) == TRUE))
+```
+
+Nice! All NA values have been removed.
+
+### Check Coordinate System
+
+As different countries use different projection systems, we need to first check the CRS of jakarta.
+
+The code chunk below uses st_crs() from the sf package:
+
+```{r}
+st_crs(geoDKI)
+```
+
+We notice that jakarta is using EPSG::4326 which is the wrong projection coordinate system. DKI Jakarta uses the DGN95, the 'Datum Geodesi Nasional 1995', EPSG::23878
+
+We can transform the crs by using st_transform() from the sf package:
+
+```{r}
+geoDKI <- geoDKI %>%
+  st_transform(crs = 23878)
+```
+
+```{r}
+st_crs(geoDKI)
+```
+
+From the output above, we can see that the CRS has been properly assigned.
+
+### Removing Outer Islands
+
+Let us visualise the geographical polygons.
+
+```{r}
+qtm(geoDKI)
+```
+
+We can see from the output that jakarta includes both the mainland and the outer islands. Our study area focuses only on the mainland and thus we need to remove them.
+
+```{r, eval = FALSE}
+View(geoDKI)
+```
+
+Before we continue further, we need to understand how DKI Jakarta geographical regions are segmented. The code chunk above lets you view the entire dataset. Let us understand the key variables below:
+
+With the help of uncle google, we will translate the names.
+
+| Name       | Translation  |
+|------------|--------------|
+| KODE_DESA  | Village Code |
+| DESA       | Village      |
+| PROVINSI   | Province     |
+| KAB_KOTA   | City         |
+| KECAMATAN  | District     |
+| DESA_KELUR | Sub-District |
+
+KAB_KOTA would be the most logical choice in isolating out the outer islands.
+
+The code chunk below helps to output uniques values in KAB_KOTA field.
+
+```{r}
+unique(geoDKI$KAB_KOTA)
+```
+
+The output above shows that there are 6 major cities in DKI Jakarta.
+
+The codechunk below will visualize the data with respect to the 6 major cities. We can then see which city isolates out the outer islands.
+
+```{r}
+tmap_mode("plot")
+tm_shape(geoDKI) +
+  tm_polygons("KAB_KOTA")
+```
+
+From the visualization above, we can see that KEPULAUAN SERIBU is not part of the mainland. We can then use filter() from dplyr package to remove the outer islands.
+
+```{r}
+geoDKI <- filter(geoDKI, KAB_KOTA !="KEPULAUAN SERIBU")
+```
+
+```{r}
+qtm(geoDKI)
+```
+
+Now we can see that our shapefile only contains the mainland, which is our study area.
+
+## Aspatial Data
+
+### Import Aspatial Data
+
+Before we import the data in, the file names are rather long. First, go to your data folder and change the aspatial data file names to Y-M format. It would look like this:
+
+![](images/image-1137647241.png){fig-align="center" width="488"}
+
+There are a total of 12 excel files we need to load into Rstudio. To read the files more efficiently, we will use the "for loop" function to read all the excel files into a data frame by using the read_excel() from the readxl package.
+
+```{r}
+# Set the working directory to the folder containing the Excel files
 setwd("data/aspatial/")
-for (i in 1:length(list)){
-  
-  df[i] <- lapply(list[i], FUN= read_excel)
+# Get a list of all Excel files in the directory
+aspatial_data <- list.files(pattern = ".xlsx")
+
+# Loop through the files and read each one into a data frame
+for (i in aspatial_data) {
+  assign(gsub(".xlsx", "", i), read_excel(i))
 }
 ```
 
+### Columns of interest and its translation
+
+In the aspatial data set, what we want is the total vaccination and not vaccinated numbers, along with these 4 regional classification columns.
+
 ```{r}
+names(`2022-6`)
+```
+
+| Name                        | Translation       |
+|-----------------------------|-------------------|
+| KODE KELURAHAN              | Village Code      |
+| WILAYAH KOTA                | City Region       |
+| KECAMATAN                   | Sub-District      |
+| KELURAHAN                   | Ward              |
+| TOTAL VAKSIN\\r\\nDIBERIKAN | Total Vaccination |
+| BELUM VAKSIN                | Not Vaccinated    |
+
+### Mutate Aspatial Data
+
+#### Mutating using for loop
+
+As there are 12 data sets, we will use the for loop that mutate, rename and select the fields that we want. The code chunk below does the following:
+
+1.  Renames KODE KELURAHAN, WILAYAH KOTA, KECAMATAN, KELURAHAN, TOTAL VAKSIN\\r\\nDIBERIKAN and BELUM VAKSIN to village_code, city_region, subdistrict, ward, total_vaccination and not_vaccinated respectively by using rename() from the dplyr package
+2.  Selects the renamed columns by using select() from the dplyr package
+3.  Adds a date column by using mutate() from the dplyr package
+
+All the mutated aspatial data frames are then placed into a list
+
+```{r}
+list_mth<- list(`2021-7`,`2021-8`,`2021-9`,`2021-10`,`2021-11`,`2021-12`,`2022-1`,`2022-2`,`2022-3`,`2022-4`,`2022-5`,`2022-6`)
+
+date <- c("July 2021", "August 2021", "September 2021", "October 2021", "November 2021", "December 2021", "January 2022", "February 2022", "March 2022", "April 2022", "May 2022", "June 2022")
+
+lists <- list()
+for (i in c(1:12)){
+  lists[[i]]<- list_mth[[i]] %>% 
+    rename(village_code=`KODE KELURAHAN`, 
+           city_region =`WILAYAH KOTA`, 
+           subdistrict=`KECAMATAN`, 
+           ward=`KELURAHAN`, 
+           total_vaccination= `TOTAL VAKSIN\r\nDIBERIKAN`, 
+           not_vaccinated =`BELUM VAKSIN`) %>% 
+  select(village_code, city_region, subdistrict, not_vaccinated ,total_vaccination) %>%
+    mutate(date = date[i], 
+           .before=1)
+}
+```
+
+#### Combine into a single dataframe from a list of dataframes
+
+Afterwhich, we can use Reduce() and rbind from base R to join all dataframes in the lists as one dataframe.
+
+The code chunk below does this:
+
+```{r}
+aspatial_data <- Reduce(rbind, lists)
+glimpse(aspatial_data)
+```
+
+We can see from the output that we have the columns that we want in its new name and having 3216 rows.
+
+From the glimpse output, we can see that there are NA values inside the dataframe. If you View the original individual files, you will notice that there will be a row that calculates the total of a respective column.
+
+#### Final steps to take
+
+So these are the steps to take,
+
+1.  Remove the NA rows in the dataframe
+2.  Filter out the outer islands
+    -   You will notice from the output of the code chunk below that outer islands is categorised as KAB.ADM.KEP.SERIBU
+
+```{r}
+unique(aspatial_data$city_region)
+```
+
+3.  Add in total population and vaccination rate columns
+    -   Formula:
+
+The code chunk below does this:
+
+```{r}
+aspatial_data <- aspatial_data %>%
+  na.exclude() %>%
+  filter(city_region != "KAB.ADM.KEP.SERIBU") %>%
+  mutate(total_population = total_vaccination + not_vaccinated, vaccination_rate = total_vaccination/total_population)
+```
+
+## Combining Geospatial and Aspatial together
+
+Do note that the names for aspatial_data and geoDKI are of different names. Ensure that when using left_join() from the dplyr package, we insert the argument by = c(). This will join using village_code
+
+```{r}
+vaccination <- left_join(aspatial_data, geoDKI, 
+                         by = c("village_code" = "KODE_DESA"))
+```
+
+```{r}
+vaccination <- st_as_sf(vaccination) %>%
+  mutate(date = as.factor(date))
+```
+
+# Choropleth Mapping and Analysis
+
+## Visualizing the data
+
+#### Shiny App
+
+Something extra to this TakeHome Assignment will be the use of the ShinyApp. This is a short introduction as to how Rshiny works:
+
+1.  Define the UI:
+    -   You will have an input and in this case, we will use selectInput("dates", "Pick a month", date, selected = "July 2021",multiple = FALSE).
+
+        -   "dates": This is the variable name to call into the output portion in the server
+
+        -   "Pick a month": This is a text under the user interface to ask the user to pick a choice
+
+        -   date: This is the vector of choices that they can pick from.
+
+        -   selected = "July 2021" : This sets the choice "July 2021" as the default when starting up the app
+
+        -   multiple = FALSE : Prevents the user from picking multiple options and can only choose 1
+2.  Define Server:
+    -   This is where tmap is used and calls upon the variable name defined in UI which is "dates".
+
+```{r, eval = FALSE}
+library(shiny)
+
+date <- c("July 2021", "August 2021", "September 2021", "October 2021", "November 2021", "December 2021", "January 2022", "February 2022", "March 2022", "April 2022", "May 2022", "June 2022")
+# Define the UI
+ui <- fluidPage(
+  selectInput("dates", "Pick a month",
+              date, selected = "July 2021",
+              multiple = FALSE),
+  
+  tmapOutput("my_map")
+)
+
+# Define the server
+server <- function(input, output) {
+  # Render the tmap in the output element
+  output$my_map <- renderTmap({
+    a <- vaccination |>
+      filter(date == input$dates)
+
+    tm_shape(a) +
+  tm_fill("vaccination_rate",
+          style = "quantile",
+          palette ="Blues")
+  })
+}
+
+# Run the app
+shinyApp(ui, server)
+
 
 ```
+
+Refer to visual plot : [ShinyApp](https://junhaoteo.shinyapps.io/Take-Home_Ex02/)
