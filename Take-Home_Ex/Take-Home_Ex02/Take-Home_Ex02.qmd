@@ -80,7 +80,7 @@ pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl)
 ## The Data
 
 | Type       | Name                                                                                                                   | Format    | Description                                                                   |
-|-----------------|-----------------|-----------------|---------------------|
+|------------|------------------------------------------------------------------------------------------------------------------------|-----------|-------------------------------------------------------------------------------|
 | Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
 | Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
 
@@ -223,6 +223,13 @@ qtm(geoDKI)
 
 Now we can see that our shapefile only contains the mainland, which is our study area.
 
+Now, before we move on, geoDKI has alot of columns, we will select those that are relevant to our analysis:
+
+```{r}
+geoDKI <- geoDKI %>%
+  select(2,5,6,7,8)
+```
+
 ## Aspatial Data
 
 ### Import Aspatial Data
@@ -351,7 +358,7 @@ vaccination <- st_as_sf(vaccination) %>%
 
 ## Visualizing the data
 
-#### Shiny App
+### R Shiny
 
 Something extra to this TakeHome Assignment will be the use of the ShinyApp. This is a short introduction as to how Rshiny works:
 
@@ -399,8 +406,63 @@ server <- function(input, output) {
 
 # Run the app
 shinyApp(ui, server)
-
-
 ```
 
 Refer to visual plot : [ShinyApp](https://junhaoteo.shinyapps.io/Take-Home_Ex02/)
+
+Note: There are many ways to create and design the shiny app, under the user interface. One example is using a sliderInput() to let the user their zoom level. This can be found under R shiny documentation.
+
+### Tmap Visualization
+
+Considering we have 12 months of Tmap visualization to do, it would be better to create a tmap function.
+
+The code chunk below first filters out vaccination dataframe into their respective months and then inputs the filtered dataframe into the tm_shape().
+
+```{r}
+graphing <- function(x){
+  a <- vaccination %>%
+    filter(date == x)
+  tm_shape(a) +
+  tm_fill("vaccination_rate",
+          n = 6,
+          style = "quantile",
+          palette = "Blues",
+          title = "Vaccination Rate") +
+  tm_layout(main.title = paste(x),
+            main.title.position = "left",
+            legend.height = 0.8, 
+            legend.width = 0.8,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5) +
+  tm_grid(alpha =0.2)
+}
+```
+
+We will split the plots into 2 code chunks to reduce the number of graphs in a single output for a clearer view.
+
+```{r}
+tmap_mode("plot")
+tmap_arrange(graphing("July 2021"),
+             graphing("August 2021"),
+             graphing("September 2021"),
+             graphing("October 2021"),
+             graphing("November 2021"),
+             graphing("December 2021"),
+             ncol = 2)
+```
+
+```{r}
+tmap_arrange(graphing("January 2022"),
+             graphing("February 2022"),
+             graphing("March 2022"),
+             graphing("April 2022"),
+             graphing("May 2022"),
+             graphing("June 2022"),
+             ncol = 2)
+```
+
+To visualize the data, we can just create a gif, compiled by all the plots made above.
+
+![](images/7bmx3b.gif){fig-align="center"}
+
+Likewise, this can be done on Rshiny app but this will be covered on a later date when I have attended the Rshiny workshop. :)
