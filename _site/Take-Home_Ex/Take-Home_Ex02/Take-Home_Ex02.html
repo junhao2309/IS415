@@ -274,6 +274,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#r-shiny" id="toc-r-shiny" class="nav-link" data-scroll-target="#r-shiny"><span class="toc-section-number">4.1.1</span>  R Shiny</a></li>
   <li><a href="#tmap-visualization" id="toc-tmap-visualization" class="nav-link" data-scroll-target="#tmap-visualization"><span class="toc-section-number">4.1.2</span>  Tmap Visualization</a></li>
   </ul></li>
+  <li><a href="#spatial-patterns-observed-200words" id="toc-spatial-patterns-observed-200words" class="nav-link" data-scroll-target="#spatial-patterns-observed-200words"><span class="toc-section-number">4.2</span>  Spatial Patterns observed (200words)</a></li>
+  </ul></li>
+  <li><a href="#local-gi-analysis" id="toc-local-gi-analysis" class="nav-link" data-scroll-target="#local-gi-analysis"><span class="toc-section-number">5</span>  Local Gi* Analysis</a>
+  <ul class="collapse">
+  <li><a href="#computing-contiguity-spatial-weights" id="toc-computing-contiguity-spatial-weights" class="nav-link" data-scroll-target="#computing-contiguity-spatial-weights"><span class="toc-section-number">5.1</span>  Computing Contiguity Spatial Weights</a></li>
+  <li><a href="#row-standardised-weights-matrix" id="toc-row-standardised-weights-matrix" class="nav-link" data-scroll-target="#row-standardised-weights-matrix"><span class="toc-section-number">5.2</span>  Row-standardised weights matrix</a></li>
+  <li><a href="#moran-i-test" id="toc-moran-i-test" class="nav-link" data-scroll-target="#moran-i-test"><span class="toc-section-number">5.3</span>  Moran I Test</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -301,7 +308,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 19, 2023</p>
+      <p class="date-modified">February 20, 2023</p>
     </div>
   </div>
     
@@ -354,7 +361,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>The code chunk below checks whether the packages have been installed, if not it will automatically install them and load the packages into Rstudio.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, spdep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="the-data" class="level2" data-number="2.2">
@@ -945,9 +952,158 @@ $ total_vaccination &lt;dbl&gt; 3877757, 10401, 12520, 8945, 4454, 11342, 9125, 
 </figure>
 </div>
 <p>Likewise, this can be done on Rshiny app but this will be covered on a later date when I have attended the Rshiny workshop. :)</p>
-
-
 </section>
+</section>
+<section id="spatial-patterns-observed-200words" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="spatial-patterns-observed-200words"><span class="header-section-number">4.2</span> Spatial Patterns observed (200words)</h2>
+</section>
+</section>
+<section id="local-gi-analysis" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Local Gi* Analysis</h1>
+<p>To bring you back, here is the task assigned in this section:</p>
+<ul>
+<li><p>Compute local Gi* values of the monthly vaccination rate,</p></li>
+<li><p>Display the Gi* maps of the monthly vaccination rate. The maps should only display the significant (i.e.&nbsp;p-value &lt; 0.05)</p></li>
+<li><p>With reference to the analysis results, draw statistical conclusions (not more than 250 words)</p></li>
+</ul>
+<section id="computing-contiguity-spatial-weights" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="computing-contiguity-spatial-weights"><span class="header-section-number">5.1</span> Computing Contiguity Spatial Weights</h2>
+<p>Before we can compute the global spatial autocorrelation statistics, we need to construct the spatial weights of the study area.</p>
+<p>Spatial weights: Used to define the neighbourhood relationships between geographical units in the study area.</p>
+<p>By using the poly2nb() of spdep package, we can compute the contiguity weight matrices for the study area.</p>
+<p>As we are dealing with 12 different months of vaccination rates, we will have to filter the dataframe to their respective months and calculate their respective weights. Here, we will be using the ROOK mode and thus the argument: queen =FALSE. The code chunk below is a filters to the selected month and then calculate their weights by using poly2nb() of the spdep package:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>month <span class="ot">&lt;-</span> vaccination <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(date <span class="sc">==</span> <span class="st">"July 2021"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>wm <span class="ot">&lt;-</span><span class="fu">poly2nb</span>(month,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">queen =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Neighbour list object:
+Number of regions: 261 
+Number of nonzero links: 1488 
+Percentage nonzero weights: 2.184348 
+Average number of links: 5.701149 
+Link number distribution:
+
+ 2  3  4  5  6  7  8  9 11 
+ 5 11 45 57 68 40 25  9  1 
+5 least connected regions:
+35 88 155 220 255 with 2 links
+1 most connected region:
+110 with 11 links</code></pre>
+</div>
+</div>
+<p>The summary report above shows that there are 261 area units in DKI Jakarta and the most connected area unit has 11 neighbours.</p>
+</section>
+<section id="row-standardised-weights-matrix" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="row-standardised-weights-matrix"><span class="header-section-number">5.2</span> Row-standardised weights matrix</h2>
+<p>Moving on, we will need to assign weights to each neighbouring polygon.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>rswm <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(wm,</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">style =</span> <span class="st">"W"</span>,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>rswm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Characteristics of weights list object:
+Neighbour list object:
+Number of regions: 261 
+Number of nonzero links: 1488 
+Percentage nonzero weights: 2.184348 
+Average number of links: 5.701149 
+
+Weights style: W 
+Weights constants summary:
+    n    nn  S0       S1       S2
+W 261 68121 261 96.30166 1066.273</code></pre>
+</div>
+</div>
+</section>
+<section id="moran-i-test" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="moran-i-test"><span class="header-section-number">5.3</span> Moran I Test</h2>
+<p>To run all 12 months local Gi, we will create a function calculates the weights, assignes them to each neighbouring polygon and then to calculate the statistical values. When calculating each month, we want to ensure that the dataframe used is the correct on and thus the reason why we put them together. The code chunk below features a function that takes the month as an input and returns the Moran’s I test.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>localmoran_test <span class="ot">&lt;-</span> <span class="cf">function</span>(mth){</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  month <span class="ot">&lt;-</span> vaccination <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(date <span class="sc">==</span> mth)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  wm_q <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(month,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">queen =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  rswm_q <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(wm_q,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">style =</span> <span class="st">"W"</span>,</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  fips <span class="ot">&lt;-</span> <span class="fu">order</span>(month<span class="sc">$</span>vaccination_rate)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  localMI <span class="ot">&lt;-</span> <span class="fu">localmoran</span>(month<span class="sc">$</span>vaccination_rate, rswm_q)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(localMI)</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The code chunk below applies localmoran_test() to a list of dates and output the data into a list. Do note that date is a list containing “July 2021”, “August 2021”, … , “June 2020”</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>localmoran_test_stat <span class="ot">&lt;-</span> <span class="fu">lapply</span>(date, <span class="at">FUN =</span> localmoran_test)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(localmoran_test_stat[[<span class="dv">1</span>]], <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Ii          E.Ii      Var.Ii       Z.Ii Pr(z != E(Ii))
+1 -0.07681186 -6.016665e-05 0.001690837 -1.8665392     0.06196597
+2  0.15483408 -2.134499e-04 0.013763342  1.3216087     0.18629847
+3  1.47904197 -1.296001e-02 0.825013181  1.6426270     0.10046013
+4  0.13419598 -1.014655e-04 0.003695197  2.2092707     0.02715582
+5  0.09070897 -4.669042e-04 0.030098555  0.5255416     0.59920673
+6 -0.10630834 -5.527985e-04 0.017537917 -0.7985721     0.42453859</code></pre>
+</div>
+</div>
+<p>The output of the code chunk below follows the same sequence as date where localmoran_test_stat[[1]] refers to “July 2021”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>month <span class="ot">&lt;-</span> vaccination <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="st">"July 2021"</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>vac_july.localMI <span class="ot">&lt;-</span> <span class="fu">cbind</span>(month, localmoran_test_stat[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(vac_july.localMI) <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"Ii"</span>, </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"pretty"</span>,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"RdBu"</span>,</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"local moran statistics"</span>) <span class="sc">+</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-Home_Ex02_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Mistake made:: To delete later Computing Monte Carlo Moran’s I With a similar code structure to the moran_test()</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>moran_mctest <span class="ot">&lt;-</span> <span class="cf">function</span>(mth){</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  month <span class="ot">&lt;-</span> vaccination <span class="sc">%&gt;%</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(date <span class="sc">==</span> mth)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  wm_q <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(month,</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">queen =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  rswm_q <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(wm_q,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">style =</span> <span class="st">"W"</span>,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">moran.mc</span>(month<span class="sc">$</span>vaccination_rate, </span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">listw=</span>rswm_q, </span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nsim=</span><span class="dv">999</span>, </span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">zero.policy =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.action=</span>na.omit)</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>bperm <span class="ot">&lt;-</span> <span class="fu">lapply</span>(date, <span class="at">FUN =</span> moran_mctest)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>bperm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Statistical conclusion (200words)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>)){</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  a<span class="ot">&lt;-</span> <span class="fu">summary</span>(bperm[[i]]<span class="sc">$</span>res[<span class="dv">1</span><span class="sc">:</span><span class="dv">999</span>])</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  b<span class="ot">&lt;-</span> <span class="fu">var</span>(bperm[[i]]<span class="sc">$</span>res[<span class="dv">1</span><span class="sc">:</span><span class="dv">999</span>])</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(date[i]))</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(a)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(b)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
 </section>
 </section>
 

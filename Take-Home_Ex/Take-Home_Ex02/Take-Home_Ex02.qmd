@@ -74,7 +74,7 @@ The R packages used for this analysis are:
 The code chunk below checks whether the packages have been installed, if not it will automatically install them and load the packages into Rstudio.
 
 ```{r}
-pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl)
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, spdep)
 ```
 
 ## The Data
@@ -466,3 +466,129 @@ To visualize the data, we can just create a gif, compiled by all the plots made 
 ![](images/7bmx3b.gif){fig-align="center"}
 
 Likewise, this can be done on Rshiny app but this will be covered on a later date when I have attended the Rshiny workshop. :)
+
+## Spatial Patterns observed (200words)
+
+# Local Gi\* Analysis
+
+To bring you back, here is the task assigned in this section:
+
+-   Compute local Gi\* values of the monthly vaccination rate,
+
+-   Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05)
+
+-   With reference to the analysis results, draw statistical conclusions (not more than 250 words)
+
+## Computing Contiguity Spatial Weights
+
+Before we can compute the global spatial autocorrelation statistics, we need to construct the spatial weights of the study area.
+
+Spatial weights: Used to define the neighbourhood relationships between geographical units in the study area.
+
+By using the poly2nb() of spdep package, we can compute the contiguity weight matrices for the study area.
+
+As we are dealing with 12 different months of vaccination rates, we will have to filter the dataframe to their respective months and calculate their respective weights. Here, we will be using the ROOK mode and thus the argument: queen =FALSE. The code chunk below is a filters to the selected month and then calculate their weights by using poly2nb() of the spdep package:
+
+```{r}
+month <- vaccination %>%
+    filter(date == "July 2021")
+wm <-poly2nb(month,
+             queen = TRUE)
+summary(wm)
+```
+
+The summary report above shows that there are 261 area units in DKI Jakarta and the most connected area unit has 11 neighbours.
+
+## Row-standardised weights matrix
+
+Moving on, we will need to assign weights to each neighbouring polygon.
+
+```{r}
+rswm <- nb2listw(wm,
+                 style = "W",
+                   zero.policy = TRUE)
+rswm
+```
+
+## Moran I Test
+
+To run all 12 months local Gi, we will create a function calculates the weights, assignes them to each neighbouring polygon and then to calculate the statistical values. When calculating each month, we want to ensure that the dataframe used is the correct on and thus the reason why we put them together. The code chunk below features a function that takes the month as an input and returns the Moran's I test.
+
+```{r}
+localmoran_test <- function(mth){
+  month <- vaccination %>%
+    filter(date == mth)
+  wm_q <- poly2nb(month,
+                 queen = TRUE)
+  rswm_q <- nb2listw(wm_q,
+                     style = "W",
+                     zero.policy = TRUE)
+  fips <- order(month$vaccination_rate)
+  localMI <- localmoran(month$vaccination_rate, rswm_q)
+
+  return(localMI)
+  }
+```
+
+The code chunk below applies localmoran_test() to a list of dates and output the data into a list. Do note that date is a list containing "July 2021", "August 2021", ... , "June 2020"
+
+```{r}
+localmoran_test_stat <- lapply(date, FUN = localmoran_test)
+head(localmoran_test_stat[[1]], 6)
+```
+
+The output of the code chunk below follows the same sequence as date where localmoran_test_stat\[\[1\]\] refers to "July 2021".
+
+```{r}
+month <- vaccination %>%
+  filter(date == "July 2021")
+vac_july.localMI <- cbind(month, localmoran_test_stat[[1]])
+```
+
+```{r}
+tmap_mode("plot")
+tm_shape(vac_july.localMI) +
+  tm_fill(col = "Ii", 
+          style = "pretty",
+          palette = "RdBu",
+          title = "local moran statistics") +
+  tm_borders(alpha = 0.5)
+```
+
+Mistake made:: To delete later Computing Monte Carlo Moran's I With a similar code structure to the moran_test()
+
+```{r, eval = FALSE}
+moran_mctest <- function(mth){
+  month <- vaccination %>%
+    filter(date == mth)
+  wm_q <- poly2nb(month,
+                 queen = TRUE)
+  rswm_q <- nb2listw(wm_q,
+                     style = "W",
+                     zero.policy = TRUE)
+  result <- moran.mc(month$vaccination_rate, 
+                    listw=rswm_q, 
+                    nsim=999, 
+                    zero.policy = TRUE, 
+                    na.action=na.omit)
+  return(result)
+}
+```
+
+```{r, eval = FALSE}
+set.seed(1234)
+bperm <- lapply(date, FUN = moran_mctest)
+bperm
+```
+
+Statistical conclusion (200words)
+
+```{r, eval = FALSE}
+for (i in c(1:12)){
+  a<- summary(bperm[[i]]$res[1:999])
+  b<- var(bperm[[i]]$res[1:999])
+  print(paste(date[i]))
+  print(a)
+  print(b)
+}
+```
