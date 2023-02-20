@@ -110,11 +110,11 @@ moran.test(hunan$GDPPC,
 
 By running the moran test, we look at the p value. If p value is less than alpha set, the result is significant.
 
-| Significance and z-value                                                 | Explanation                                                                                                                                                                                                                                                                                                                                                                                                                              |
-|-----------------|------------------------------------------------------|
-| The p-value is *not* statistically significant.                          | You cannot reject the null hypothesis. It is quite possible that the spatial distribution of feature values is the result of random spatial processes. The observed spatial pattern of feature values could very well be one of many, many possible versions of complete spatial randomness (CSR).                                                                                                                                       |
-| The p-value *is* statistically significant, and the z-score is positive. | You may reject the null hypothesis. The spatial distribution of high values and/or low values in the dataset is more spatially clustered than would be expected if underlying spatial processes were random.                                                                                                                                                                                                                             |
-| The p-value *is* statistically significant, and the z-score is negative. | You may reject the null hypothesis. The spatial distribution of high values and low values in the dataset is more spatially dispersed than would be expected if underlying spatial processes were random. A dispersed spatial pattern often reflects some type of competitive process---a feature with a high value repels other features with high values; similarly, a feature with a low value repels other features with low values. |
+| Significance and z-value                                                 | Explanation                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|------------------|------------------------------------------------------|
+| The p-value is *not* statistically significant.                          | You cannot reject the null hypothesis. It is quite possible that the spatial distribution of feature values is the result of random spatial processes. The observed spatial pattern of feature values could very well be one of many, many possible versions of complete spatial randomness (CSR).                                                                                                                                           |
+| The p-value *is* statistically significant, and the z-score is positive. | You may reject the null hypothesis. The spatial distribution of high values and/or low values in the dataset is **more spatially clustered** than would be expected if underlying spatial processes were random.                                                                                                                                                                                                                             |
+| The p-value *is* statistically significant, and the z-score is negative. | You may reject the null hypothesis. The spatial distribution of high values and low values in the dataset is **more spatially dispersed** than would be expected if underlying spatial processes were random. A dispersed spatial pattern often reflects some type of competitive process---a feature with a high value repels other features with high values; similarly, a feature with a low value repels other features with low values. |
 
 : Knowing how to read the Moran Test Statistic
 
@@ -232,6 +232,7 @@ print(GC_corr)
 ```
 
 # Chapter 10
+
 ## Cluster and Outlier Analysis
 
 ### Computing local Moran's I
@@ -259,18 +260,24 @@ localmoran() function returns a matrix of values whose columns are:
 -   Pr(): the p-value of local moran statistic
 
 The code chunk below list the content of the local Moran matrix
+
 ```{r}
 printCoefmat(data.frame(localMI[fips,],
                         row.names =hunan$County[fips]),
              check.names=FALSE)
 ```
+
 ### Mapping Local Moran's
+
 ```{r}
 hunan.localMI <- cbind(hunan,localMI) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
+
 ### Mapping Local Moran's I values
+
 Using choropleth mapping functions of tmap package, we can plot the local Moran's I values by using the code chunk below.
+
 ```{r}
 tm_shape(hunan.localMI) +
   tm_fill(col = "Ii", 
@@ -281,7 +288,9 @@ tm_shape(hunan.localMI) +
 ```
 
 ### Mapping local Moran's I p-values.
+
 It may be better to show p-values to see which regions are statistically significant
+
 ```{r}
 tm_shape(hunan.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -292,6 +301,7 @@ tm_shape(hunan.localMI) +
 ```
 
 ### Mapping both local Moran's I values and p-values
+
 ```{r}
 localMI.map <- tm_shape(hunan.localMI) +
   tm_fill(col = "Ii", 
@@ -310,6 +320,7 @@ tmap_arrange(localMI.map, pvalue.map, asp=1, ncol=2)
 ```
 
 ## Creating a LISA Cluster Map
+
 ### Plotting Moran scatterplot
 
 ```{r}
@@ -320,7 +331,9 @@ nci <- moran.plot(hunan$GDPPC, rswm_q,
 ```
 
 ### Plotting Moran scatterplot with standardised variable
+
 First we will use scale() to centers and scales the variable. Here centering is done by subtracting the mean (omitting NAs) the corresponding columns, and scaling is done by dividing the (centered) variable by their standard deviations.
+
 ```{r}
 hunan$Z.GDPPC <- scale(hunan$GDPPC) %>% 
   as.vector 
@@ -329,6 +342,7 @@ hunan$Z.GDPPC <- scale(hunan$GDPPC) %>%
 as.vector() is added to make sure the data type is a vector that can be map neatly into a dataframe.
 
 We can then plot the scatter plot using the code chunk below.
+
 ```{r}
 nci2 <- moran.plot(hunan$Z.GDPPC, rswm_q,
                    labels=as.character(hunan$County),
@@ -337,21 +351,29 @@ nci2 <- moran.plot(hunan$Z.GDPPC, rswm_q,
 ```
 
 ### Preparing LISA map classes
+
 The code chunks below show the steps to prepare a LISA cluster map
+
 ```{r}
 quadrant <- vector(mode="numeric",
                    length=nrow(localMI))
 ```
+
 Next, derive the spatially lagged variable of interest and centres the spatially lagged variable around its mean.
+
 ```{r}
 hunan$lag_GDPPC <- lag.listw(rswm_q, hunan$GDPPC)
 DV <- hunan$lag_GDPPC - mean(hunan$lag_GDPPC)     
 ```
+
 This is followed by centering the local Moran's around the mean
+
 ```{r}
 LM_I <- localMI[,1] - mean(localMI[,1])
 ```
+
 Next, we can set the statistical significance level for the local Moran
+
 ```{r}
 signif <- 0.05
 ```
@@ -368,6 +390,7 @@ quadrant[localMI[,5]>signif] <- 0
 ```
 
 Combined everything above into the codechunk below
+
 ```{r}
 quadrant <- vector(mode="numeric",length=nrow(localMI))
 hunan$lag_GDPPC <- lag.listw(rswm_q, hunan$GDPPC)
@@ -382,6 +405,7 @@ quadrant[localMI[,5]>signif] <- 0
 ```
 
 ### Plotting LISA map
+
 ```{r}
 hunan.localMI$quadrant <- quadrant
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -396,9 +420,11 @@ tm_shape(hunan.localMI) +
   tm_view(set.zoom.limits = c(11,17)) +
   tm_borders(alpha=0.5)
 ```
-For effective interpretation, it is better to plot both the local Moran’s I values map and its corresponding p-values map next to each other.
+
+For effective interpretation, it is better to plot both the local Moran's I values map and its corresponding p-values map next to each other.
 
 The code chunk below will be used to create such visualisation.
+
 ```{r}
 gdppc <- qtm(hunan, "GDPPC")
 
@@ -423,9 +449,4 @@ tmap_arrange(gdppc, LISAmap,
 
 ### Getis Ord's G-Statistics
 
-### Computing Gi Statistics 
-
-
-
-
-
+### Computing Gi Statistics

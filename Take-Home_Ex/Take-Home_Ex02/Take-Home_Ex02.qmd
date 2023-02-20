@@ -80,7 +80,7 @@ pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, s
 ## The Data
 
 | Type       | Name                                                                                                                   | Format    | Description                                                                   |
-|------------|------------------------------------------------------------------------------------------------------------------------|-----------|-------------------------------------------------------------------------------|
+|------------------|--------------------|------------------|------------------|
 | Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
 | Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
 
@@ -537,58 +537,55 @@ localmoran_test_stat <- lapply(date, FUN = localmoran_test)
 head(localmoran_test_stat[[1]], 6)
 ```
 
-The output of the code chunk below follows the same sequence as date where localmoran_test_stat\[\[1\]\] refers to "July 2021".
+The output of the code chunk below follows the same sequence as date where localmoran_test_stat\[\[1\]\] refers to "July 2021" and localmoran_test_stat\[\[12\]\] refers to "June 2022".
+
+The code chunks below creates a function that binds the filtered dataframe and the localmoran_test_stat together and loops it into a list called vac.localMI.
 
 ```{r}
-month <- vaccination %>%
-  filter(date == "July 2021")
-vac_july.localMI <- cbind(month, localmoran_test_stat[[1]])
+localMI<- function(mth,x){
+  month <- vaccination %>%
+    filter(date == mth)
+  vac_mth.local.MI <- cbind(month, localmoran_test_stat[[x]]) %>%
+    rename(Pr.Ii=`Pr.z....E.Ii..`)
+  return(vac_mth.local.MI)
+}
 ```
+
+```{r}
+vac.localMI <- list()
+for (i in 1:12){
+  vac.localMI[[i]] <- localMI(date[i], i)
+}
+```
+
+We can then visualize the date below.
 
 ```{r}
 tmap_mode("plot")
-tm_shape(vac_july.localMI) +
-  tm_fill(col = "Ii", 
-          style = "pretty",
-          palette = "RdBu",
-          title = "local moran statistics") +
+localMI_Map <- function(MI){
+  tm_shape(MI) +
+  tm_fill(col = "Pr.Ii",
+          breaks=c(-Inf, 0.001, 0.01, 0.05, Inf),
+          palette = "-Blues",
+          title = "local moran p-value") +
   tm_borders(alpha = 0.5)
-```
-
-Mistake made:: To delete later Computing Monte Carlo Moran's I With a similar code structure to the moran_test()
-
-```{r, eval = FALSE}
-moran_mctest <- function(mth){
-  month <- vaccination %>%
-    filter(date == mth)
-  wm_q <- poly2nb(month,
-                 queen = TRUE)
-  rswm_q <- nb2listw(wm_q,
-                     style = "W",
-                     zero.policy = TRUE)
-  result <- moran.mc(month$vaccination_rate, 
-                    listw=rswm_q, 
-                    nsim=999, 
-                    zero.policy = TRUE, 
-                    na.action=na.omit)
-  return(result)
 }
 ```
 
-```{r, eval = FALSE}
-set.seed(1234)
-bperm <- lapply(date, FUN = moran_mctest)
-bperm
+```{r}
+tmap_arrange(localMI_Map(vac.localMI[[1]]),
+             localMI_Map(vac.localMI[[2]]),
+             localMI_Map(vac.localMI[[3]]),
+             localMI_Map(vac.localMI[[4]]),
+             localMI_Map(vac.localMI[[5]]),
+             localMI_Map(vac.localMI[[6]]),
+             ncol = 2)
 ```
 
-Statistical conclusion (200words)
+### Statistical Conclusion (Not more than 250words) :
 
-```{r, eval = FALSE}
-for (i in c(1:12)){
-  a<- summary(bperm[[i]]$res[1:999])
-  b<- var(bperm[[i]]$res[1:999])
-  print(paste(date[i]))
-  print(a)
-  print(b)
-}
+###  
+
+```{r}
+
 ```

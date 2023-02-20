@@ -1,0 +1,23 @@
+---
+title: "In-class Exercise 7: Global and Local Measures"
+date: "20 February 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Getting Started
+```{r}
+
+```
+
+
+
+
+
+
