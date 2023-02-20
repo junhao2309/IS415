@@ -655,7 +655,7 @@
     "href": "In-class_Ex/In-class_Ex07/In-class_Ex07.html#visualizing-gi",
     "title": "In-class Exercise 7: Global and Local Measures",
     "section": "3.2 Visualizing Gi*",
-    "text": "3.2 Visualizing Gi*\n\ntmap_mode(\"view\")\ntm_shape(HCSA)+\n  tm_fill(\"gi_star\") +\n  tm_borders(alpha=0.5)+\n  tm_view(set.zoom.limits = c(6,8))\n\n\n\n\n\n\n\ntmap_mode(\"plot\")\ntm_shape(HCSA) +\n  tm_fill(\"p_sim\") +\n  tm_borders(alpha = 0.5)\n\n\n\n\n\npacman::p_load(plotly)\n\n\nThe downloaded binary packages are in\n    /var/folders/fc/f1h6qsms6kn106201z7qmqdc0000gn/T//RtmpZ1Esqr/downloaded_packages\n\n\n\nGDPPC <- read_csv(\"data/aspatial/Hunan_GDPPC.csv\")"
+    "text": "3.2 Visualizing Gi*\n\ntmap_mode(\"view\")\ntm_shape(HCSA)+\n  tm_fill(\"gi_star\") +\n  tm_borders(alpha=0.5)+\n  tm_view(set.zoom.limits = c(6,8))\n\n\n\n\n\n\n\ntmap_mode(\"plot\")\ntm_shape(HCSA) +\n  tm_fill(\"p_sim\") +\n  tm_borders(alpha = 0.5)\n\n\n\n\n\npacman::p_load(plotly)\n\n\nGDPPC <- read_csv(\"data/aspatial/Hunan_GDPPC.csv\")"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex07/In-class_Ex07.html#creating-a-time-series-cube",
