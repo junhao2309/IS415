@@ -157,7 +157,7 @@ GDPPC <- read_csv("data/aspatial/Hunan_GDPPC.csv")
 ```
 ## Creating a Time Series Cube
 
-The code chunk below creates a spatio-temporal cube by using spacetime() from the sfdep package
+The code chunk below creates a spatio-temporal cube by using spacetime() from the sfdep packagePC
 ```{r}
 GDPPC_st <- spacetime(GDPPC, hunan,
                       .loc_col = "County",

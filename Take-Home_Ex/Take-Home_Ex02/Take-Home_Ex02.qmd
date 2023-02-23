@@ -80,7 +80,7 @@ pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, s
 ## The Data
 
 | Type       | Name                                                                                                                   | Format    | Description                                                                   |
-|------------------|--------------------|------------------|------------------|
+|----------------|------------------------|----------------|----------------|
 | Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
 | Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
 
@@ -195,7 +195,7 @@ With the help of uncle google, we will translate the names.
 
 KAB_KOTA would be the most logical choice in isolating out the outer islands.
 
-The code chunk below helps to output uniques values in KAB_KOTA field.
+The code chunk below helps to output unique values in KAB_KOTA field.
 
 ```{r}
 unique(geoDKI$KAB_KOTA)
@@ -218,16 +218,19 @@ geoDKI <- filter(geoDKI, KAB_KOTA !="KEPULAUAN SERIBU")
 ```
 
 ```{r}
-qtm(geoDKI)
+tm_shape(geoDKI) + 
+  tm_polygons("KAB_KOTA")
 ```
 
 Now we can see that our shapefile only contains the mainland, which is our study area.
 
-Now, before we move on, geoDKI has alot of columns, we will select those that are relevant to our analysis:
+Now, before we move on, geoDKI has alot of columns.
+Since we are only interested in the subdistrict level, we will select we will select those that are relevant to our analysis and rename them:
 
 ```{r}
 geoDKI <- geoDKI %>%
-  select(2,5,6,7,8)
+  select(7, "geometry") %>%
+  rename(subdistrict=`KECAMATAN`)
 ```
 
 ## Aspatial Data
@@ -284,19 +287,17 @@ All the mutated aspatial data frames are then placed into a list
 ```{r}
 list_mth<- list(`2021-7`,`2021-8`,`2021-9`,`2021-10`,`2021-11`,`2021-12`,`2022-1`,`2022-2`,`2022-3`,`2022-4`,`2022-5`,`2022-6`)
 
-date <- c("July 2021", "August 2021", "September 2021", "October 2021", "November 2021", "December 2021", "January 2022", "February 2022", "March 2022", "April 2022", "May 2022", "June 2022")
+date <- c("2021-07-01", "2021-08-01", "2021-09-01", "2021-10-01", "2021-11-01", "2021-12-01", "2022-01-01", "2022-02-01", "2022-03-01", "2022-04-01", "2022-05-01", "2022-06-01")
 
 lists <- list()
 for (i in c(1:12)){
   lists[[i]]<- list_mth[[i]] %>% 
-    rename(village_code=`KODE KELURAHAN`, 
-           city_region =`WILAYAH KOTA`, 
+    rename(city_region =`WILAYAH KOTA`, 
            subdistrict=`KECAMATAN`, 
-           ward=`KELURAHAN`, 
            total_vaccination= `TOTAL VAKSIN\r\nDIBERIKAN`, 
            not_vaccinated =`BELUM VAKSIN`) %>% 
-  select(village_code, city_region, subdistrict, not_vaccinated ,total_vaccination) %>%
-    mutate(date = date[i], 
+  select(city_region, subdistrict, not_vaccinated ,total_vaccination) %>%
+    mutate(date = as.Date(date[i]), 
            .before=1)
 }
 ```
@@ -314,7 +315,7 @@ glimpse(aspatial_data)
 
 We can see from the output that we have the columns that we want in its new name and having 3216 rows.
 
-From the glimpse output, we can see that there are NA values inside the dataframe. If you View the original individual files, you will notice that there will be a row that calculates the total of a respective column.
+From the glimpse output, we can see that there are NA values inside the dataframe. If you View the original individual files, you will notice that there will be a row that calculates the total of a respective column and that row contains NA values.
 
 #### Final steps to take
 
@@ -336,17 +337,50 @@ The code chunk below does this:
 ```{r}
 aspatial_data <- aspatial_data %>%
   na.exclude() %>%
-  filter(city_region != "KAB.ADM.KEP.SERIBU") %>%
-  mutate(total_population = total_vaccination + not_vaccinated, vaccination_rate = total_vaccination/total_population)
+  filter(city_region != "KAB.ADM.KEP.SERIBU") %>% 
+  mutate(total_population = total_vaccination + not_vaccinated, vaccination_rate = total_vaccination/total_population) %>%
+  select(date, subdistrict, vaccination_rate)
 ```
 
-## Combining Geospatial and Aspatial together
-
-Do note that the names for aspatial_data and geoDKI are of different names. Ensure that when using left_join() from the dplyr package, we insert the argument by = c(). This will join using village_code
+Before we join both aspatial and geospatial data, we have to check whether the subdistrict names match between files. To do so, we will use setdiff() from the dplyr package:
+```{r}
+setdiff(aspatial_data$subdistrict, geoDKI$subdistrict)
+```
+```{r}
+setdiff(geoDKI$subdistrict, aspatial_data$subdistrict)
+```
+From the output above, we can compare and see that these names usually differ by a spacing. The first output shows the names in aspatial_data while the second output show the names in geoDKI. 
+We will amend geoDKI to match the names in the aspatial_data.
+```{r}
+n1 <- which(geoDKI$subdistrict == "KRAMATJATI")
+n2 <- index <- which(geoDKI$subdistrict == "PAL MERAH")
+n3 <- index <- which(geoDKI$subdistrict == "PULOGADUNG")
+n4 <- index <- which(geoDKI$subdistrict == "SETIABUDI")
+n5 <- index <- which(geoDKI$subdistrict == "KALIDERES")
+for (i in n1) {
+  geoDKI$subdistrict[i] <- "KRAMAT JATI"
+}
+for (i in n2) {
+  geoDKI$subdistrict[i] <- "PALMERAH"
+}
+for (i in n3) {
+  geoDKI$subdistrict[i] <- "PULO GADUNG"
+}
+for (i in n4) {
+  geoDKI$subdistrict[i] <- "SETIA BUDI"
+}
+for (i in n5) {
+  geoDKI$subdistrict[i] <- "KALI DERES"
+}
+```
+Done! Now we can just do the same check, we will notice that the output is character(0) meaning that both columns names have matched.
+```{r}
+setdiff(aspatial_data$subdistrict, geoDKI$subdistrict)
+```
 
 ```{r}
 vaccination <- left_join(aspatial_data, geoDKI, 
-                         by = c("village_code" = "KODE_DESA"))
+                         by = "subdistrict")
 ```
 
 ```{r}
@@ -442,32 +476,29 @@ We will split the plots into 2 code chunks to reduce the number of graphs in a s
 
 ```{r}
 tmap_mode("plot")
-tmap_arrange(graphing("July 2021"),
-             graphing("August 2021"),
-             graphing("September 2021"),
-             graphing("October 2021"),
-             graphing("November 2021"),
-             graphing("December 2021"),
+tmap_arrange(graphing("2021-07-01"),
+             graphing("2021-08-01"),
+             graphing("2021-09-01"),
+             graphing("2021-10-01"),
+             graphing("2021-11-01"),
+             graphing("2021-12-01"),
              ncol = 2)
 ```
 
 ```{r}
-tmap_arrange(graphing("January 2022"),
-             graphing("February 2022"),
-             graphing("March 2022"),
-             graphing("April 2022"),
-             graphing("May 2022"),
-             graphing("June 2022"),
+tmap_arrange(graphing("2022-01-01"),
+             graphing("2022-02-01"),
+             graphing("2022-03-01"),
+             graphing("2022-04-01"),
+             graphing("2022-05-01"),
+             graphing("2022-06-01"),
              ncol = 2)
 ```
-
-To visualize the data, we can just create a gif, compiled by all the plots made above.
-
-![](images/7bmx3b.gif){fig-align="center"}
 
 Likewise, this can be done on Rshiny app but this will be covered on a later date when I have attended the Rshiny workshop. :)
 
 ## Spatial Patterns observed (200words)
+
 
 # Local Gi\* Analysis
 
@@ -485,107 +516,156 @@ Before we can compute the global spatial autocorrelation statistics, we need to 
 
 Spatial weights: Used to define the neighbourhood relationships between geographical units in the study area.
 
-By using the poly2nb() of spdep package, we can compute the contiguity weight matrices for the study area.
-
-As we are dealing with 12 different months of vaccination rates, we will have to filter the dataframe to their respective months and calculate their respective weights. Here, we will be using the ROOK mode and thus the argument: queen =FALSE. The code chunk below is a filters to the selected month and then calculate their weights by using poly2nb() of the spdep package:
+As we are dealing with 12 different months of vaccination rates, we will have to filter the dataframe to their respective months and calculate their respective weights. Here, we will be using the QUEEN mode and thus the argument: queen =TRUE. The code chunk below shows the function that filters to the selected month and then calculate their weights.
 
 ```{r}
 month <- vaccination %>%
-    filter(date == "July 2021")
-wm <-poly2nb(month,
-             queen = TRUE)
-summary(wm)
+  filter(date == "2021-07-01")
+wm_q <- month %>%
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before=1)
+wm_q
 ```
 
-The summary report above shows that there are 261 area units in DKI Jakarta and the most connected area unit has 11 neighbours.
-
-## Row-standardised weights matrix
-
-Moving on, we will need to assign weights to each neighbouring polygon.
-
+## Computing local Moran's I
+Next, we will use local_moran() of the sfdep package to calculate local Moran's I.
 ```{r}
-rswm <- nb2listw(wm,
-                 style = "W",
-                   zero.policy = TRUE)
-rswm
+set.seed(1234)
+lisa <- wm_q %>%
+  mutate(local_moran = local_moran(vaccination_rate,
+                                   nb,
+                                   wt,
+                                   nsim = 99),
+         .before = 1) %>%
+  unnest(local_moran)
 ```
 
-## Moran I Test
-
-To run all 12 months local Gi, we will create a function calculates the weights, assignes them to each neighbouring polygon and then to calculate the statistical values. When calculating each month, we want to ensure that the dataframe used is the correct on and thus the reason why we put them together. The code chunk below features a function that takes the month as an input and returns the Moran's I test.
-
-```{r}
-localmoran_test <- function(mth){
-  month <- vaccination %>%
-    filter(date == mth)
-  wm_q <- poly2nb(month,
-                 queen = TRUE)
-  rswm_q <- nb2listw(wm_q,
-                     style = "W",
-                     zero.policy = TRUE)
-  fips <- order(month$vaccination_rate)
-  localMI <- localmoran(month$vaccination_rate, rswm_q)
-
-  return(localMI)
-  }
-```
-
-The code chunk below applies localmoran_test() to a list of dates and output the data into a list. Do note that date is a list containing "July 2021", "August 2021", ... , "June 2020"
-
-```{r}
-localmoran_test_stat <- lapply(date, FUN = localmoran_test)
-head(localmoran_test_stat[[1]], 6)
-```
-
-The output of the code chunk below follows the same sequence as date where localmoran_test_stat\[\[1\]\] refers to "July 2021" and localmoran_test_stat\[\[12\]\] refers to "June 2022".
-
-The code chunks below creates a function that binds the filtered dataframe and the localmoran_test_stat together and loops it into a list called vac.localMI.
-
-```{r}
-localMI<- function(mth,x){
-  month <- vaccination %>%
-    filter(date == mth)
-  vac_mth.local.MI <- cbind(month, localmoran_test_stat[[x]]) %>%
-    rename(Pr.Ii=`Pr.z....E.Ii..`)
-  return(vac_mth.local.MI)
-}
-```
-
-```{r}
-vac.localMI <- list()
-for (i in 1:12){
-  vac.localMI[[i]] <- localMI(date[i], i)
-}
-```
-
-We can then visualize the date below.
+## Visualizing p-value of local Moran's I
 
 ```{r}
 tmap_mode("plot")
-localMI_Map <- function(MI){
-  tm_shape(MI) +
-  tm_fill(col = "Pr.Ii",
-          breaks=c(-Inf, 0.001, 0.01, 0.05, Inf),
-          palette = "-Blues",
-          title = "local moran p-value") +
-  tm_borders(alpha = 0.5)
+tm_shape(lisa) +
+  tm_fill("p_ii_sim", 
+          palette ="-Reds", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, Inf)) +
+  tm_borders(alpha = 0.5) +
+   tm_layout(main.title = "p-value of local Moran's I",
+            main.title.size = 0.8)
+```
+## Putting it all together
+As you follow along, these are the 3 main steps to creating the plots required for this section. As mentioned above, we will combine these 3 sections into a single function to calculate the local Gi for each month. 
+The code chunk below takes in input "mth" to filter vaccination to the respective month and calculate the weights and the local Moran's I.
+### Creating the local MI computation function
+```{r}
+lisa <- function(mth){
+  set.seed(1234)
+  month <- vaccination %>%
+    filter(date ==mth)
+  wm_q <- month %>%
+    mutate(nb = st_contiguity(geometry),
+           wt = st_weights(nb,
+                           style = "W"),
+           .before = 1)
+  result <- wm_q %>%
+    mutate(local_moran = local_moran(vaccination_rate,
+                                     nb,
+                                     wt,
+                                     nsim = 99),
+           .before = 1) %>% 
+    unnest(local_moran)
+  return(result)
+}
+```
+
+Now we will calculate the local Moran's I for each month and place it into a list for easy referencing for the plots later.
+```{r}
+date = c("2021-07-01", "2021-08-01", "2021-09-01", "2021-10-01", "2021-11-01", "2021-12-01", "2022-01-01", "2022-02-01", "2022-03-01", "2022-04-01", "2022-05-01", "2022-06-01")
+lisa_LMI <- list()
+for (i in 1:12){
+  lisa_LMI[[i]] <- lisa(date[i])
+}
+```
+Now we have a list of dataframes with local Moran I computed. 
+Note that lisa_LMI[[1]] refers to July 2021, in ascending order. 
+
+### Creating the Tmap function
+```{r}
+graph_lisa <- function(x){
+  plot <- tm_shape(x) +
+    tm_fill("p_ii_sim", 
+            palette ="-Reds", 
+            breaks=c(-Inf, 0.001, 0.01, 0.05, Inf)) +
+    tm_borders(alpha = 0.5) +
+    tm_layout(main.title = paste("p-value of local Moran's I", "(",x$date[1],")"),
+              main.title.size = 0.8)
+  return(plot)
 }
 ```
 
 ```{r}
-tmap_arrange(localMI_Map(vac.localMI[[1]]),
-             localMI_Map(vac.localMI[[2]]),
-             localMI_Map(vac.localMI[[3]]),
-             localMI_Map(vac.localMI[[4]]),
-             localMI_Map(vac.localMI[[5]]),
-             localMI_Map(vac.localMI[[6]]),
-             ncol = 2)
+tmap_mode("plot")
+tmap_arrange(graph_lisa(lisa_LMI[[1]]),
+             graph_lisa(lisa_LMI[[2]]),
+             graph_lisa(lisa_LMI[[3]]),
+             graph_lisa(lisa_LMI[[4]]),
+             graph_lisa(lisa_LMI[[5]]),
+             graph_lisa(lisa_LMI[[6]]),
+             ncol =2)
 ```
-
-### Statistical Conclusion (Not more than 250words) :
-
-###  
-
 ```{r}
-
+tmap_arrange(graph_lisa(lisa_LMI[[7]]),
+             graph_lisa(lisa_LMI[[8]]),
+             graph_lisa(lisa_LMI[[9]]),
+             graph_lisa(lisa_LMI[[10]]),
+             graph_lisa(lisa_LMI[[11]]),
+             graph_lisa(lisa_LMI[[12]]),
+             ncol =2)
 ```
+## Statistical Conclusion (Not more than 250words) :
+
+# Emerging Hot Spot Analysis(EHSA)
+## Creating a Time Series Cube
+
+The code chunk below creates a spatio-temporal cube by using spacetime() from the sfdep package
+
+```{r, eval = FALSE}
+vaccination_rate_st<- spacetime(aspatial_data, 
+                                geoDKI, 
+                                .loc_col = "subdistrict",
+                                .time_col = "date")
+```
+
+```{r, eval = FALSE}
+vaccination_rate_nb <- vaccination_rate_st %>%
+  activate("geometry")
+  
+result <- vaccination_rate_nb %>%
+  mutate(
+    nb = include_self(st_contiguity(geometry)),
+    wt = st_weights(nb)) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+
+```{r,eval = FALSE}
+gi_star <- vaccination_rate_nb %>%
+  group_by(as.numeric(date)) %>%
+  mutate(gi_star = local_gstar_perm(aspatial_data, 
+                                    nb, 
+                                    wt, 
+                                    nsim = 99)) %>%
+  tidyr::unnest(gi_star)
+```
+
+```{r, eval = FALSE}
+HCSA <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    aspatial_data, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+HCSA
+```
+
