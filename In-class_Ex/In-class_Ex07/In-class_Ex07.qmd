@@ -12,6 +12,7 @@ editor: visual
 ---
 
 # Getting Started
+
 Unlike the Hands-on Ex07, we will mainly use sfdep package for calculating the global and local measures. This is because spdep is going to be discontinued.
 
 ## Load packages:
@@ -53,6 +54,7 @@ wm_q <- hunan_GDPPC %>%
 ```
 
 ## Computing Global Moran's I
+
 ```{r}
 moranI <- global_moran(wm_q$GDPPC,
                        wm_q$nb,
@@ -60,12 +62,15 @@ moranI <- global_moran(wm_q$GDPPC,
 ```
 
 ## Performing Global Moran's I Test
+
 ```{r}
 global_moran_test(wm_q$GDPPC,
                   wm_q$nb,
                   wm_q$wt)
 ```
+
 ## Performing Global Moran'I permutation test
+
 ```{r}
 set.seed(1234)
 ```
@@ -76,7 +81,9 @@ global_moran_perm(wm_q$GDPPC,
                   wm_q$wt,
                   nsim=99)
 ```
+
 ## Computing Local Moran's I
+
 ```{r}
 lisa <- wm_q %>%
   mutate(local_moran = local_moran(GDPPC,
@@ -91,6 +98,7 @@ lisa
 ## Visualizing Lisa
 
 ### Visualize Local Moran's I plot
+
 ```{r}
 tmap_mode("plot")
 tm_shape(lisa) +
@@ -100,6 +108,7 @@ tm_shape(lisa) +
 ```
 
 ### p-value plot
+
 ```{r}
 tmap_mode("plot")
 tm_shape(lisa) +
@@ -123,6 +132,7 @@ tm_shape(lisa_sig) +
 # Hot Spot and Cold Spot Analysis
 
 ## Computing local Moran'sI
+
 ```{r}
 HCSA <- wm_q %>%
   mutate(local_Gi = local_gstar_perm(
@@ -132,7 +142,8 @@ HCSA <- wm_q %>%
 HCSA
 ```
 
-## Visualizing Gi*
+## Visualizing Gi\*
+
 ```{r}
 tmap_mode("view")
 tm_shape(HCSA)+
@@ -155,9 +166,11 @@ pacman::p_load(plotly)
 ```{r}
 GDPPC <- read_csv("data/aspatial/Hunan_GDPPC.csv")
 ```
+
 ## Creating a Time Series Cube
 
 The code chunk below creates a spatio-temporal cube by using spacetime() from the sfdep packagePC
+
 ```{r}
 GDPPC_st <- spacetime(GDPPC, hunan,
                       .loc_col = "County",
@@ -175,6 +188,7 @@ GDPPC_nb <- GDPPC_st %>%
 ```
 
 ### Computing Gi
+
 ```{r}
 gi_star <- GDPPC_nb %>%
   group_by(Year) %>%
@@ -192,7 +206,3 @@ ehsa <- emerging_hotspot_analysis(
   k =1,
   nsim = 99)
 ```
-
-
-
-
