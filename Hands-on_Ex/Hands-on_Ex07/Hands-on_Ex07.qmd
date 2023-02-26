@@ -13,13 +13,15 @@ editor: visual
 
 # Overview
 
-In this hands-on exercise, we are taught on the contents in Chapter 9: Global Measures of Spatial Autocorrelation and Chapter 10: Local Measures of Spatial Autocorrelation. We will be using the spdep package amongst other packages used.
+In this hands-on exercise, we are taught on the contents in Chapter 9: Global Measures of Spatial Autocorrelation and Chapter 10: Local Measures of Spatial Autocorrelation.
+We will be using the spdep package amongst other packages used.
 
 # Getting Started
 
 ## Analytical problem
 
-As mentioned in the course materials, in spatial policy, one of the main development objective of the local government is to ensure equal distribution of development with in the province. This helps policy makers to zoom in on any unequal distribution which can be seen clustering.
+As mentioned in the course materials, in spatial policy, one of the main development objective of the local government is to ensure equal distribution of development with in the province.
+This helps policy makers to zoom in on any unequal distribution which can be seen clustering.
 
 ## The Study Data
 
@@ -74,9 +76,12 @@ tmap_arrange(equal,
 
 ## Computing Contiguity Spatial Weights
 
-Before we compute the global spatial autocorrelation statistics, we need to construct the spatial weights of the study area. The spatial weights is used to define the neighbourhood relationships between the geographical units in the study area.
+Before we compute the global spatial autocorrelation statistics, we need to construct the spatial weights of the study area.
+The spatial weights is used to define the neighbourhood relationships between the geographical units in the study area.
 
-By using the poly2nb() of spdep package, we can compute the coniguity weight matrices for the study area. There are two main modes, queen and rook. By using the arguments below: queen = TRUE : QUEEN queen = FALSE : ROOK
+By using the poly2nb() of spdep package, we can compute the coniguity weight matrices for the study area.
+There are two main modes, queen and rook.
+By using the arguments below: queen = TRUE : QUEEN queen = FALSE : ROOK
 
 ```{r}
 wm_q <- poly2nb(hunan, 
@@ -108,10 +113,11 @@ moran.test(hunan$GDPPC,
            na.action= na.omit)
 ```
 
-By running the moran test, we look at the p value. If p value is less than alpha set, the result is significant.
+By running the moran test, we look at the p value.
+If p value is less than alpha set, the result is significant.
 
 | Significance and z-value                                                 | Explanation                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-|------------------|------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | The p-value is *not* statistically significant.                          | You cannot reject the null hypothesis. It is quite possible that the spatial distribution of feature values is the result of random spatial processes. The observed spatial pattern of feature values could very well be one of many, many possible versions of complete spatial randomness (CSR).                                                                                                                                           |
 | The p-value *is* statistically significant, and the z-score is positive. | You may reject the null hypothesis. The spatial distribution of high values and/or low values in the dataset is **more spatially clustered** than would be expected if underlying spatial processes were random.                                                                                                                                                                                                                             |
 | The p-value *is* statistically significant, and the z-score is negative. | You may reject the null hypothesis. The spatial distribution of high values and low values in the dataset is **more spatially dispersed** than would be expected if underlying spatial processes were random. A dispersed spatial pattern often reflects some type of competitive process---a feature with a high value repels other features with high values; similarly, a feature with a low value repels other features with low values. |
@@ -122,7 +128,8 @@ Credits: <https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statis
 
 ### Computing Monte Carlo Moran's I
 
-The code chunk below performs the permutation test for Moran's I statistic by using moran.mc() of spdep. A total of 1000 simulation will be performed.
+The code chunk below performs the permutation test for Moran's I statistic by using moran.mc() of spdep.
+A total of 1000 simulation will be performed.
 
 ```{r}
 set.seed(1234)
@@ -210,7 +217,8 @@ MI_corr <- sp.correlogram(wm_q,
 plot(MI_corr)
 ```
 
-Plotting shows the output but does not provide the full interpretation as each autocorrelation value is not statistically significant. The code chunk below shows each point and their statistical significance.
+Plotting shows the output but does not provide the full interpretation as each autocorrelation value is not statistically significant.
+The code chunk below shows each point and their statistical significance.
 
 ```{r}
 print(MI_corr)
@@ -332,7 +340,8 @@ nci <- moran.plot(hunan$GDPPC, rswm_q,
 
 ### Plotting Moran scatterplot with standardised variable
 
-First we will use scale() to centers and scales the variable. Here centering is done by subtracting the mean (omitting NAs) the corresponding columns, and scaling is done by dividing the (centered) variable by their standard deviations.
+First we will use scale() to centers and scales the variable.
+Here centering is done by subtracting the mean (omitting NAs) the corresponding columns, and scaling is done by dividing the (centered) variable by their standard deviations.
 
 ```{r}
 hunan$Z.GDPPC <- scale(hunan$GDPPC) %>% 
@@ -447,6 +456,130 @@ tmap_arrange(gdppc, LISAmap,
 
 ## Hot Spot and Cold Spot Area Analysis
 
+Beside detecting clusters and outliers, localised spatial statistics can be used to detect hot/cold spot areas.
+
+The term 'hot spot' is used to describe a region or value that is higher relative to its surroundings.
+
 ### Getis Ord's G-Statistics
 
+#### Deriving distance-based weight matrix
+
+```{r}
+longitude <- map_dbl(hunan$geometry, ~st_centroid(.x)[[1]])
+```
+
+```{r}
+latitude <- map_dbl(hunan$geometry,~ st_centroid(.x)[[2]])
+```
+
+```{r}
+coords <- cbind(longitude, latitude)
+```
+
+#### Determining cut-off distance
+
+-   Return a matrix with the indices of points belonging to the set of the k nearest neighbours of each other by using [*knearneigh()*](https://r-spatial.github.io/spdep/reference/knearneigh.html) of **spdep**.
+
+-   Convert the knn object returned by *knearneigh()* into a neighbours list of class nb with a list of integer vectors containing neighbour region number ids by using [*knn2nb()*](https://r-spatial.github.io/spdep/reference/knn2nb.html).
+
+-   Return the length of neighbour relationship edges by using [*nbdists()*](https://r-spatial.github.io/spdep/reference/nbdists.html) of **spdep**.
+    The function returns in the units of the coordinates if the coordinates are projected, in km otherwise.
+
+-   Remove the list structure of the returned object by using [**unlist()**](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/unlist).
+
+```{r}
+#coords <- coordinates(hunan)
+k1 <- knn2nb(knearneigh(coords))
+k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
+summary(k1dists)
+```
+
+#### Computing fixed distance weight matrix
+
+```{r}
+wm_d62 <- dnearneigh(coords, 0, 62, longlat = TRUE)
+wm_d62
+```
+
+Next, nb2listw() is used to convert the nb object into spatial weights object.
+
+```{r}
+wm62_lw <- nb2listw(wm_d62, style = 'B')
+summary(wm62_lw)
+```
+
+#### Computing adaptive weight matrix
+
+```{r}
+knn <- knn2nb(knearneigh(coords, k=8))
+knn
+```
+
+```{r}
+knn_lw <- nb2listw(knn, style = 'B')
+summary(knn_lw)
+```
+
 ### Computing Gi Statistics
+
+#### Gi statistics using fixed distance
+
+```{r}
+fips <- order(hunan$County)
+gi.fixed <- localG(hunan$GDPPC, wm62_lw)
+gi.fixed
+```
+
+The output of localG() is a vector of G or Gstar values, with attributes \"gstari\" set to TRUE or FALSE, \"call\" set to the function call, and class \"localG\".
+
+The Gi statistics is represented as a Z-score.
+Greater values represent a greater intensity of clustering and the direction (positive or negative) indicates high or low clusters.
+
+Next, we will join the Gi values to their corresponding hunan sf data frame by using the code chunk below.
+
+```{r}
+hunan.gi <- cbind(hunan, as.matrix(gi.fixed)) %>%
+  rename(gstat_fixed = as.matrix.gi.fixed.)
+```
+
+#### Mapping Gi values with fixed distance weights
+
+```{r}
+gdppc <- qtm(hunan, "GDPPC")
+
+Gimap <-tm_shape(hunan.gi) +
+  tm_fill(col = "gstat_fixed", 
+          style = "pretty",
+          palette="-RdBu",
+          title = "local Gi") +
+  tm_borders(alpha = 0.5)
+
+tmap_arrange(gdppc, Gimap, asp=1, ncol=2)
+```
+
+#### Gi statistics using adaptive distance
+
+```{r}
+fips <- order(hunan$County)
+gi.adaptive <- localG(hunan$GDPPC, knn_lw)
+hunan.gi <- cbind(hunan, as.matrix(gi.adaptive)) %>%
+  rename(gstat_adaptive = as.matrix.gi.adaptive.)
+```
+
+#### Mapping Gi values with adaptive weights
+
+```{r}
+gdppc<- qtm(hunan, "GDPPC")
+
+Gimap <- tm_shape(hunan.gi) + 
+  tm_fill(col = "gstat_adaptive", 
+          style = "pretty", 
+          palette="-RdBu", 
+          title = "local Gi") + 
+  tm_borders(alpha = 0.5)
+
+tmap_arrange(gdppc, 
+             Gimap, 
+             asp=1, 
+             ncol=2)
+```

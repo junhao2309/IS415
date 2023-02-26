@@ -2,6 +2,11 @@
 title: "Jun Hao's IS415-GAA Coursework"
 ---
 
-Welcome to IS415 Geospatial Analytics and Applications
+Welcome to IS415 Geospatial Analytics and Applications (GAA)
 
-This is the course website of IS415 I study this term. you will find my course work on this website.
+This is the course website of IS415 I study this term.
+
+You will find my course work on this website.
+
+Hands-on Exercises and In-class exercises are sections that are taught in this module.
+For the Take-Home Exercises, it is where I apply what I have learnt into analyzing the given dataset.

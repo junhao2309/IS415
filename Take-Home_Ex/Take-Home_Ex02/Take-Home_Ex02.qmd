@@ -13,7 +13,8 @@ editor: visual
 
 # Context
 
-Since the outbreak of COVID-19, many countries have rushed to create a vaccine and ensure its population is well immunized against this novel coronavirus. On 13 January 2021, the mass immunisation program commenced and since then Indonesia ranks third in Asia and fifth in the world in terms of total doses given.
+Since the outbreak of COVID-19, many countries have rushed to create a vaccine and ensure its population is well immunized against this novel coronavirus.
+On 13 January 2021, the mass immunisation program commenced and since then Indonesia ranks third in Asia and fifth in the world in terms of total doses given.
 
 In this take-home assignment, we will be exploring vaccination rates in DKI Jarkarta, identifying sub-districts with relatively higher number of vaccination rate and how they changed over time.
 
@@ -33,7 +34,8 @@ With reference to the vaccination rate maps prepared in ESDA:
 
 -   Compute local Gi\* values of the monthly vaccination rate,
 
--   Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05)
+-   Display the Gi\* maps of the monthly vaccination rate.
+    The maps should only display the significant (i.e. p-value \< 0.05)
 
 -   With reference to the analysis results, draw statistical conclusions (not more than 250 words).
 
@@ -45,9 +47,11 @@ With reference to the local Gi\* values of the vaccination rate maps prepared in
 
 -   Select three sub-districts and describe the temporal trends revealed (not more than 250 words), and
 
--   Prepared a EHSA map of the Gi\* values of vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05).
+-   Prepared a EHSA map of the Gi\* values of vaccination rate.
+    The maps should only display the significant (i.e. p-value \< 0.05).
 
--   With reference to the EHSA map prepared, describe the spatial patterns revelaed. (not more than 250 words).
+-   With reference to the EHSA map prepared, describe the spatial patterns revelaed.
+    (not more than 250 words).
 
 Throughout this page, each step will be explained and guided so that you can follow along.
 
@@ -80,17 +84,19 @@ pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, p
 ## The Data
 
 | Type       | Name                                                                                                                   | Format    | Description                                                                   |
-|------------|-------------------------------|------------|-------------------|
+|------------|------------------------------------------------------------------------------------------------------------------------|-----------|-------------------------------------------------------------------------------|
 | Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
 | Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
 
 -   Geospatial Data
 
-The link under Geospatial Data above brings you to a page where there are many download links sorted by province. Ensure that you are using **Shapefile (SHP) Batas Desa Provinsi DKI Jakarta.**
+The link under Geospatial Data above brings you to a page where there are many download links sorted by province.
+Ensure that you are using **Shapefile (SHP) Batas Desa Provinsi DKI Jakarta.**
 
 -   Aspatial Data
 
-The link under Aspatial Data above brings you to a page where there are two types of data files you can use. Please choose **Data Vaksinasi Berbasis Kelurahan dan Kecamatan** and download a total of 12 files beginning July 2021 to June 2022.
+The link under Aspatial Data above brings you to a page where there are two types of data files you can use.
+Please choose **Data Vaksinasi Berbasis Kelurahan dan Kecamatan** and download a total of 12 files beginning July 2021 to June 2022.
 
 Do note that we will be using the beginning of each month for our download.
 
@@ -115,11 +121,13 @@ Before we begin, we should check whether there are any invalid geometries by usi
 st_is_valid(geoDKI)
 ```
 
-st_is_valid() from the sf package helps to check whether a geometry is valid. From the output, there are no invalid geometries.
+st_is_valid() from the sf package helps to check whether a geometry is valid.
+From the output, there are no invalid geometries.
 
 ### Check for Missing values
 
-The code chunk below uses is.na() from base R checks whether the data set has NA values. which() from base R takes the indices of these values and lastly length() helps us calculate the length of the data objects.
+The code chunk below uses is.na() from base R checks whether the data set has NA values.
+which() from base R takes the indices of these values and lastly length() helps us calculate the length of the data objects.
 
 ```{r}
 length(which(is.na(geoDKI) == TRUE))
@@ -139,7 +147,8 @@ The code chunk below uses st_crs() from the sf package:
 st_crs(geoDKI)
 ```
 
-We notice that jakarta is using EPSG::4326 which is the wrong projection coordinate system. DKI Jakarta uses the DGN95, the 'Datum Geodesi Nasional 1995', EPSG::23878
+We notice that jakarta is using EPSG::4326 which is the wrong projection coordinate system.
+DKI Jakarta uses the DGN95, the 'Datum Geodesi Nasional 1995', EPSG::23878
 
 We can transform the crs by using st_transform() from the sf package:
 
@@ -162,13 +171,16 @@ Let us visualise the geographical polygons.
 qtm(geoDKI)
 ```
 
-We can see from the output that jakarta includes both the mainland and the outer islands. Our study area focuses only on the mainland and thus we need to remove them.
+We can see from the output that jakarta includes both the mainland and the outer islands.
+Our study area focuses only on the mainland and thus we need to remove them.
 
 ```{r, eval = FALSE}
 View(geoDKI)
 ```
 
-Before we continue further, we need to understand how DKI Jakarta geographical regions are segmented. The code chunk above lets you view the entire dataset. Let us understand the key variables below:
+Before we continue further, we need to understand how DKI Jakarta geographical regions are segmented.
+The code chunk above lets you view the entire dataset.
+Let us understand the key variables below:
 
 With the help of uncle google, we will translate the names.
 
@@ -180,7 +192,8 @@ With the help of uncle google, we will translate the names.
 | KAB_KOTA  | City                              |
 | KECAMATAN | Sub-District                      |
 
-KAB_KOTA would be the most logical choice in isolating out the outer islands. This will be shown in the plots later.
+KAB_KOTA would be the most logical choice in isolating out the outer islands.
+This will be shown in the plots later.
 
 The code chunk below helps to output unique values in KAB_KOTA field.
 
@@ -190,7 +203,8 @@ unique(geoDKI$KAB_KOTA)
 
 The output above shows that there are 6 major cities in DKI Jakarta, ignoring the NA value.
 
-The codechunk below will visualize the data with respect to the 6 major cities. We can then see which city isolates out the outer islands.
+The codechunk below will visualize the data with respect to the 6 major cities.
+We can then see which city isolates out the outer islands.
 
 ```{r}
 tmap_mode("view")
@@ -202,7 +216,8 @@ tm_shape(geoDKI) +
 
 As seen in the above study area plot, the NA values in geoDKI pertains to the information of small areas that is shaded white.
 
-By viewing geoDKI, row 243 and 244 is where all the NA resides at. From checking the area bounds online, the white sub-districts pertains to city region, JAKARTA UTARA. As we could not find the KODE DESA (village code), we will just assign unique values: 3188888801 and 3188888802 for now.
+By viewing geoDKI, row 243 and 244 is where all the NA resides at.
+From checking the area bounds online, the white sub-districts pertains to city region, JAKARTA UTARA. As we could not find the KODE DESA (village code), we will just assign unique values: 3188888801 and 3188888802 for now.
 
 This ensures completeness in our geographical plots later on.
 
@@ -216,7 +231,8 @@ geoDKI$KODE_DESA[244]<-"3188888802"
 
 #### Filtering out Outer Islands
 
-From the visualization above, we can see that KEPULAUAN SERIBU is not part of the mainland. We can then use filter() from dplyr package to remove the outer islands.
+From the visualization above, we can see that KEPULAUAN SERIBU is not part of the mainland.
+We can then use filter() from dplyr package to remove the outer islands.
 
 ```{r}
 geoDKI <- filter(geoDKI, KAB_KOTA !="KEPULAUAN SERIBU")
@@ -228,7 +244,8 @@ tm_shape(geoDKI) +
   tm_polygons("KAB_KOTA")
 ```
 
-Now, before we move on further, geoDKI has alot of columns. Since we are only interested in the subdistrict level, we will select KODE_DESA and rename it to village_code.
+Now, before we move on further, geoDKI has alot of columns.
+Since we are only interested in the subdistrict level, we will select KODE_DESA and rename it to village_code.
 
 Note: village_code is also known as the subdistrict code.
 
@@ -242,11 +259,14 @@ geoDKI <- geoDKI %>%
 
 ### Import Aspatial Data
 
-Before we import the data in, the file names are rather long. First, go to your data folder and change the aspatial data file names to Y-M format. It would look like this:
+Before we import the data in, the file names are rather long.
+First, go to your data folder and change the aspatial data file names to Y-M format.
+It would look like this:
 
 ![](images/image-1137647241.png){fig-align="center" width="488"}
 
-There are a total of 12 excel files we need to load into Rstudio. To read the files more efficiently, we will use the "for loop" function to read all the excel files into a data frame by using the read_excel() from the readxl package.
+There are a total of 12 excel files we need to load into Rstudio.
+To read the files more efficiently, we will use the "for loop" function to read all the excel files into a data frame by using the read_excel() from the readxl package.
 
 ```{r}
 # Set the working directory to the folder containing the Excel files
@@ -279,7 +299,8 @@ names(`2022-6`)
 
 #### Mutating using for loop
 
-As there are 12 data sets, we will use the for loop that mutate, rename and select the fields that we want. The code chunk below does the following:
+As there are 12 data sets, we will use the for loop that mutate, rename and select the fields that we want.
+The code chunk below does the following:
 
 1.  Renames KODE KELURAHAN, WILAYAH KOTA, SASARAN and BELUM VAKSIN to village_code, city_region, vaccinated and not_vaccinated respectively by using rename() from the dplyr package
 2.  Selects the renamed columns by using select() from the dplyr package
@@ -319,7 +340,8 @@ glimpse(aspatial_data)
 
 We can see from the output that we have the columns that we want in its new name and having 3216 rows.
 
-From the glimpse output, we can see that there are NA values inside the dataframe. If you View the original individual files, you will notice that there will be a row that calculates the total of a respective column and that row contains NA values.
+From the glimpse output, we can see that there are NA values inside the dataframe.
+If you View the original individual files, you will notice that there will be a row that calculates the total of a respective column and that row contains NA values.
 
 #### Final steps to take
 
@@ -355,7 +377,8 @@ Recall that there are two polygons that held missing values.
 setdiff(geoDKI$village_code, aspatial_data$village_code)
 ```
 
-We notice that in the aspatial data, no information were collected for these two sub-districts. Hence, we have to add in these two subdistricts so that both dataframes will match when it is joint later on.
+We notice that in the aspatial data, no information were collected for these two sub-districts.
+Hence, we have to add in these two subdistricts so that both dataframes will match when it is joint later on.
 
 Note: Each month must have one observation, vaccination rate for the added rows will equal 0.
 
@@ -387,6 +410,7 @@ aspatial_data <- rbind(aspatial_data, c("2021-07-01", 3188888801,NA),
 ```
 
 Both aspatial_data and geoDKI have the same number of unique village code.\
+
 The code chunk below joins them together by their village code, sets vaccination_rate as numeric and excludes the NA values in the joined dataframe.
 
 ```{r}
@@ -406,7 +430,8 @@ vaccination <- st_as_sf(vaccination)
 
 ### iR Shiny
 
-Something extra to this TakeHome Assignment will be the use of the ShinyApp. This is a short introduction as to how Rshiny works:
+Something extra to this TakeHome Assignment will be the use of the ShinyApp.
+This is a short introduction as to how Rshiny works:
 
 1.  Define the UI:
     -   You will have an input and in this case, we will use selectInput("dates", "Pick a month", date, selected = "July 2021",multiple = FALSE).
@@ -465,7 +490,9 @@ shinyApp(ui, server)
 
 Refer to visual plot : [ShinyApp](https://junhaoteo.shinyapps.io/Take-Home_Ex02/)
 
-Note: There are many ways to create and design the shiny app, under the user interface. One example is using a sliderInput() to let the user their zoom level. This can be found under R shiny documentation.
+Note: There are many ways to create and design the shiny app, under the user interface.
+One example is using a sliderInput() to let the user their zoom level.
+This can be found under R shiny documentation.
 
 ### Tmap Visualization
 
@@ -516,7 +543,8 @@ tmap_arrange(graphing("2022-01-01"),
              ncol = 2)
 ```
 
-Likewise, this can be done on Rshiny app but this will be covered on a later date when I have attended the Rshiny workshop. :)
+Likewise, this can be done on Rshiny app but this will be covered on a later date when I have attended the Rshiny workshop.
+:)
 
 ## Spatial Patterns observed (200words)
 
@@ -526,7 +554,8 @@ To bring you back, here is the task assigned in this section:
 
 -   Compute local Gi\* values of the monthly vaccination rate,
 
--   Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05)
+-   Display the Gi\* maps of the monthly vaccination rate.
+    The maps should only display the significant (i.e. p-value \< 0.05)
 
 -   With reference to the analysis results, draw statistical conclusions (not more than 250 words)
 
@@ -536,7 +565,9 @@ Before we can compute the global spatial autocorrelation statistics, we need to 
 
 Spatial weights: Used to define the neighbourhood relationships between geographical units in the study area.
 
-As we are dealing with 12 different months of vaccination rates, we will have to filter the dataframe to their respective months and calculate their respective weights. Here, we will be using the QUEEN mode and thus the argument: queen =TRUE. The code chunk below shows the function that filters to the selected month and then calculate their weights.
+As we are dealing with 12 different months of vaccination rates, we will have to filter the dataframe to their respective months and calculate their respective weights.
+Here, we will be using the QUEEN mode and thus the argument: queen =TRUE.
+The code chunk below shows the function that filters to the selected month and then calculate their weights.
 
 ```{r}
 month <- vaccination %>%
@@ -582,7 +613,10 @@ tm_shape(july_LGI) +
 
 ## Putting it all together
 
-As you follow along, these are the 3 main steps to creating the plots required for this section. As mentioned above, we will combine these 3 sections into a single function to calculate the local Gi for each month. The code chunk below takes in input "mth" to filter vaccination to the respective month and calculate the weights and the local Moran's I. \### Creating the local MI computation function
+As you follow along, these are the 3 main steps to creating the plots required for this section.
+As mentioned above, we will combine these 3 sections into a single function to calculate the local Gi for each month.
+The code chunk below takes in input "mth" to filter vaccination to the respective month and calculate the weights and the local Moran's I.
+### Creating the local MI computation function
 
 ```{r}
 lisa <- function(mth){
@@ -617,7 +651,8 @@ for (i in 1:12){
 }
 ```
 
-Now we have a list of dataframes with local Moran I computed. Note that lisa_LMI\[\[1\]\] refers to July 2021, in ascending order.
+Now we have a list of dataframes with local Moran I computed.
+Note that lisa_LMI\[\[1\]\] refers to July 2021, in ascending order.
 
 ### Creating the Tmap function
 
