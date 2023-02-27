@@ -446,7 +446,7 @@ Next, we can perform the Moran's I test for residual spatial autocorrelation.
 lm.morantest(condo.mlr1,nb_lw)
 ```
 
-The Global Moran\'s I test for residual spatial autocorrelation shows that it\'s p-value is less than 0.00000000000000022 which is less than the alpha value of 0.05.
+The Global Moran's I test for residual spatial autocorrelation shows that it's p-value is less than 0.00000000000000022 which is less than the alpha value of 0.05.
 Hence, we will reject the null hypothesis that the residuals are randomly distributed.
 
 Since the Observed Global Moran I = 0.1424418 which is greater than 0, we can infer than the residuals resemble cluster distribution.\
@@ -557,7 +557,7 @@ In addition to regression residuals, the output feature class table includes fie
     Confidence in those estimates are higher when standard errors are small in relation to the actual coefficient values.
     Large standard errors may indicate problems with local collinearity.
 
-They are all stored in a SpatialPointsDataFrame or SpatialPolygonsDataFrame object integrated with fit.points, GWR coefficient estimates, y value, predicted values, coefficient standard errors and t-values in its \"data\" slot in an object called **SDF** of the output list.
+They are all stored in a SpatialPointsDataFrame or SpatialPolygonsDataFrame object integrated with fit.points, GWR coefficient estimates, y value, predicted values, coefficient standard errors and t-values in its "data" slot in an object called **SDF** of the output list.
 
 ## Converting SDF into sf data.frame
 

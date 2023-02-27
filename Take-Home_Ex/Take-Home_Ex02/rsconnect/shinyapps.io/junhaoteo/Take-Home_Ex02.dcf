@@ -5,10 +5,10 @@ account: junhaoteo
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8339942
-bundleId: 6879955
+bundleId: 6890803
 url: https://junhaoteo.shinyapps.io/Take-Home_Ex02/
-when: 1677172645.0478
-lastSyncTime: 1677172645.04781
+when: 1677464437.4194
+lastSyncTime: 1677464437.41941
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: images/7bmx3b.gif|images/image-1137647241.png|Take-Home_Ex02.qmd|Take-Home_Ex02.rmarkdown
+ignoredFiles: images/7bmx3b.gif|images/image-1137647241.png|Take-Home_Ex02.qmd
