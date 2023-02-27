@@ -34,7 +34,8 @@ sg_sf <- st_read(dsn = "data", layer = "CostalOutline")
 mpsz_sf <- st_read(dsn = "data", layer = "MP14_SUBZONE_WEB_PL")
 ```
 
-Both mpsz_sf and sg_sf are projecting with SVY21 but are currently using EPSG:9001. We can check by using st_crs().
+Both mpsz_sf and sg_sf are projecting with SVY21 but are currently using EPSG:9001.
+We can check by using st_crs().
 
 ## Convert data into dataframe
 
@@ -149,7 +150,10 @@ tm_shape(childcare) +
 tmap_mode('plot')
 ```
 
-Ways to solve duplication problems: - 1. Delete duplicates -- Cons: some useful point may be lost - 2. Use jittering: Adds a small perturbation so that duplicates do not occupy the same space - 3. Make each point unique
+Ways to solve duplication problems: - 1.
+Delete duplicates -- Cons: some useful point may be lost - 2.
+Use jittering: Adds a small perturbation so that duplicates do not occupy the same space - 3.
+Make each point unique
 
 This code uses No.2 approach
 
@@ -300,7 +304,8 @@ plot(kde_childcareSG_600)
 
 ### Computing KDE by using adaptive bandwidth
 
-Fixed bandwidth method is very sensitive to highly skew distribution. To overcome this problem, use adaptive bandwidth: density.adaptive() of spatstat
+Fixed bandwidth method is very sensitive to highly skew distribution.
+To overcome this problem, use adaptive bandwidth: density.adaptive() of spatstat
 
 ```{r}
 kde_childcareSG_adaptive <- adaptive.density(childcareSG_ppp.km, method="kernel")
@@ -418,7 +423,8 @@ plot(childcare_jw_ppp.km, main="Jurong West")
 
 #### Computing KDE
 
-Compute the KDE of these 4 planning areas. bw.diggle is used to derive bandwidth
+Compute the KDE of these 4 planning areas.
+bw.diggle is used to derive bandwidth
 
 ```{r}
 par(mfrow=c(2,2))
@@ -492,7 +498,8 @@ clarkevans.test(childcareSG_ppp,
 
 ## Analysing Spatial Point Process Using G-Function
 
-G functions is used to measure the distribution of the distances from an arbitrary event to its nearest event. This is computed by using Gest() of spatstat package.
+G functions is used to measure the distribution of the distances from an arbitrary event to its nearest event.
+This is computed by using Gest() of spatstat package.
 
 ### Choa Chu Kang planning area
 

@@ -84,7 +84,7 @@ pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, p
 ## The Data
 
 | Type       | Name                                                                                                                   | Format    | Description                                                                   |
-|------------|-------------------------------|------------|-------------------|
+|---------------|---------------------------|---------------|----------------|
 | Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
 | Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
 
@@ -134,8 +134,7 @@ length(which(is.na(geoDKI) == TRUE))
 ```
 
 In the above output, there are 14 NA values within the jakarta data set.
-
-We will just hold onto these 14 NA values and move on first.
+We will carry on with these 14 NA values and will be further explained later.
 
 ### Check Coordinate System
 
@@ -209,14 +208,17 @@ We can then see which city isolates out the outer islands.
 ```{r}
 tmap_mode("view")
 tm_shape(geoDKI) +
-  tm_polygons("KAB_KOTA")
+  tm_polygons("KAB_KOTA") +
+  tm_view(set.zoom.limits = c(9,14))
 ```
 
 #### Dealing with NA values
 
-As seen in the above study area plot, the NA values in geoDKI pertains to the information of small areas that is shaded white.
+Before we filter out the outer islands, we have to fix the NA values within geoDKI.
 
-By viewing geoDKI, row 243 and 244 is where all the NA resides at.
+The NA values in geoDKI pertains to the information of small areas that is shaded white, shown in the map above between JAKARTA UTARA and JAKARTA PUSAT
+
+By viewing geoDKI, row 243 and 244 is where all the 14 NA reside at, as mentioned above.
 From checking the area bounds online, the white sub-districts pertains to city region, JAKARTA UTARA. As we could not find the KODE DESA (village code), we will just assign unique values: 3188888801 and 3188888802 for now.
 
 This ensures completeness in our geographical plots later on.
@@ -244,6 +246,10 @@ tm_shape(geoDKI) +
   tm_polygons("KAB_KOTA")
 ```
 
+On top of getting the mainland study area, we notice the two white shaded areas are now under JAKARTA UTARA (Blue).
+
+### Filtering Relevant Columns
+
 Now, before we move on further, geoDKI has alot of columns.
 Since we are only interested in the subdistrict level, we will select KODE_DESA and rename it to village_code.
 
@@ -266,7 +272,7 @@ It would look like this:
 ![](images/image-1137647241.png){fig-align="center" width="488"}
 
 There are a total of 12 excel files we need to load into Rstudio.
-To read the files more efficiently, we will use the "for loop" function to read all the excel files into a data frame by using the read_excel() from the readxl package.
+To read the files more efficiently, we will use the "for loop" to read all the excel files into a data frame by using the read_excel() from the readxl package.
 
 ```{r}
 # Set the working directory to the folder containing the Excel files
@@ -319,9 +325,9 @@ for (i in c(1:12)){
   lists[[i]]<- list_mth[[i]] %>% 
     rename(village_code=`KODE KELURAHAN`,
            city_region =`WILAYAH KOTA`,
-           vaccinated= `SASARAN`, 
+           target= `SASARAN`, 
            not_vaccinated =`BELUM VAKSIN`) %>% 
-  select(village_code,city_region, not_vaccinated ,vaccinated) %>%
+  select(village_code,city_region, not_vaccinated ,target) %>%
     mutate(date = as.Date(date[i]), 
            .before=1)
 }
@@ -357,6 +363,7 @@ unique(aspatial_data$city_region)
 
 3.  Add in vaccination rate column
     -   Formula:
+        -   vaccination_rate = (target - not_vaccinated)/target
 
 The code chunk below does this:
 
@@ -364,8 +371,7 @@ The code chunk below does this:
 aspatial_data <- aspatial_data %>%
   na.exclude() %>%
   filter(city_region != "KAB.ADM.KEP.SERIBU") %>% 
-  mutate(total_population = vaccinated + not_vaccinated, 
-         vaccination_rate = as.numeric(vaccinated/total_population)) %>%
+  mutate(vaccination_rate = as.numeric((target-not_vaccinated)/target)) %>%
   select(date, village_code, vaccination_rate)
 ```
 
@@ -378,9 +384,9 @@ setdiff(geoDKI$village_code, aspatial_data$village_code)
 ```
 
 We notice that in the aspatial data, no information were collected for these two sub-districts.
-Hence, we have to add in these two subdistricts so that both dataframes will match when it is joint later on.
+Hence, we have to add in these two subdistricts so that both dataframes will match when it is joined later on.
 
-Note: Each month must have one observation, vaccination rate for the added rows will equal 0.
+Note: Each month must have one observation, vaccination rate for the added rows will be considered NA, missing data.
 
 ```{r}
 aspatial_data <- rbind(aspatial_data, c("2021-07-01", 3188888801,NA),
@@ -424,11 +430,21 @@ vaccination <- left_join(aspatial_data, geoDKI,
 vaccination <- st_as_sf(vaccination)
 ```
 
+#### Extra Step
+
+We can save the vaccination sf dataframe as a file so that we can call upon it without having to run the above codes.
+
+Furthermore, when we transfer this file to other people, they will notice the two polygons with missing data more clearly when analysing the datafile.
+
+```{r, echo = FALSE}
+saveRDS(vaccination, "vaccination.rds")
+```
+
 # Choropleth Mapping and Analysis
 
 ## Visualizing the data
 
-### iR Shiny
+### R Shiny
 
 Something extra to this TakeHome Assignment will be the use of the ShinyApp.
 This is a short introduction as to how Rshiny works:
@@ -491,7 +507,6 @@ shinyApp(ui, server)
 Refer to visual plot : [ShinyApp](https://junhaoteo.shinyapps.io/Take-Home_Ex02/)
 
 Note: There are many ways to create and design the shiny app, under the user interface.
-One example is using a sliderInput() to let the user their zoom level.
 This can be found under R shiny documentation.
 
 ### Tmap Visualization
@@ -548,6 +563,13 @@ Likewise, this can be done on Rshiny app but this will be covered on a later dat
 
 ## Spatial Patterns observed (200words)
 
+Firstly, from the choropleth maps seen above, we notice that the southern part of DKI Jakarta started out with lower vaccination rates but in 2022-06, it became the region with one of the highest vaccination rates.
+Another observation is that the northern region of DKI Jakarta gradually over the months had vaccination rates lower than the other parts.
+However, this does not mean that vaccination rates are decreasing in the northern region.
+One of the distinct change is through the classification numbers.
+In 2021-07, we notice that the minimum vaccination rate is 0.227 and that number increases as the months go by to 0.781 in 2022-06.
+Overall, we can conclude that vaccination rates throughout DKI Jakarta have seen an increase and a more stable distribution across its sub-district.
+
 # Local Gi\* Analysis
 
 To bring you back, here is the task assigned in this section:
@@ -582,9 +604,11 @@ wm_q <- month %>%
 wm_q
 ```
 
-## Computing local Moran's I
+## Computing local GI
 
-Next, we will use local_moran() of the sfdep package to calculate local Moran's I.
+Next, we will use local_gstar_perm() of the sfdep package to calculate local GI.
+
+We will also need to use set.seed() to ensure we obtain the same result when the code chunk is re-runned.
 
 ```{r}
 set.seed(1234)
@@ -616,10 +640,11 @@ tm_shape(july_LGI) +
 As you follow along, these are the 3 main steps to creating the plots required for this section.
 As mentioned above, we will combine these 3 sections into a single function to calculate the local Gi for each month.
 The code chunk below takes in input "mth" to filter vaccination to the respective month and calculate the weights and the local Moran's I.
-### Creating the local MI computation function
+
+### Creating the local GI computation function
 
 ```{r}
-lisa <- function(mth){
+local_gi <- function(mth){
   set.seed(1234)
   month <- vaccination %>%
     filter(date ==mth)
@@ -645,19 +670,19 @@ Now we will calculate the local Gi for each month and place it into a list for e
 ```{r}
 date <- c("2021-07-01", "2021-08-01", "2021-09-01", "2021-10-01", "2021-11-01", "2021-12-01",
           "2022-01-01", "2022-02-01", "2022-03-01","2022-04-01", "2022-05-01", "2022-06-01")
-lisa_GI <- list()
+month_GI <- list()
 for (i in 1:12){
-  lisa_GI[[i]] <- lisa(date[i])
+  month_GI[[i]] <- local_gi(date[i])
 }
 ```
 
-Now we have a list of dataframes with local Moran I computed.
+Now we have a list of dataframes with local GI computed.
 Note that lisa_LMI\[\[1\]\] refers to July 2021, in ascending order.
 
 ### Creating the Tmap function
 
 ```{r}
-graph_lisa <- function(x){
+graph_gi <- function(x){
   HCSA_sig <- x %>%
     filter(p_sim <0.05)
   HCSA_plots <- tm_shape(x) +
@@ -676,22 +701,22 @@ graph_lisa <- function(x){
 
 ```{r}
 tmap_mode("plot")
-tmap_arrange(graph_lisa(lisa_GI[[1]]),
-             graph_lisa(lisa_GI[[2]]),
-             graph_lisa(lisa_GI[[3]]),
-             graph_lisa(lisa_GI[[4]]),
-             graph_lisa(lisa_GI[[5]]),
-             graph_lisa(lisa_GI[[6]]),
+tmap_arrange(graph_gi(month_GI[[1]]),
+             graph_gi(month_GI[[2]]),
+             graph_gi(month_GI[[3]]),
+             graph_gi(month_GI[[4]]),
+             graph_gi(month_GI[[5]]),
+             graph_gi(month_GI[[6]]),
              ncol =2)
 ```
 
 ```{r}
-tmap_arrange(graph_lisa(lisa_GI[[7]]),
-             graph_lisa(lisa_GI[[8]]),
-             graph_lisa(lisa_GI[[9]]),
-             graph_lisa(lisa_GI[[10]]),
-             graph_lisa(lisa_GI[[11]]),
-             graph_lisa(lisa_GI[[12]]),
+tmap_arrange(graph_gi(month_GI[[7]]),
+             graph_gi(month_GI[[8]]),
+             graph_gi(month_GI[[9]]),
+             graph_gi(month_GI[[10]]),
+             graph_gi(month_GI[[11]]),
+             graph_gi(month_GI[[12]]),
              ncol =2)
 ```
 
@@ -858,3 +883,5 @@ tm_shape(ehsa_sig) +
   tm_fill("classification") + 
   tm_borders(alpha = 0.4)
 ```
+
+## Statistical Conclusion (Not more than 250 words)
