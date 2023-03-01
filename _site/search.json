@@ -831,5 +831,12 @@
     "title": "Take-Home Exercise 2: Spatio-temporal analysis of COVID-19 Vaccination Trends at the Sub-district Level, DKI Jarkarta",
     "section": "6.5 Performing Emerging Hotspot Analysis",
     "text": "6.5 Performing Emerging Hotspot Analysis\nFirstly, we will run the gi* values from all the vilage code using the same steps above. By using the MannKendall(), we can calculate their relevant test statistics. Afterwhich, we will filter by their sl values to those significant.\n\nehsa <- gi_stars %>%\n  group_by(date) %>%\n  summarise(mk = list(\n    unclass(\n      Kendall::MannKendall(gi_star)))) %>%\n  tidyr::unnest_wider(mk) %>%\n  filter(sl < 0.05)\n\n\n6.5.1 Arrange to show significant emerging hotspots and coldspots\n\nemerging <- ehsa %>% \n  arrange(sl, abs(tau)) %>% \n  slice(1:5)\n\nThe code chunk below uses the emerging_hotspot_analysis() from the sf package.\nArguments:\n\nx takes in a spacetime object\n.var takes in the variable of interest, in this case is vaccination_rate\nk refers to the number of time lags.\n\n\nset.seed(1234)\nehsa <- emerging_hotspot_analysis(\n  x = vaccination_rate_st,\n  .var = \"vaccination_rate\",\n  k = 1,\n  nsim = 99\n)\n\n\n\n6.5.2 Visualising distribution of EHSA\nWe can visualise the data using ggplot to see the distribution of the classifications.\n\nggplot(data = ehsa,\n       aes(x = classification)) +\n  geom_bar()\n\n\n\n\n\n\n6.5.3 Visualising EHSA\nWe will first need to join the ehsa dataframe with our classification column. This will be joined together by the unique identifier “village_code” and “location”.\n\nvaccination_ehsa <- left_join(geoDKI, ehsa, by = c(\"village_code\" = \"location\"))\n\n\nehsa_sig <- vaccination_ehsa  %>%\n  filter(p_value < 0.05)\ntmap_mode(\"view\")\ntm_shape(vaccination_ehsa) +\n  tm_polygons() +\n  tm_borders(alpha = 0.5) +\ntm_shape(ehsa_sig) +\n  tm_fill(\"classification\") + \n  tm_borders(alpha = 0.4)"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Jun Hao’s IS415-GAA Coursework",
+    "section": "",
+    "text": "Welcome to IS415 Geospatial Analytics and Applications (GAA)\nThis is the course website of IS415 I study this term.\nYou will find my course work on this website.\nHands-on Exercises and In-class exercises are sections that are taught in this module. For the Take-Home Exercises, it is where I apply what I have learnt into analyzing the given dataset."
   }
 ]
