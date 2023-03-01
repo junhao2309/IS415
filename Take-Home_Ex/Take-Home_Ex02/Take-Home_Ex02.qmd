@@ -83,13 +83,13 @@ pacman::p_load(sf, raster, spatstat, tmap, tidyverse, sfdep, maptools, readxl, p
 
 ## The Data
 
-+----------------+------------------------------------------------------------------------------------------------------------------------+----------------+-------------------------------------------------------------------------------+
-| Type           | Name                                                                                                                   | Format         | Description                                                                   |
-+================+========================================================================================================================+================+===============================================================================+
-| Geospatial     | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile      | Sub-districts in DKI Jakarta                                                  |
-+----------------+------------------------------------------------------------------------------------------------------------------------+----------------+-------------------------------------------------------------------------------+
-| Aspatial       | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx          | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
-+----------------+------------------------------------------------------------------------------------------------------------------------+----------------+-------------------------------------------------------------------------------+
++------------+------------------------------------------------------------------------------------------------------------------------+-----------+-------------------------------------------------------------------------------+
+| Type       | Name                                                                                                                   | Format    | Description                                                                   |
++============+========================================================================================================================+===========+===============================================================================+
+| Geospatial | [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) | shapefile | Sub-districts in DKI Jakarta                                                  |
++------------+------------------------------------------------------------------------------------------------------------------------+-----------+-------------------------------------------------------------------------------+
+| Aspatial   | [Riwayat File Vaksinasi DKI Jakarta](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)            | .xlsx     | Sub-district level data of vaccination numbers between July 2021 to June 2022 |
++------------+------------------------------------------------------------------------------------------------------------------------+-----------+-------------------------------------------------------------------------------+
 
 -   Geospatial Data
 
@@ -841,6 +841,7 @@ The output we will be focusing on are:
 2.  sl : This is the p value and for it to be significant, it has to be less than significance level, 0.05.
 
 ```{r}
+set.seed(1234)
 test_stat1 <- cbg_1 %>%
   summarise(mk = list(
     unclass(
@@ -853,8 +854,8 @@ glimpse(test_stat1)
 
 For the 1st sub-district chosen, we notice from the plot that gi\* values is in the negative suggesting that it is a cold spot.
 It is also seen that gi\* values are getting larger as months go by, indicating that vaccination rates are improving.
-This is supported by the Mann Kendell test where there is a positive association between gi\* values and date as tau = 0.575 \> 0.
-It is also statistically significant at the 0.05 level of significance since sl \< 0.05.
+This is supported by the Mann Kendell test where there is a positive association between gi\* values and date as tau = 0.727 \> 0.
+It is also statistically significant at the 0.05 level of significance since sl= 0.001 \< 0.05.
 
 ### District 2: 3173031006
 
@@ -877,6 +878,7 @@ ggplot(data = cbg_2,
 ```
 
 ```{r}
+set.seed(1234)
 test_stat2 <- cbg_2 %>%
   summarise(mk = list(
     unclass(
@@ -888,7 +890,7 @@ glimpse(test_stat2)
 #### Statistical Conclusion 2:
 
 From the plot above, we notice that gi\* values increase in the initial month and then fluctuate but remain relatively consistent.
-However while tau \> 0, it is close to 0 and that there is no trend since sl = 0.837 \> 0.05.
+However while tau=0.151 \> 0, sl = 0.537 \> 0.05.
 Hence the result is statistically insignificant and we can conclude there is no trend between gi\* values and date for District 2.
 This suggest that for district 2, the gi\* values have no trend and base on the plot, there is clustering but it remains relatively consistent.
 
@@ -912,6 +914,7 @@ ggplot(data = cbg_3,
 ```
 
 ```{r}
+set.seed(1234)
 test_stat3 <- cbg_3 %>%
   summarise(mk = list(
     unclass(
@@ -922,9 +925,9 @@ glimpse(test_stat3)
 
 #### Statistical Conclusion 3:
 
-Similar to the first district, there is a positive association between gi\* values and date as tau =0.545 \> 0.
+Similar to the first district, there is a positive association between gi\* values and date as tau =0.696 \> 0.
 According to the plot, we also see a strong positive associate where gi\* values increases as the month goes by.
-This result is also statistically significant since sl = 0.016 \< 0.05.
+This result is also statistically significant since sl = 0.002 \< 0.05.
 This suggest that there is greater clustering of hotspots, suggesting higher vaccination rates as gi\* values increases.
 
 ## Performing Emerging Hotspot Analysis
@@ -934,6 +937,7 @@ By using the MannKendall(), we can calculate their relevant test statistics.
 Afterwhich, we will filter by their sl values to those significant.
 
 ```{r}
+set.seed(1234)
 ehsa <- gi_stars %>%
   group_by(date) %>%
   summarise(mk = list(
@@ -1010,37 +1014,13 @@ We can refer to the table below obtained from this [link](https://pro.arcgis.com
 +===========================+============================================================================================================================================================================================================================================================================================================================+
 | **No Pattern Detected**   | Does not fall into any of the hot or cold spot patterns defined below.                                                                                                                                                                                                                                                     |
 +---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| New Hot Spot              | A location that is a statistically significant hot spot for the final time step and has never been a statistically significant hot spot before.                                                                                                                                                                            |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Consecutive Hot Spot      | A location with a single uninterrupted run of at least two statistically significant hot spot bins in the final time-step intervals. The location has never been a statistically significant hot spot prior to the final hot spot run and less than 90 percent of all bins are statistically significant hot spots.        |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Intensifying Hot Spot     | A location that has been a statistically significant hot spot for 90 percent of the time-step intervals, including the final time step. In addition, the intensity of clustering of high counts in each time step is increasing overall and that increase is statistically significant.                                    |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Persistent Hot Spot       | A location that has been a statistically significant hot spot for 90 percent of the time-step intervals with no discernible trend in the intensity of clustering over time.                                                                                                                                                |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Diminishing Hot Spot      | A location that has been a statistically significant hot spot for 90 percent of the time-step intervals, including the final time step. In addition, the intensity of clustering in each time step is decreasing overall and that decrease is statistically significant.                                                   |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Sporadic Hot Spot**     | A statistically significant hot spot for the final time-step interval with a history of also being an on-again and off-again hot spot. Less than 90 percent of the time-step intervals have been statistically significant hot spots and none of the time-step intervals have been statistically significant cold spots.   |
 +---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Oscillating Hot Spot**  | A statistically significant hot spot for the final time-step interval that has a history of also being a statistically significant cold spot during a prior time step. Less than 90 percent of the time-step intervals have been statistically significant hot spots.                                                      |
 +---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Historical Hot Spot       | The most recent time period is not hot, but at least 90 percent of the time-step intervals have been statistically significant hot spots.                                                                                                                                                                                  |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| New Cold Spot             | A location that is a statistically significant cold spot for the final time step and has never been a statistically significant cold spot before.                                                                                                                                                                          |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Consecutive Cold Spot     | A location with a single uninterrupted run of at least two statistically significant cold spot bins in the final time-step intervals. The location has never been a statistically significant cold spot prior to the final cold spot run and less than 90 percent of all bins are statistically significant cold spots.    |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Intensifying Cold Spot    | A location that has been a statistically significant cold spot for 90 percent of the time-step intervals, including the final time step. In addition, the intensity of clustering of low counts in each time step is increasing overall and that increase is statistically significant.                                    |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Persistent Cold Spot      | A location that has been a statistically significant cold spot for 90 percent of the time-step intervals with no discernible trend in the intensity of clustering of counts over time.                                                                                                                                     |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Diminishing Cold Spot     | A location that has been a statistically significant cold spot for 90 percent of the time-step intervals, including the final time step. In addition, the intensity of clustering of low counts in each time step is decreasing overall and that decrease is statistically significant.                                    |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Sporadic Cold Spot**    | A statistically significant cold spot for the final time-step interval with a history of also being an on-again and off-again cold spot. Less than 90 percent of the time-step intervals have been statistically significant cold spots and none of the time-step intervals have been statistically significant hot spots. |
 +---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Oscillating Cold Spot** | A statistically significant cold spot for the final time-step interval that has a history of also being a statistically significant hot spot during a prior time step. Less than 90 percent of the time-step intervals have been statistically significant cold spots.                                                     |
-+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Historical Cold Spot      | The most recent time period is not cold, but at least 90 percent of the time-step intervals have been statistically significant cold spots.                                                                                                                                                                                |
 +---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 By referring to the definitions above, an oscillating hot spot implies that many sub-districts that were cold-spots initially became hotspots, indicating that there is a shift in clustering of low to high vaccination rates.
