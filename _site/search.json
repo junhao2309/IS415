@@ -838,5 +838,19 @@
     "title": "Jun Hao’s IS415-GAA Coursework",
     "section": "",
     "text": "Welcome to IS415 Geospatial Analytics and Applications (GAA)\nThis is the course website of IS415 I study this term.\nYou will find my course work on this website.\nHands-on Exercises and In-class exercises are sections that are taught in this module. For the Take-Home Exercises, it is where I apply what I have learnt into analyzing the given dataset."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html",
+    "title": "Take-home Exercise 3: Predicting HDB Public Housing Resale Pricies using Geographically Weighted Methods",
+    "section": "",
+    "text": "Housing is an essential component of household wealth worldwide. Buying a housing has always been a major investment for most people. The price of housing is affected by many factors. Some of them are global in nature such as the general economy of a country or inflation rate. Others can be more specific to the properties themselves. These factors can be further divided to structural and locational factors. Structural factors are variables related to the property themselves such as the size, fitting, and tenure of the property. Locational factors are variables related to the neighbourhood of the properties such as proximity to childcare centre, public transport service and shopping centre.\nConventional, housing resale prices predictive models were built by using Ordinary Least Square (OLS) method. However, this method failed to take into consideration that spatial autocorrelation and spatial heterogeneity exist in geographic data sets such as housing transactions. With the existence of spatial autocorrelation, the OLS estimation of predictive housing resale pricing models could lead to biased, inconsistent, or inefficient results (Anselin 1998). In view of this limitation, Geographical Weighted Models were introduced for calibrating predictive model for housing resale prices.\n\n\nIn this take-home exercise, you are tasked to predict HDB resale prices at the sub-market level (i.e. HDB 3-room, HDB 4-room and HDB 5-room) for the month of January and February 2023 in Singapore. The predictive models must be built by using by using conventional OLS method and GWR methods. You are also required to compare the performance of the conventional OLS method versus the geographical weighted methods.\n\n\n\n\npacman::p_load(tidyverse, sf, sfdep, tmap)\n\n\n\n\n\nGeospatial Data\nList of structural variables\n\nArea of the unit\nFloor level\nRemaining lease\nAge of the unit\nMain Upgrading Program (MUP) completed\n\nList of locational factors\n\nProxomity to CBD\nProximity to eldercare\nProximity to foodcourt/hawker centres\nProximity to MRT\nProximity to park\nProximity to good primary school\nProximity to shopping mall\nProximity to supermarket\nNumbers of kindergartens within 350m\nNumbers of childcare centres within 350m\nNumbers of bus stop within 350m\nNumbers of primary school within 1km"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html#geospatial-data",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html#geospatial-data",
+    "title": "Take-home Exercise 3: Predicting HDB Public Housing Resale Pricies using Geographically Weighted Methods",
+    "section": "2.1 Geospatial Data",
+    "text": "2.1 Geospatial Data\n\nmpsz <- st_read(dsn = \"data/geospatial\",\n                layer = \"MP14_SUBZONE_WEB_PL\")\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `/Users/junhaoteo/Documents/junhao2309/IS415/Take-Home_Ex/Take-Home_Ex03/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21"
   }
 ]

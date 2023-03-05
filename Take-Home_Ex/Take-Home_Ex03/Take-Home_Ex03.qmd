@@ -1,0 +1,76 @@
+---
+title: "Take-home Exercise 3: Predicting HDB Public Housing Resale Pricies using Geographically Weighted Methods"
+date: "6 March 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Setting the Scene
+
+Housing is an essential component of household wealth worldwide.
+Buying a housing has always been a major investment for most people.
+The price of housing is affected by many factors.
+Some of them are global in nature such as the general economy of a country or inflation rate.
+Others can be more specific to the properties themselves.
+These factors can be further divided to structural and locational factors.
+Structural factors are variables related to the property themselves such as the size, fitting, and tenure of the property.
+Locational factors are variables related to the neighbourhood of the properties such as proximity to childcare centre, public transport service and shopping centre.
+
+Conventional, housing resale prices predictive models were built by using [**Ordinary Least Square (OLS)**](https://en.wikipedia.org/wiki/Ordinary_least_squares) method.
+However, this method failed to take into consideration that spatial autocorrelation and spatial heterogeneity exist in geographic data sets such as housing transactions.
+With the existence of spatial autocorrelation, the OLS estimation of predictive housing resale pricing models could lead to biased, inconsistent, or inefficient results (Anselin 1998).
+In view of this limitation, **Geographical Weighted Models** were introduced for calibrating predictive model for housing resale prices.
+
+## The Task
+
+In this take-home exercise, you are tasked to predict HDB resale prices at the sub-market level (i.e. HDB 3-room, HDB 4-room and HDB 5-room) for the month of January and February 2023 in Singapore.
+The predictive models must be built by using by using conventional OLS method and GWR methods.
+You are also required to compare the performance of the conventional OLS method versus the geographical weighted methods.
+
+## Packages used:
+
+```{r}
+pacman::p_load(tidyverse, sf, sfdep, tmap)
+```
+
+## Data used:
+
+-   Geospatial Data
+
+-   List of structural variables
+
+    1.  Area of the unit
+    2.  Floor level
+    3.  Remaining lease
+    4.  Age of the unit
+    5.  Main Upgrading Program (MUP) completed
+
+-   List of locational factors
+
+    1.  Proxomity to CBD
+    2.  Proximity to eldercare
+    3.  Proximity to foodcourt/hawker centres
+    4.  Proximity to MRT
+    5.  Proximity to park
+    6.  Proximity to good primary school
+    7.  Proximity to shopping mall
+    8.  Proximity to supermarket
+    9.  Numbers of kindergartens within 350m
+    10. Numbers of childcare centres within 350m
+    11. Numbers of bus stop within 350m
+    12. Numbers of primary school within 1km
+
+# Load Data into R
+
+## Geospatial Data
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial",
+                layer = "MP14_SUBZONE_WEB_PL")
+```
