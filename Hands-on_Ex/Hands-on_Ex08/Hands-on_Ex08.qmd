@@ -61,7 +61,7 @@ The R packages needed for this exercise are as follows:
 The code chunks below installs and launches these R packages into R environment.
 
 ```{r}
-pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, sfdep)
+pacman::p_load(olsrr, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, sfdep)
 ```
 
 # Geospatial Data Wrangling
@@ -271,7 +271,7 @@ ggplot(data=condo_resale.sf,
 This is an important step as multicollinearity will create bias and inaccuracy in the model.
 
 ```{r}
-corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
+corrplot::corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
          tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
 ```
 
@@ -476,7 +476,7 @@ bw.fixed <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD +
                    longlat=FALSE)
 ```
 
-The result shows that the recommended bandwidth is 971.3405 metres.
+The result shows that the recommended bandwidth is 971.3405 metres. It is in metres because it follows the coordinate system, where svy is in metres.
 We notice that the CV score is the smallest and thus it is recommended that we use the corresponding fixed bandwidth.
 
 ### GWModel method - fixed bandwidth
