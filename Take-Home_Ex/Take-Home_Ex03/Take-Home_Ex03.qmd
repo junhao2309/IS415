@@ -73,4 +73,78 @@ pacman::p_load(tidyverse, sf, sfdep, tmap)
 ```{r}
 mpsz <- st_read(dsn = "data/geospatial",
                 layer = "MP14_SUBZONE_WEB_PL")
+
+train <- st_read(dsn = "data/geospatial",
+                 layer = "RapidTransitSystemStation")
+
+Bus_stop <- st_read(dsn = "data/geospatial",
+                    layer = "BusStop")
+
+```
+
+https://datamall.lta.gov.sg/content/dam/datamall/datasets/Geospatial/TrainStation.zip
+
+```{r}
+
+```
+
+```{r}
+HDB <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
+
+Punggol <- HDB %>%
+  filter(town == "PUNGGOL",
+         month == c("2022-01","2022-02","2022-03", "2022-04","2022-05","2022-06","2022-07","2022-08","2022-09","2022-09","2022-10","2022-11","2022-12"))
+
+```
+
+```{r}
+library("httr")
+geocode <- function(block, streetname) {
+  base_url <- "https://developers.onemap.sg/commonapi/search"
+  address <- paste(block, streetname, sep = " ")
+  query <- list("searchVal" = address, 
+                "returnGeom" = "Y",
+                "getAddrDetails" = "N",
+                "pageNum" = "1")
+  
+  res <- GET(base_url, query = query)
+  restext<-content(res, as="text")
+  
+  output <- jsonlite::fromJSON(restext)  %>% 
+    as.data.frame() %>%
+    dplyr::select("results.LATITUDE", "results.LONGITUDE")
+  return(output)
+}
+```
+
+```{r}
+Punggol$LATITUDE <- 0
+Punggol$LONGITUDE <- 0
+
+for (i in 1:nrow(Punggol)){
+  temp_output <- geocode(Punggol[i, 4], Punggol[i, 5])
+  
+  Punggol$LATITUDE[i] <- temp_output$results.LATITUDE
+  Punggol$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r}
+punggol_sf <- st_as_sf(Punggol, coords = c("LONGITUDE", "LATITUDE"), crs = 4326) %>%
+  st_transform(crs = 3414)
+
+punggol_block <- punggol_sf %>%
+  select(4:12)
+
+```
+
+```{r}
+qtm(punggol_sf)
+```
+
+```{r}
+tmap_mode("view")
+
+tm_shape(punggol_block) +
+  tm_dots()
 ```
