@@ -36,10 +36,173 @@ You are also required to compare the performance of the conventional OLS method 
 ## Packages used:
 
 ```{r}
-pacman::p_load(tidyverse, sf, sfdep, tmap)
+pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, readxl)
 ```
 
 ## Data used:
+
+```{r}
+# initialise a dataframe of our aspatial and geospatial dataset details
+datasets <- data.frame(
+  Type=c("Aspatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         
+         "Geospatial - Extracted",
+         "Geospatial - Extracted",
+         "Geospatial - Extracted",
+         "Geospatial - Extracted",
+         "Geospatial - Extracted",
+         "Geospatial - Extracted",
+         "Geospatial - Extracted",
+         
+         "Geospatial - Selfsourced",
+         "Geospatial - Selfsourced",
+         "Geospatial - Selfsourced",
+         "Geospatial - Selfsourced"),
+  
+  Name=c("Resale Flat Prices",
+         "Singapore National Boundary",
+         "Master Plan 2014 Subzone Boundary (Web)",
+         "MRT & LRT Locations Aug 2021",
+         "Bus Stop Locations Aug 2021",
+         
+         "Childcare Services",
+         "Eldercare Services",
+         "Hawker Centres",
+         "Kindergartens",
+         "Parks",
+         "Supermarkets",
+         "Primary Schools",
+         
+         "Community Health Assistance Scheme (CHAS) Clinics",
+         "Integrated Screening Programme (ISP) Clinics",
+         "Public, Private and Non-for-profit Hospitals",
+         "Shopping Mall SVY21 Coordinates`"),
+  
+  Format=c(".csv", 
+           ".shp", 
+           ".shp", 
+           ".shp", 
+           ".shp",
+           
+           ".shp", 
+           ".shp", 
+           ".shp", 
+           ".shp",
+           ".shp", 
+           ".shp",
+           ".shp",
+           
+           ".kml",
+           ".shp",
+           ".xlsx",
+           ".csv"),
+  
+  Source=c("[data.gov.sg](https://data.gov.sg/dataset/resale-flat-prices)",
+           "[data.gov.sg](https://data.gov.sg/dataset/national-map-polygon)",
+           "[data.gov.sg](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)",
+           "[LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=Train)",
+           "[LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop)",
+           
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           
+           "[data.gov.sg](https://data.gov.sg/dataset/chas-clinics)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "Self-sourced and collated (section 2.3)",
+           "[Mall SVY21 Coordinates Web Scaper](https://github.com/ValaryLim/Mall-Coordinates-Web-Scraper)")
+  )
+
+# with reference to this guide on kableExtra:
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+# kable_material is the name of the kable theme
+# 'hover' for to highlight row when hovering, 'scale_down' to adjust table to fit page width
+library(knitr)
+library(kableExtra)
+kable(datasets, caption="Datasets Used") %>%
+  kable_material("hover", latex_options="scale_down")
+
+```
+
+### How to extract data from onemap
+
+These are the steps:
+
+*The code chunks below uses onemapsgapi package.*
+
+1.  Register an account with [onemap](https://developers.onemap.sg/register/)
+2.  A code is then be sent to your email. Then fill in this [form](https://developers.onemap.sg/confirm_account/)
+3.  In the console, run the code chunk below:
+
+```{r, eval = FALSE}
+token <- get_token("email", "password")
+```
+
+Input the email and password that you've registered with onemap.
+This will provide you a token ID under objectname: token.
+Note that you will need to do this again as the token is only valid for 3 days.
+
+4.  Obtain queryname by running the code chunk below:
+
+```{r, eval = FALSE}
+themes <- search_themes(token)
+```
+
+Input your token ID and you can source for the queryname for Step 5.
+
+5.  Use get_theme() to get the data from onemap
+
+For this example, we will use queryname, "eldercare".
+
+```{r, eval = FALSE}
+eldercare<-get_theme(token,"eldercare")
+```
+
+6.  Convert the object into an sf object then download it into your data folder.
+
+    st_as_sf() is for converting the file and st_write() is for writing the file into your folder. st_transform() sets the coordinate reference system to Singapore, EPSG::3414. These functions are from the sf package.
+
+```{r, eval = FALSE}
+eldercaresf <- st_as_sf(eldercare, coords=c("Lng", "Lat"), 
+                        crs=4326) %>% 
+  st_transform(crs = 3414)
+st_write(obj = eldercaresf,
+         dsn = "data/geospatial",
+         layer = "eldercare",
+         driver = "ESRI Shapefile")
+```
+
+To make it more automatic, define which variables you want from the onemap database into a vector.
+The code chunk runs a for loop that does steps 5 and 6 together and stores them into your folder.
+
+```{r, eval = FALSE}
+onemap_variables <- c("eldercare","kindergartens", "hawkercentre", "communityclubs", "nationalparks","registered_pharmacy")
+
+df <- list()
+df_sf <- list()
+for (i in 1:length(onemap_variables)){
+  df[[i]] <- get_theme(token, onemap_variables[i])
+  df_sf[[i]] <- st_as_sf(df[[i]], coords=c("Lng", "Lat"), 
+                        crs=4326) %>%
+    st_transform(crs = 3414)
+st_write(obj = df_sf[[i]],
+         dsn = "data/geospatial/Onemap",
+         layer = onemap_variables[i],
+         driver = "ESRI Shapefile")
+}
+```
+
+```{r}
+
+```
 
 -   Geospatial Data
 
@@ -85,15 +248,7 @@ Bus_stop <- st_read(dsn = "data/geospatial",
 https://datamall.lta.gov.sg/content/dam/datamall/datasets/Geospatial/TrainStation.zip
 
 ```{r}
-
-```
-
-```{r}
 HDB <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
-
-Punggol <- HDB %>%
-  filter(town == "PUNGGOL",
-         month == c("2022-01","2022-02","2022-03", "2022-04","2022-05","2022-06","2022-07","2022-08","2022-09","2022-09","2022-10","2022-11","2022-12"))
 
 ```
 
@@ -117,34 +272,6 @@ geocode <- function(block, streetname) {
 }
 ```
 
-```{r}
-Punggol$LATITUDE <- 0
-Punggol$LONGITUDE <- 0
+Load data
 
-for (i in 1:nrow(Punggol)){
-  temp_output <- geocode(Punggol[i, 4], Punggol[i, 5])
-  
-  Punggol$LATITUDE[i] <- temp_output$results.LATITUDE
-  Punggol$LONGITUDE[i] <- temp_output$results.LONGITUDE
-}
-```
 
-```{r}
-punggol_sf <- st_as_sf(Punggol, coords = c("LONGITUDE", "LATITUDE"), crs = 4326) %>%
-  st_transform(crs = 3414)
-
-punggol_block <- punggol_sf %>%
-  select(4:12)
-
-```
-
-```{r}
-qtm(punggol_sf)
-```
-
-```{r}
-tmap_mode("view")
-
-tm_shape(punggol_block) +
-  tm_dots()
-```
