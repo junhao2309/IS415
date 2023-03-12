@@ -166,9 +166,7 @@ For this example, we will use queryname, "eldercare".
 eldercare<-get_theme(token,"eldercare")
 ```
 
-6.  Convert the object into an sf object then download it into your data folder.
-
-    st_as_sf() is for converting the file and st_write() is for writing the file into your folder. st_transform() sets the coordinate reference system to Singapore, EPSG::3414. These functions are from the sf package.
+6.  Convert the object into an sf object then download it into your data folder. st_as_sf() is for converting the file and st_write() is for writing the file into your folder. st_transform() sets the coordinate reference system to Singapore, EPSG::3414. These functions are from the sf package.
 
 ```{r, eval = FALSE}
 eldercaresf <- st_as_sf(eldercare, coords=c("Lng", "Lat"), 
@@ -184,7 +182,7 @@ To make it more automatic, define which variables you want from the onemap datab
 The code chunk runs a for loop that does steps 5 and 6 together and stores them into your folder.
 
 ```{r, eval = FALSE}
-onemap_variables <- c("eldercare","kindergartens", "hawkercentre", "communityclubs", "nationalparks","registered_pharmacy")
+onemap_variables <- c("eldercare","kindergartens", "hawkercentre", "communityclubs", "nationalparks","registered_pharmacy","family")
 
 df <- list()
 df_sf <- list()
@@ -200,57 +198,134 @@ st_write(obj = df_sf[[i]],
 }
 ```
 
-```{r}
-
-```
-
--   Geospatial Data
-
--   List of structural variables
-
-    1.  Area of the unit
-    2.  Floor level
-    3.  Remaining lease
-    4.  Age of the unit
-    5.  Main Upgrading Program (MUP) completed
-
--   List of locational factors
-
-    1.  Proxomity to CBD
-    2.  Proximity to eldercare
-    3.  Proximity to foodcourt/hawker centres
-    4.  Proximity to MRT
-    5.  Proximity to park
-    6.  Proximity to good primary school
-    7.  Proximity to shopping mall
-    8.  Proximity to supermarket
-    9.  Numbers of kindergartens within 350m
-    10. Numbers of childcare centres within 350m
-    11. Numbers of bus stop within 350m
-    12. Numbers of primary school within 1km
-
 # Load Data into R
 
 ## Geospatial Data
 
+::: panel-tabset
+### One-Map
+
+```{r}
+pharmacy <- st_read(dsn = "data/geospatial/Onemap",
+                layer = "registered_pharmacy")
+parks <- st_read(dsn = "data/geospatial/Onemap",
+                 layer = "nationalparks")
+kindergartens <- st_read(dsn = "data/geospatial/Onemap",
+                    layer = "kindergartens")
+hawker <- st_read(dsn = "data/geospatial/Onemap",
+                    layer = "hawkercentre")
+eldercare <- st_read(dsn = "data/geospatial/Onemap",
+                    layer = "eldercare")
+communityclubs <-st_read(dsn = "data/geospatial/Onemap",
+                    layer = "communityclubs")
+supermarkets <- st_read(dsn = "data/geospatial/Onemap",
+                    layer = "SUPERMARKETS")
+familyservices <- st_read(dsn = "data/geospatial/Onemap",
+                    layer = "FAMILY")
+```
+
+### Geospatial Map
+
 ```{r}
 mpsz <- st_read(dsn = "data/geospatial",
                 layer = "MP14_SUBZONE_WEB_PL")
-
-train <- st_read(dsn = "data/geospatial",
-                 layer = "RapidTransitSystemStation")
-
-Bus_stop <- st_read(dsn = "data/geospatial",
-                    layer = "BusStop")
-
 ```
 
-https://datamall.lta.gov.sg/content/dam/datamall/datasets/Geospatial/TrainStation.zip
+### DATA.GOV
 
 ```{r}
-HDB <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
-
+Bus_stop <- st_read(dsn = "data/geospatial",
+                layer = "BusStop")
+MRT <- st_read(dsn = "data/geospatial",
+                layer = "RapidTransitSystemStation")
 ```
+
+### Aspatial Data
+
+```{r}
+Resale <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
+```
+
+```{r}
+Primary_sch <- read_csv("data/aspatial/primaryschoolsg.csv")
+```
+
+```{r}
+Secondary_sch <- read_csv("data/aspatial/secsch_cleaned.csv")
+```
+
+```{r}
+Malls <- read_csv("data/aspatial/mall_coordinates_updated.csv")
+```
+:::
+
+# Data Wrangling
+
+## HDB Resale Price
+
+For the purpose of this take-home exercise, we will only be using five-room flat and transaction period should be January and February 2023.
+
+```{r}
+glimpse(Resale)
+```
+
+From the output above, the variables we want are:
+
+-   Resale Price
+-   Area of the unit
+-   Floor level
+-   Remaining Lease
+-   Age of the unit
+
+We will first filter out the relevant columns we want by running the code chunk below:
+
+select() helps to select the columns we want and filter() helps us to filter to the specific two months.
+These two functions come from the dplyr package.
+
+```{r}
+Resale_2023 <- Resale %>%
+  select(1,3,4,5,6,7,10,11) %>%
+  mutate(month = as.Date(paste0(month, "-01"), format ="%Y-%m-%d")) %>%
+  filter(month >= "2022-01-01" & month <= "2022-12-01",
+         flat_type == "5 ROOM")
+```
+
+We also notice that the data type for story_range, flat_type and remaining_lease are chr type.
+For story_range and flat_type, we should change them to factor while remaining lease should be made into a numeric.
+
+We will first settle the remaining lease by running the code chunk below:
+
+```{r}
+# Splits the string by year and month, using str_split from the stringr package
+str_list <- str_split(Resale_2023$remaining_lease, " ")
+
+for (i in 1:length(str_list)) {
+  if (length(unlist(str_list[i])) > 2) {
+      year <- as.numeric(unlist(str_list[i])[1])
+      month <- as.numeric(unlist(str_list[i])[3])
+      Resale_2023$remaining_lease[i] <- year + round(month/12, 2)
+  }
+  else {
+    year <- as.numeric(unlist(str_list[i])[1])
+    Resale_2023$remaining_lease[i] <- year
+  }
+}
+```
+
+Once done, we will use mutate() to change the remaining two variables to the correct data type.
+
+```{r}
+Resale_2023 <-Resale_2023 %>%
+  mutate(flat_type = as.factor(flat_type),
+         storey_range = as.factor(storey_range),
+         remaining_lease = as.numeric(remaining_lease))
+glimpse(Resale_2023)
+```
+
+### Inserting geometries
+
+To do this, we will have to obtain the geometries from this [url](https://developers.onemap.sg/commonapi/search).
+This code is referenced from [Megan's work](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/).
 
 ```{r}
 library("httr")
@@ -272,6 +347,164 @@ geocode <- function(block, streetname) {
 }
 ```
 
-Load data
+```{r, eval = FALSE}
+Resale_2023$LATITUDE <- 0
+Resale_2023$LONGITUDE <- 0
 
+for (i in 1:nrow(Resale_2023)){
+  temp_output <- geocode(Resale_2023[i, 3], Resale_2023[i, 4])
+  
+  Resale_2023$LATITUDE[i] <- temp_output$results.LATITUDE
+  Resale_2023$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
 
+### Convert into Resale_2023 dataframe into sf
+
+By using st_as_sf() from the sf package, we can convert Resale_2023 into an sf and then transform the crs to EPSG:: 3414 which is the coordinate reference system for Singapore
+
+```{r, eval = FALSE}
+Resale_sf <- st_as_sf(Resale_2023, 
+                      coords = c("LONGITUDE", "LATITUDE"),
+                      crs = 4326) %>%
+  st_transform(crs = 3414)
+```
+
+We can store it as a shapefile for future retrieval.
+
+```{r,eval = FALSE}
+st_write(Resale_sf, 
+         dsn = "data/aspatial", 
+         layer = "resale",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+Resale_sf <- st_read(dsn = "data/aspatial",
+                     layer = "resale")
+```
+
+## Aspatial Data Wrangling
+
+For Primary_sch, Secondary_sch and Mall, we need to convert them into sf and transform it to the correct CRS.
+
+Primary School:
+
+```{r}
+Pri_sch <- Primary_sch %>%
+  st_as_sf(coords = c("Latitude", "Longitude"),
+           crs = 4326) %>% 
+  st_transform(crs = 3414)
+```
+
+Secondary School:
+
+```{r}
+Sec_sch <- Secondary_sch %>%
+  st_as_sf(coords = c("latitude", "longitude"),
+           crs = 4326) %>% 
+  st_transform(crs = 3414)
+```
+
+Malls:
+
+```{r}
+malls <- Malls %>%
+  st_as_sf(coords = c("latitude", "longitude"),
+           crs = 4326) %>% 
+  st_transform(crs = 3414)
+```
+
+## Ensure all datasets are in EPSG:3414
+
+Aside from the onemap variables, we need to check the geospatial data and the other data sets, primary school, secondary school and shopping malls.
+
+```{r}
+st_crs(mpsz) ; st_crs(Bus_stop) ; st_crs(MRT)
+```
+
+We notice that the CRS for these 3 geospatial data is not correct.
+We will use st_transformed as taught previously to convert it to EPSG:3414
+
+```{r}
+mpsz <- mpsz %>%
+  st_transform(crs = 4326) %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+Bus_stop <- Bus_stop %>%
+  st_transform(crs = 4326) %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+MRT <- MRT %>%
+  st_transform(crs = 4326) %>%
+  st_transform(crs = 3414)
+```
+
+## Checking invalid geometries
+
+We should also check for any invalid geometries
+
+::: panel-tabset
+### Onemap variable checks 
+
+```{r}
+length(which(st_is_valid(communityclubs)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(eldercare)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(familyservices)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(hawker)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(kindergartens)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(parks)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(pharmacy)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(supermarkets)== FALSE))
+```
+
+We can see that for the oneMap variables, there are no invalid geometries.
+
+### DATA.GOV
+
+```{r}
+length(which(st_is_valid(mpsz)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(Bus_stop)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(MRT)== FALSE))
+```
+
+For the data obtained from DATA.GOV, there are some invalid geometries
+
+We will proceed to remove them
+
+```{r}
+mpsz <- st_make_valid(mpsz)
+MRT <- st_make_valid(mpsz)
+```
+:::
