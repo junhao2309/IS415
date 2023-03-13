@@ -1,0 +1,151 @@
+---
+title: "In-class_Ex09: Geospatial random forest"
+date: "13 March 2023"
+date-modified: "`r Sys.Date()`"
+number-sections: true
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# Setting the context
+
+## Load Package
+
+```{r}
+pacman::p_load(olsrr, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, tidymodels, SpatialML, devtools, rsample)
+```
+
+## Load Data
+
+```{r}
+mdata <- read_rds("data/aspatial/mdata.rds")
+```
+
+```{r}
+set.seed(1234)
+resale_split <- initial_split(mdata,
+                              prop = 6.5/10,)
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+```
+
+```{r, eval = FALSE}
+write_rds(train_data,"data/aspatial/train_data.rds")
+write_rds(test_data, "data/aspatial/test_data.rds")
+```
+
+```{r}
+train_data <- read_rds("data/aspatial/train_data.rds")
+test_data <-read_rds("data/aspatial/test_data.rds")
+```
+
+```{r}
+price_mlr <- lm(resale_price ~ floor_area_sqm +storey_order +
+remaining_lease_mths +PROX_CBD +PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT+
+PROX_PARK + PROX_GOOD_PRISCH+PROX_MALL +PROX_CHAS + PROX_SUPERMARKET + 
+WITHIN_350M_KINDERGARTEN +WITHIN_350M_CHILDCARE +WITHIN_350M_BUS +WITHIN_1KM_PRISCH,
+data = train_data)
+summary(price_mlr)
+```
+
+## GWR Predictive Method
+
+### Converting the sf data frame to SpatialPointDataFrame
+
+```{r}
+train_data_sp <- as_Spatial(train_data)
+train_data_sp
+```
+
+```{r, eval = FALSE}
+bw_gwr<- bw.gwr(resale_price ~ floor_area_sqm +storey_order +
+remaining_lease_mths +PROX_CBD +PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT+
+PROX_PARK + PROX_GOOD_PRISCH+PROX_MALL +PROX_CHAS + PROX_SUPERMARKET + 
+WITHIN_350M_KINDERGARTEN +WITHIN_350M_CHILDCARE +WITHIN_350M_BUS +WITHIN_1KM_PRISCH,
+data = train_data,
+approach = "CV",
+       kernel = "gaussian")
+```
+
+```{r}
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+```{r, eval = FALSE}
+coords_train <- write_rds(coords_train, "data/aspatial/coords_train.rds")
+coords_test <- write_rds(coords_test, "data/aspatial/coords_test.rds")
+```
+
+## Preparing
+
+### Dropping geometry
+
+```{r}
+train_data <- train_data %>%
+  st_drop_geometry()
+```
+
+## Calibrating Random Forest
+
+```{r}
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm +storey_order +
+remaining_lease_mths +PROX_CBD +PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT+
+PROX_PARK + PROX_GOOD_PRISCH+PROX_MALL +PROX_CHAS + PROX_SUPERMARKET + 
+WITHIN_350M_KINDERGARTEN +WITHIN_350M_CHILDCARE +WITHIN_350M_BUS +WITHIN_1KM_PRISCH,
+data = train_data)
+```
+
+```{r}
+print(rf)
+```
+
+```{r, eval = FALSE}
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm +storey_order +
+remaining_lease_mths +PROX_CBD +PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT+
+PROX_PARK + PROX_GOOD_PRISCH+PROX_MALL +PROX_CHAS + PROX_SUPERMARKET + 
+WITHIN_350M_KINDERGARTEN +WITHIN_350M_CHILDCARE +WITHIN_350M_BUS +WITHIN_1KM_PRISCH,
+dframe = train_data,
+bw = 55,
+kernel = "adaptive",
+coords = coords_train)
+```
+
+```{r, eval = FALSE}
+write_rds(gwRF_adaptive, file = "data/aspatial/gwRF_adaptive.rds")
+```
+
+```{r}
+gwRF_adaptive<- read_rds("data/aspatial/gwRF_adaptive.rds")
+```
+
+### 'Predicting by using test data
+
+#### Preparing the test data
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+```{r, eval = FALSE}
+gwRF_pred <- predict.grf(gwRF_adaptive,
+                         test_data,
+                         x.var.name= "X",
+                         y.var.name ="Y",
+                         local.w = 1,
+                         global.w =1)
+```
+
+#### Converting the predicting output into a dataframe
+
+```{r, eval = FALSE}
+gwRF_pred_df <- as.data.frame(gwRF_pred)
+```

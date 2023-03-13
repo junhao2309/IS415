@@ -427,20 +427,16 @@ We notice that the CRS for these 3 geospatial data is not correct.
 We will use st_transformed as taught previously to convert it to EPSG:3414
 
 ```{r}
-mpsz <- mpsz %>%
-  st_transform(crs = 4326) %>%
-  st_transform(crs = 3414)
+mpsz <- mpsz %>%st_transform(crs = 3414)
 ```
 
 ```{r}
 Bus_stop <- Bus_stop %>%
-  st_transform(crs = 4326) %>%
   st_transform(crs = 3414)
 ```
 
 ```{r}
 MRT <- MRT %>%
-  st_transform(crs = 4326) %>%
   st_transform(crs = 3414)
 ```
 
@@ -449,7 +445,7 @@ MRT <- MRT %>%
 We should also check for any invalid geometries
 
 ::: panel-tabset
-### Onemap variable checks 
+### Onemap variable checks
 
 ```{r}
 length(which(st_is_valid(communityclubs)== FALSE))
@@ -505,6 +501,195 @@ We will proceed to remove them
 
 ```{r}
 mpsz <- st_make_valid(mpsz)
-MRT <- st_make_valid(mpsz)
+```
+
+```{r, eval = FALSE}
+MRT <- st_make_valid(MRT)
+```
+
+### Aspatial Data
+
+```{r}
+length(which(st_is_valid(Pri_sch)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(Sec_sch)== FALSE))
+```
+
+```{r}
+length(which(st_is_valid(malls)==FALSE))
+```
+
+There is no invalid geometries in the aspatial data set.
+:::
+
+## Removing Unnecessary columns
+
+::: panel-tab
+### Onemap
+
+```{r}
+communityclubs <- communityclubs %>%
+  select(1)
+```
+
+```{r}
+eldercare <- eldercare %>%
+  select(1)
+```
+
+```{r}
+familyservices <- familyservices %>%
+  select(1)
+```
+
+```{r}
+hawker <- hawker %>%
+  select(1)
+```
+
+```{r}
+kindergartens <- kindergartens %>%
+  select(1)
+```
+
+```{r}
+parks <- parks %>%
+  select(1)
+```
+
+```{r}
+pharmacy <- pharmacy %>%
+  select(1)
+```
+
+```{r}
+supermarkets <- supermarkets %>%
+  select(1)
+```
+
+### DATA.GOV
+
+```{r}
+Bus_stop <- select(Bus_stop, 1)
+```
+
+```{r}
+MRT_Station <- select(MRT,4)
+```
+
+### Aspatial Data
+
+```{r}
+Pri_sch <- select(Pri_sch, 1)
+```
+
+```{r}
+Sec_sch <- select(Sec_sch, 2)
+```
+
+```{r}
+malls <- select(malls,2)
 ```
 :::
+
+## Check NA values
+
+::: panel-tab
+### Onemap
+
+```{r}
+communityclubs[rowSums(is.na(communityclubs))!=0,]
+```
+
+```{r}
+eldercare[rowSums(is.na(eldercare))!=0,]
+```
+
+```{r}
+familyservices[rowSums(is.na(familyservices))!=0,]
+```
+
+```{r}
+hawker[rowSums(is.na(hawker))!=0,]
+```
+
+```{r}
+kindergartens[rowSums(is.na(kindergartens))!=0,]
+```
+
+```{r}
+parks[rowSums(is.na(parks))!=0,]
+```
+
+```{r}
+pharmacy[rowSums(is.na(pharmacy))!=0,]
+```
+
+```{r}
+supermarkets[rowSums(is.na(supermarkets))!=0,]
+```
+
+We notice that family services has NA values, we will proceed to remove them using na.omit()
+
+```{r}
+familyservices<- na.omit(familyservices, c("ADDRESSBUI"))
+```
+
+### DATA.GOV
+
+```{r}
+Bus_stop[rowSums(is.na(Bus_stop))!=0,]
+```
+
+```{r}
+MRT_Station[rowSums(is.na(MRT_Station))!=0,]
+```
+
+```{r}
+mpsz[rowSums(is.na(mpsz))!=0,]
+```
+
+### Aspatial Data
+
+```{r}
+length(which(is.na(Pri_sch) == TRUE))
+```
+
+```{r}
+length(which(is.na(Sec_sch) == TRUE))
+```
+
+```{r}
+length(which(is.na(malls) == TRUE))
+```
+:::
+
+# Visualisation
+
+## Initial Mapping
+
+::: panel-tab
+### Subzone
+
+```{r}
+tmap_mode("plot")
+tm_shape(mpsz) +
+  tm_polygons()
+```
+
+### MRT Stations
+
+```{r, eval = FALSE}
+tmap_mode("view")
+tm_shape(MRT_Station) +
+  tm_dots()
+```
+
+### Bus Stops
+:::
+
+```{r}
+
+```
