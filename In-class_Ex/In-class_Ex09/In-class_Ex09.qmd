@@ -144,7 +144,15 @@ gwRF_pred <- predict.grf(gwRF_adaptive,
                          global.w =1)
 ```
 
+```{r, eval = FALSE}
+write_rds(gwRF_pred, "data/aspatial/gwRF_pred.rds")
+```
+
 #### Converting the predicting output into a dataframe
+
+```{r}
+gwRF_pred <- read_rds("data/aspatial/gwRF_pred.rds")
+```
 
 ```{r, eval = FALSE}
 gwRF_pred_df <- as.data.frame(gwRF_pred)

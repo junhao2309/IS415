@@ -36,7 +36,7 @@ You are also required to compare the performance of the conventional OLS method 
 ## Packages used:
 
 ```{r}
-pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, readxl)
+pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, readxl, GWmodel, SpatialML, rsample)
 ```
 
 ## Data used:
@@ -182,7 +182,7 @@ To make it more automatic, define which variables you want from the onemap datab
 The code chunk runs a for loop that does steps 5 and 6 together and stores them into your folder.
 
 ```{r, eval = FALSE}
-onemap_variables <- c("eldercare","kindergartens", "hawkercentre", "communityclubs", "nationalparks","registered_pharmacy","family")
+onemap_variables <- c("childcare")
 
 df <- list()
 df_sf <- list()
@@ -221,7 +221,9 @@ communityclubs <-st_read(dsn = "data/geospatial/Onemap",
 supermarkets <- st_read(dsn = "data/geospatial/Onemap",
                     layer = "SUPERMARKETS")
 familyservices <- st_read(dsn = "data/geospatial/Onemap",
-                    layer = "FAMILY")
+                    layer = "family")
+childcare <- st_read(dsn = "data/geospatial/Onemap",
+                     layer = "childcare")
 ```
 
 ### Geospatial Map
@@ -236,22 +238,17 @@ mpsz <- st_read(dsn = "data/geospatial",
 ```{r}
 Bus_stop <- st_read(dsn = "data/geospatial",
                 layer = "BusStop")
-MRT <- st_read(dsn = "data/geospatial",
-                layer = "RapidTransitSystemStation")
+MRT <- st_read(dsn = "data/geospatial/lta-mrt-station-exit-kml.kml")
 ```
 
 ### Aspatial Data
 
-```{r}
+```{r, eval = FALSE}
 Resale <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
 ```
 
 ```{r}
-Primary_sch <- read_csv("data/aspatial/primaryschoolsg.csv")
-```
-
-```{r}
-Secondary_sch <- read_csv("data/aspatial/secsch_cleaned.csv")
+Schools <- read_csv("data/aspatial/schools.csv")
 ```
 
 ```{r}
@@ -264,10 +261,6 @@ Malls <- read_csv("data/aspatial/mall_coordinates_updated.csv")
 ## HDB Resale Price
 
 For the purpose of this take-home exercise, we will only be using five-room flat and transaction period should be January and February 2023.
-
-```{r}
-glimpse(Resale)
-```
 
 From the output above, the variables we want are:
 
@@ -282,11 +275,14 @@ We will first filter out the relevant columns we want by running the code chunk 
 select() helps to select the columns we want and filter() helps us to filter to the specific two months.
 These two functions come from the dplyr package.
 
-```{r}
-Resale_2023 <- Resale %>%
+::: panel-tabset
+### Training Data
+
+```{r, eval = FALSE}
+Resale_train <- Resale %>%
   select(1,3,4,5,6,7,10,11) %>%
   mutate(month = as.Date(paste0(month, "-01"), format ="%Y-%m-%d")) %>%
-  filter(month >= "2022-01-01" & month <= "2022-12-01",
+  filter(month >= "2021-01-01" & month <= "2022-12-01",
          flat_type == "5 ROOM")
 ```
 
@@ -295,39 +291,71 @@ For story_range and flat_type, we should change them to factor while remaining l
 
 We will first settle the remaining lease by running the code chunk below:
 
-```{r}
+```{r, eval = FALSE}
 # Splits the string by year and month, using str_split from the stringr package
-str_list <- str_split(Resale_2023$remaining_lease, " ")
+str_list <- str_split(Resale_train$remaining_lease, " ")
 
 for (i in 1:length(str_list)) {
   if (length(unlist(str_list[i])) > 2) {
       year <- as.numeric(unlist(str_list[i])[1])
       month <- as.numeric(unlist(str_list[i])[3])
-      Resale_2023$remaining_lease[i] <- year + round(month/12, 2)
+      Resale_train$remaining_lease[i] <- year + round(month/12, 2)
   }
   else {
     year <- as.numeric(unlist(str_list[i])[1])
-    Resale_2023$remaining_lease[i] <- year
+    Resale_train$remaining_lease[i] <- year
   }
 }
 ```
 
 Once done, we will use mutate() to change the remaining two variables to the correct data type.
 
-```{r}
-Resale_2023 <-Resale_2023 %>%
+```{r, eval = FALSE}
+Resale_train <-Resale_train %>%
   mutate(flat_type = as.factor(flat_type),
          storey_range = as.factor(storey_range),
          remaining_lease = as.numeric(remaining_lease))
-glimpse(Resale_2023)
 ```
+
+### Test Data
+
+```{r, eval = FALSE}
+Resale_test <- Resale %>%
+  select(1,3,4,5,6,7,10,11) %>%
+  mutate(month = as.Date(paste0(month, "-01"), format ="%Y-%m-%d")) %>%
+  filter(month == c("2023-01-01","2023-02-01"),
+         flat_type == "5 ROOM")
+```
+
+We also notice that the data type for story_range, flat_type and remaining_lease are chr type.
+For story_range and flat_type, we should change them to factor while remaining lease should be made into a numeric.
+
+We will first settle the remaining lease by running the code chunk below:
+
+```{r, eval = FALSE}
+# Splits the string by year and month, using str_split from the stringr package
+str_list <- str_split(Resale_test$remaining_lease, " ")
+
+for (i in 1:length(str_list)) {
+  if (length(unlist(str_list[i])) > 2) {
+      year <- as.numeric(unlist(str_list[i])[1])
+      month <- as.numeric(unlist(str_list[i])[3])
+      Resale_test$remaining_lease[i] <- year + round(month/12, 2)
+  }
+  else {
+    year <- as.numeric(unlist(str_list[i])[1])
+    Resale_test$remaining_lease[i] <- year
+  }
+}
+```
+:::
 
 ### Inserting geometries
 
 To do this, we will have to obtain the geometries from this [url](https://developers.onemap.sg/commonapi/search).
 This code is referenced from [Megan's work](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/).
 
-```{r}
+```{r, eval = FALSE}
 library("httr")
 geocode <- function(block, streetname) {
   base_url <- "https://developers.onemap.sg/commonapi/search"
@@ -347,24 +375,45 @@ geocode <- function(block, streetname) {
 }
 ```
 
-```{r, eval = FALSE}
-Resale_2023$LATITUDE <- 0
-Resale_2023$LONGITUDE <- 0
+::: panel-tabset
+#### Training Data
 
-for (i in 1:nrow(Resale_2023)){
-  temp_output <- geocode(Resale_2023[i, 3], Resale_2023[i, 4])
+```{r, eval = FALSE}
+Resale_train$LATITUDE <- 0
+Resale_train$LONGITUDE <- 0
+
+for (i in 1:nrow(Resale_train)){
+  temp_output <- geocode(Resale_train[i, 3], Resale_train[i, 4])
   
-  Resale_2023$LATITUDE[i] <- temp_output$results.LATITUDE
-  Resale_2023$LONGITUDE[i] <- temp_output$results.LONGITUDE
+  Resale_train$LATITUDE[i] <- temp_output$results.LATITUDE
+  Resale_train$LONGITUDE[i] <- temp_output$results.LONGITUDE
 }
 ```
+
+#### Testing Data
+
+```{r, eval = FALSE}
+Resale_test$LATITUDE <- 0
+Resale_test$LONGITUDE <- 0
+
+for (i in 1:nrow(Resale_test)){
+  temp_output <- geocode(Resale_test[i, 3], Resale_test[i, 4])
+  
+  Resale_test$LATITUDE[i] <- temp_output$results.LATITUDE
+  Resale_test$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+:::
 
 ### Convert into Resale_2023 dataframe into sf
 
 By using st_as_sf() from the sf package, we can convert Resale_2023 into an sf and then transform the crs to EPSG:: 3414 which is the coordinate reference system for Singapore
 
+::: panel-tabset
+#### Training Data
+
 ```{r, eval = FALSE}
-Resale_sf <- st_as_sf(Resale_2023, 
+Resale_sf <- st_as_sf(Resale_train, 
                       coords = c("LONGITUDE", "LATITUDE"),
                       crs = 4326) %>%
   st_transform(crs = 3414)
@@ -380,28 +429,166 @@ st_write(Resale_sf,
 ```
 
 ```{r}
-Resale_sf <- st_read(dsn = "data/aspatial",
+Resale_training <- st_read(dsn = "data/aspatial",
                      layer = "resale")
 ```
 
+#### Test Data
+
+```{r, eval = FALSE}
+Resale_test_sf <- st_as_sf(Resale_test, 
+                      coords = c("LONGITUDE", "LATITUDE"),
+                      crs = 4326) %>%
+  st_transform(crs = 3414)
+```
+
+We can store it as a shapefile for future retrieval
+
+```{r,eval = FALSE}
+st_write(Resale_test_sf, 
+         dsn = "data/aspatial", 
+         layer = "resale_test",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+Resale_test <- st_read(dsn = "data/aspatial",
+                     layer = "resale_test")
+```
+:::
+
 ## Aspatial Data Wrangling
+
+For schools, the dataframe holds several levels of schools.
+For the purpose the regression, we will focus only on primary and secondary schools.
+
+```{r}
+unique(Schools$mainlevel_code)
+```
+
+We will create the respective primary school and secondary school dataframe.
+
+We will also make some tweaks to the geocode function created above, that takes in postal code instead of block and street.
+
+```{r}
+geocode <- function(postal) {
+  base_url <- "https://developers.onemap.sg/commonapi/search"
+  query <- list("searchVal" = postal, 
+                "returnGeom" = "Y",
+                "getAddrDetails" = "N",
+                "pageNum" = "1")
+  
+  res <- GET(base_url, query = query)
+  restext<-content(res, as="text")
+  
+  output <- jsonlite::fromJSON(restext)  %>% 
+    as.data.frame() %>%
+    dplyr::select("results.LATITUDE", "results.LONGITUDE")
+  return(output)
+}
+```
+
+::: panel-tabset
+### Primary School
+
+```{r}
+Primary <- Schools %>%
+  filter(mainlevel_code == "PRIMARY") %>%
+  select(school_name,postal_code)
+```
+
+```{r, eval = FALSE}
+Primary$LATITUDE <- 0
+Primary$LONGITUDE <- 0
+
+for (i in 1:nrow(Primary)){
+  temp_output <- geocode(Primary[i, 2])
+  
+  Primary$LATITUDE[i] <- temp_output$results.LATITUDE
+  Primary$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r, eval =FALSE}
+write_rds(Primary, "data/aspatial/Primary.rds")
+```
+
+```{r}
+Primary <- read_rds("data/aspatial/Primary.rds")
+```
+
+### Secondary School
+
+```{r, eval = FALSE}
+Secondary <- Schools %>%
+  filter(mainlevel_code == "SECONDARY") %>%
+  select(school_name,postal_code)
+```
+
+After running the geocode loop on secondary school, we notice that [ZHENGHUA SECONDARY SCHOOL](https://www.moe.gov.sg/schoolfinder/schooldetail?schoolname=zhenghua-secondary-school) has a wrong postal code.
+
+```{r, eval = FALSE}
+Secondary[137,2]<- "679962"
+```
+
+We can rerun the code.
+
+```{r, eval = FALSE}
+Secondary$LATITUDE <- 0
+Secondary$LONGITUDE <- 0
+
+for (i in 1:nrow(Secondary)){
+  temp_output <- geocode(Secondary[i, 2])
+  
+  Secondary$LATITUDE[i] <- temp_output$results.LATITUDE
+  Secondary$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r, eval = FALSE}
+write_rds(Secondary, file = "data/aspatial/Secondary.rds")
+```
+
+```{r}
+Secondary <- read_rds("data/aspatial/Secondary.rds")
+```
+:::
 
 For Primary_sch, Secondary_sch and Mall, we need to convert them into sf and transform it to the correct CRS.
 
 Primary School:
 
 ```{r}
-Pri_sch <- Primary_sch %>%
-  st_as_sf(coords = c("Latitude", "Longitude"),
+Primary_sf <- Primary %>%
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"),
            crs = 4326) %>% 
   st_transform(crs = 3414)
+```
+
+Good Primary Schools:
+
+We will refer to [schlah](https://schlah.com/primary-schools) list of good primary schools.
+Note that CANOSSA HIGH SCHOOL in schlah webpage is known as CANOSSA CATHOLIC PRIMARY SCHOOL.
+
+```{r}
+Good_Prisch <- Primary_sf %>%
+  filter(school_name %in% c("NANYANG PRIMARY SCHOOL",
+                            "TAO NAN SCHOOL",
+                            "CANOSSA CATHOLIC PRIMARY SCHOOL",
+                            "NAN HUA PRIMARY SCHOOL",
+                            "ST. HILDA'S PRIMARY SCHOOL",
+                            "HENRY PARK PRIMARY SCHOOL",
+                            "ANGLO-CHINESE SCHOOL (PRIMARY)",
+                            "RAFFLES GIRLS' PRIMARY SCHOOL",
+                            "PEI HWA PRESBYTERIAN PRIMARY SCHOOL"
+                            ))
 ```
 
 Secondary School:
 
 ```{r}
-Sec_sch <- Secondary_sch %>%
-  st_as_sf(coords = c("latitude", "longitude"),
+Secondary_sf <- Secondary %>%
+  st_as_sf(coords = c("LONGITUDE","LATITUDE"),
            crs = 4326) %>% 
   st_transform(crs = 3414)
 ```
@@ -410,9 +597,20 @@ Malls:
 
 ```{r}
 malls <- Malls %>%
-  st_as_sf(coords = c("latitude", "longitude"),
-           crs = 4326) %>% 
-  st_transform(crs = 3414)
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = 4326) %>%
+  st_transform(crs= 3414)
+```
+
+CBD Area:
+
+```{r}
+lat <- 1.287953
+lng <- 103.851784
+
+cbd_sf <- data.frame(lat, lng) %>%
+  st_as_sf(coords = c("lng", "lat"), crs=4326) %>%
+  st_transform(crs=3414)
 ```
 
 ## Ensure all datasets are in EPSG:3414
@@ -420,14 +618,15 @@ malls <- Malls %>%
 Aside from the onemap variables, we need to check the geospatial data and the other data sets, primary school, secondary school and shopping malls.
 
 ```{r}
-st_crs(mpsz) ; st_crs(Bus_stop) ; st_crs(MRT)
+st_crs(mpsz) ; st_crs(Bus_stop) ; st_crs(MRT) ; st_crs(supermarkets)
 ```
 
 We notice that the CRS for these 3 geospatial data is not correct.
 We will use st_transformed as taught previously to convert it to EPSG:3414
 
 ```{r}
-mpsz <- mpsz %>%st_transform(crs = 3414)
+mpsz <- mpsz %>%
+  st_transform(crs = 3414)
 ```
 
 ```{r}
@@ -437,6 +636,11 @@ Bus_stop <- Bus_stop %>%
 
 ```{r}
 MRT <- MRT %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+supermarkets <- supermarkets %>%
   st_transform(crs = 3414)
 ```
 
@@ -479,6 +683,10 @@ length(which(st_is_valid(pharmacy)== FALSE))
 length(which(st_is_valid(supermarkets)== FALSE))
 ```
 
+```{r}
+length(which(st_is_valid(childcare)== FALSE))
+```
+
 We can see that for the oneMap variables, there are no invalid geometries.
 
 ### DATA.GOV
@@ -503,18 +711,14 @@ We will proceed to remove them
 mpsz <- st_make_valid(mpsz)
 ```
 
-```{r, eval = FALSE}
-MRT <- st_make_valid(MRT)
-```
-
 ### Aspatial Data
 
 ```{r}
-length(which(st_is_valid(Pri_sch)== FALSE))
+length(which(st_is_valid(Primary_sf)== FALSE))
 ```
 
 ```{r}
-length(which(st_is_valid(Sec_sch)== FALSE))
+length(which(st_is_valid(Secondary_sf)== FALSE))
 ```
 
 ```{r}
@@ -526,7 +730,7 @@ There is no invalid geometries in the aspatial data set.
 
 ## Removing Unnecessary columns
 
-::: panel-tab
+::: panel-tabset
 ### Onemap
 
 ```{r}
@@ -569,34 +773,43 @@ supermarkets <- supermarkets %>%
   select(1)
 ```
 
+```{r}
+childcare <- childcare %>%
+  select(1)
+```
+
 ### DATA.GOV
 
 ```{r}
 Bus_stop <- select(Bus_stop, 1)
 ```
 
+For MRT, we will need to drop the Z-dimension.
+This can be seen when you View(MRT).
+
 ```{r}
-MRT_Station <- select(MRT,4)
+MRT_Station <- st_zm(MRT) %>%
+  select(1)
 ```
 
 ### Aspatial Data
 
 ```{r}
-Pri_sch <- select(Pri_sch, 1)
+Primary_sf <- select(Primary_sf, 1)
 ```
 
 ```{r}
-Sec_sch <- select(Sec_sch, 2)
+Secondary_sf <- select(Secondary_sf, 1)
 ```
 
 ```{r}
-malls <- select(malls,2)
+malls <- select(malls, name)
 ```
 :::
 
 ## Check NA values
 
-::: panel-tab
+::: panel-tabset
 ### Onemap
 
 ```{r}
@@ -631,6 +844,10 @@ pharmacy[rowSums(is.na(pharmacy))!=0,]
 supermarkets[rowSums(is.na(supermarkets))!=0,]
 ```
 
+```{r}
+childcare[rowSums(is.na(childcare))!=0,]
+```
+
 We notice that family services has NA values, we will proceed to remove them using na.omit()
 
 ```{r}
@@ -654,11 +871,11 @@ mpsz[rowSums(is.na(mpsz))!=0,]
 ### Aspatial Data
 
 ```{r}
-length(which(is.na(Pri_sch) == TRUE))
+length(which(is.na(Primary_sf) == TRUE))
 ```
 
 ```{r}
-length(which(is.na(Sec_sch) == TRUE))
+length(which(is.na(Secondary_sf) == TRUE))
 ```
 
 ```{r}
@@ -670,7 +887,7 @@ length(which(is.na(malls) == TRUE))
 
 ## Initial Mapping
 
-::: panel-tab
+::: panel-tabset
 ### Subzone
 
 ```{r}
@@ -682,14 +899,537 @@ tm_shape(mpsz) +
 ### MRT Stations
 
 ```{r, eval = FALSE}
-tmap_mode("view")
+# Error
+tmap_mode("plot")
+tm_shape(mpsz) +
+  tm_polygons() +
 tm_shape(MRT_Station) +
   tm_dots()
 ```
 
 ### Bus Stops
-:::
 
 ```{r}
+tmap_mode("plot")
+tm_shape(mpsz) + 
+  tm_polygons() +
+tm_shape(Bus_stop) +
+  tm_dots(col = "red",
+          size = 0.0075)
+```
 
+Note that the points outside of Singapore boundaries are related to bus stop at Johor Bahru and they are valid points to our analysis.
+
+### Community Club
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(communityclubs) +
+  tm_dots()
+```
+
+### Eldercare
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(eldercare) +
+  tm_dots()
+```
+
+### Family Service
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(familyservices) +
+  tm_dots()
+```
+
+### Hawker Centre
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(hawker) +
+  tm_dots()
+```
+
+### Kindergarten
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(kindergartens) +
+  tm_dots()
+```
+
+### Malls
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(malls) +
+  tm_dots()
+```
+
+### Parks
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(parks) +
+  tm_dots()
+```
+
+### Pharmacies
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(pharmacy) +
+  tm_dots()
+```
+
+### Childcare
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(childcare) +
+  tm_dots()
+```
+
+### Primary School
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(Primary_sf) +
+  tm_dots()
+```
+
+### Secondary School
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(Secondary_sf) +
+  tm_dots()
+```
+:::
+
+# Proximity distance calculator
+
+```{r, eval = FALSE}
+library(units)
+library(matrixStats)
+proximity <- function(df1, df2, varname) {
+  dist_matrix <- st_distance(df1, df2) %>%
+    drop_units()
+  df1[,varname] <- rowMins(dist_matrix)
+  r
+```
+
+![](images/bw_adaptive_run.png)eturn(df1) }
+
+::: panel-tabset
+## Training Data
+
+```{r, eval = FALSE}
+training_resale <- 
+  # the columns will be truncated later on when viewing 
+  # so we're limiting ourselves to two-character columns for ease of viewing between
+  proximity(Resale_training, cbd_sf, "PROX_CBD") %>%
+  proximity(.,Bus_stop, "PROX_BUS") %>%
+  proximity(., communityclubs, "PROX_CLUBS") %>%
+  proximity(., eldercare, "PROX_ELDERCARE") %>%
+  proximity(., familyservices, "PROX_FAM") %>%
+  proximity(., MRT_Station, "PROX_MRT") %>%
+  proximity(., hawker, "PROX_HAWKER") %>%
+  proximity(., kindergartens, "PROX_KINDERGARTENS") %>%
+  proximity(., pharmacy, "PROX_PHARMACY") %>%
+  proximity(., parks, "PROX_PARK") %>%
+  proximity(., malls, "PROX_MALL") %>%
+  proximity(., supermarkets, "PROX_SPRMKT") %>%
+  proximity(., childcare, "PROX_CHILDCARE") %>%
+  proximity(., Primary_sf, "PROX_PRISCH") %>%
+  proximity(., Good_Prisch, "PROX_GOODP") %>%
+  proximity(., Secondary_sf, "PROX_SECSCH") 
+```
+
+```{r, eval =FALSE}
+training_resale <- training_resale %>%
+  mutate() %>%
+  rename("FLAT_TYPE" = "flt_typ",
+         "STOREY" = "stry_rn",
+         "AREA_SQM" = "flr_r_s",
+         "PRICE" = "rsl_prc",
+         "REMAINING_LEASE" = "rmnng_l") %>%
+  relocate(`PRICE`)
+```
+
+## Test Data
+
+```{r, eval=FALSE}
+test_resale <- 
+  # the columns will be truncated later on when viewing 
+  # so we're limiting ourselves to two-character columns for ease of viewing between
+  proximity(Resale_test, cbd_sf, "PROX_CBD") %>%
+  proximity(.,Bus_stop, "PROX_BUS") %>%
+  proximity(., communityclubs, "PROX_CLUBS") %>%
+  proximity(., eldercare, "PROX_ELDERCARE") %>%
+  proximity(., familyservices, "PROX_FAM") %>%
+  proximity(., MRT_Station, "PROX_MRT") %>%
+  proximity(., hawker, "PROX_HAWKER") %>%
+  proximity(., kindergartens, "PROX_KINDERGARTENS") %>%
+  proximity(., pharmacy, "PROX_PHARMACY") %>%
+  proximity(., parks, "PROX_PARK") %>%
+  proximity(., malls, "PROX_MALL") %>%
+  proximity(., supermarkets, "PROX_SPRMKT") %>%
+  proximity(., childcare, "PROX_CHILDCARE") %>%
+  proximity(., Primary_sf, "PROX_PRISCH") %>%
+  proximity(., Good_Prisch, "PROX_GOODP") %>%
+  proximity(., Secondary_sf, "PROX_SECSCH") 
+```
+
+```{r, eval = FALSE}
+test_resale <- test_resale %>%
+  mutate() %>%
+  rename("FLAT_TYPE" = "flt_typ",
+         "STOREY" = "stry_rn",
+         "AREA_SQM" = "flr_r_s",
+         "PRICE" = "rsl_prc",
+         "REMAINING_LEASE" = "rmnng_l") %>%
+  relocate(`PRICE`)
+```
+:::
+
+## Facility Count within Radius Calculation
+
+Here, we want to find the number of facilities within a particular radius.
+Like above, we'll use st_distance() to compute the distance between the flats and the desired facilities, and then sum up the observations with rowSums().
+The values will be appended to the data frame as a new column.
+
+```{r, eval = FALSE}
+num_radius <- function(df1, df2, varname, radius) {
+  dist_matrix <- st_distance(df1, df2) %>%
+    drop_units() %>%
+    as.data.frame()
+  df1[,varname] <- rowSums(dist_matrix <= radius)
+  return(df1)
+}
+```
+
+::: panel-tabset
+### Training Data
+
+```{r, eval = FALSE}
+training_resale <- 
+  num_radius(training_resale, kindergartens, "NUM_KNDRGTN", 350) %>%
+  num_radius(., childcare, "NUM_CHILDCARE", 350) %>%
+  num_radius(., Bus_stop, "NUM_BUS_STOP", 350) %>%
+  num_radius(., Primary_sf, "NUM_PRISCH", 1000) %>%
+  num_radius(., Secondary_sf, "NUM_SECSCH", 1000)
+```
+
+```{r, eval = FALSE}
+st_write(training_resale, dsn = "data/aspatial/training_resale.shp")
+```
+
+### Test Data
+
+```{r, eval = FALSE}
+test_resale <- 
+  num_radius(test_resale, kindergartens, "NUM_KNDRGTN", 350) %>%
+  num_radius(., childcare, "NUM_CHILDCARE", 350) %>%
+  num_radius(., Bus_stop, "NUM_BUS_STOP", 350) %>%
+  num_radius(., Primary_sf, "NUM_PRISCH", 1000) %>%
+  num_radius(., Secondary_sf, "NUM_SECSCH", 1000)
+```
+
+```{r, eval = FALSE}
+st_write(test_resale, dsn = "data/aspatial/test_resale.shp")
+```
+:::
+
+# Read Data in
+
+```{r}
+training_data <- st_read(dsn="data/aspatial",
+                         layer = "training_resale")
+test_data <- st_read(dsn = "data/aspatial",
+                     layer = "test_resale")
+```
+
+::: panel-tabset
+### Training Data
+
+```{r}
+glimpse(training_data)
+```
+
+We can see that we have forgotten to as.factor the categorical variable columns.
+
+```{r}
+training_data <- training_data %>%
+  mutate(FLAT_TY = as.factor(FLAT_TY),
+         STOREY = as.factor(STOREY))
+```
+
+### Test Data
+
+```{r}
+glimpse(test_data)
+```
+
+We can see that we have forgotten to as.factor the categorical variable columns.
+
+```{r}
+test_data <- test_data %>%
+  mutate(FLAT_TY = as.factor(FLAT_TY),
+         STOREY = as.factor(STOREY))
+```
+:::
+
+# Computing Correlation Matrix
+
+```{r}
+training_data_nogeo <- training_data %>%
+  st_drop_geometry()
+corrplot::corrplot(cor(training_data_nogeo[, 7:28]), 
+                   diag = FALSE, 
+                   order = "AOE",
+                   tl.pos = "td", 
+                   tl.cex = 0.5, 
+                   method = "number", 
+                   type = "upper")
+```
+
+We can see several correlated variables but they are within acceptable range to be included in the regression.
+
+# Building a non-spatial multiple linear regression
+
+Since Area and Flat Type are most likely highly correlated, we will drop Flat Type.
+
+```{r}
+price_mlr <- lm(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+                data = training_data)
+summary(price_mlr)
+                  
+```
+
+```{r, eval = FALSE}
+write_rds(price_mlr, "data/model/price_mlr.rds")
+```
+
+# GWR Predictive Method
+
+## Converting sf dataframe to SpatialPointDataframe
+
+```{r}
+train_data_sp <- as_Spatial(training_data)
+train_data_sp
+```
+
+```{r, eval = FALSE}
+
+bw_adaptive <- bw.gwr(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+                data = train_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+![](images/bw_adaptive_run.png)
+
+The smallest CV score is adaptive bandwidth: 372.
+
+```{r, eval = FALSE}
+write_rds(bw_adaptive, file = "data/model/bw_adaptive.rds")
+```
+
+## Construct the adaptive bandwidth gwr
+
+```{r}
+bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
+bw_adaptive
+```
+
+```{r, eval = FALSE}
+gwr_adaptive <- gwr.basic(formula = PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+                          data = train_data_sp,
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE,
+                          longlat = FALSE)
+```
+
+```{r, eval = FALSE}
+write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
+```
+
+```{r}
+gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
+gwr_adaptive
+```
+
+## Preparing coordinates data
+
+### Extracting coordinates data
+
+The code chunk below extract the x, y coordinates of the full, training and test data sets.
+This is as taught in in-class exercise 9.
+
+```{r, eval = FALSE}
+coords_train <- st_coordinates(training_data)
+coords_test <- st_coordinates(test_data)
+```
+
+Before we proceed, we should save the output into rds for future uses
+
+```{r, eval = FALSE}
+write_rds(coords_train, "data/model/coords_train.rds" )
+write_rds(coords_test, "data/model/coords_test.rds" )
+```
+
+```{r}
+coords_train <- read_rds("data/model/coords_train.rds")
+coords_test <- read_rds("data/model/coords_test.rds")
+```
+
+### Dropping geometry field
+
+We need to drop the geometry column of the sf data.frame by using st_drop_geometry() of the sf package.
+This is because, in the later parts, we cannot have the geometry columns in the data when running the random forest model.
+
+```{r, eval = FALSE}
+train_data_nogeo <- training_data %>%
+  st_drop_geometry()
+```
+
+```{r, eval = FALSE}
+write_rds(train_data_nogeo, "data/model/train_data_nogeo.rds")
+```
+
+```{r}
+train_data_nogeo <- read_rds("data/model/train_data_nogeo.rds")
+```
+
+## Calibrating Random Forest Model
+
+The code chunk below uses ranger() from the ranger package
+
+This is done to calibrate the model, for predicting HDB resale prices.
+
+```{r}
+set.seed(1234)
+rf <- ranger(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+                data = train_data_nogeo)
+```
+
+```{r}
+print(rf)
+```
+
+```{r, eval = FALSE}
+gwRF_bw <- grf.bw(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+                data = train_data_nogeo,
+                kernel = "adaptive",
+                coords = coords_train)
+```
+
+We will save the bandwidth output by using the code chunk below:
+
+```{r, eval = FALSE}
+write_rds(gwRF_bw, "data/model/gwRF_bw.rds")
+```
+
+## Calibrating Geographical Random Forest Model
+
+```{r, eval = FALSE}
+set.seed(1234)
+gwRF_adaptive <- grf(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+                     dframe=train_data_nogeo, 
+                     bw=gwRF_bw,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+Let's save the model output below:
+
+```{r, eval = FALSE}
+write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+```
+
+```{r, eval = FALSE}
+gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+gwRF_adaptive
+```
+
+## Predicting by using test data
+
+### Preparing the test data
+
+The code chunk below will be used to combine the test data with its corresponding coordinates data
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+### Predicting with test data
+
+Next, predict.grf() of spatialML package will be used to predict the resale value by using the test data and gwRF_adaptive model calibrated earlier.
+
+```{r, eval = FALSE}
+gwRF_pred <- gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+We should always save our output into rds since these computations take a really long time.
+
+```{r, eval = FALSE}
+GRF_pred <- write_rds(gwRF_pred, "data/model/GRF_pred.rds")
+```
+
+### Converting predicted output into a data frame
+
+```{r, eval = FALSE}
+GRF_pred_df <- as.data.frame(read_rds("data/model/GRF_pred.rds"))
+```
+
+Then, we will use cbind() to append the predicted values onto the test data
+
+```{r, eval = FALSE}
+test_data_p <- cbind(test_data, GRF_pred_df)
+```
+
+```{r, eval = FALSE}
+write_rds(test_data_p, "data/model/test_data_p.rds")
+```
+
+### Calculating Root Mean Square Error
+
+The root mean square error (RMSE) allows us to measure how far predicted values are from observed values in a regression analysis.
+In the code chunk below, rmse() of Metrics package is used to compute the RMSE.
+
+```{r, eval = FALSE}
+rmse(test_data_p$PRICE, 
+     test_data_p$GRF_pred)
+```
+
+### Visualisaing the predicted values
+
+```{r, eval = FALSE}
+ggplot(data = test_data_p,
+       aes(x = GRF_pred,
+           y = PRICE)) +
+  geom_point()
 ```
