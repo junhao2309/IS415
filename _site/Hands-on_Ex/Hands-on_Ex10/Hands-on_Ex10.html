@@ -320,7 +320,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 19, 2023</p>
+      <p class="date-modified">March 20, 2023</p>
     </div>
   </div>
     
@@ -534,7 +534,7 @@ $ total_cost     &lt;dbl&gt; 20562.45, 45726.57, 18485.58, 36769.69, 31800.65, 3
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Hansen Method</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">KD2SFCA Method</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Spatial Accessibility Measure (SAM)</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<p>Step 1: The code chunk below calculates Hansen's accessibility using <em>ac()</em> of <strong>SpatialAcc</strong> and <em>data.frame()</em> to save the output in a data frame called <code>acc_Handsen</code>.</p>
+<p>Step 1: The code chunk below calculates Hansen’s accessibility using <em>ac()</em> of <strong>SpatialAcc</strong> and <em>data.frame()</em> to save the output in a data frame called <code>acc_Handsen</code>.</p>
 <p>Note: Argument of ac(), family = “Hansen”</p>
 <p>Step 2: You will notice that the default field name is messy by running glimpse() from the dplyr package. For easy referencing, we will rename it to accHansen</p>
 <p>Step 3: Next, we will convert the data table into a tibble format</p>
@@ -618,8 +618,9 @@ $ total_cost     &lt;dbl&gt; 20562.45, 45726.57, 18485.58, 36769.69, 31800.65, 3
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <section id="computing-kd2sfcas-accessibility" class="level3" data-number="3.0.3">
 <h3 data-number="3.0.3" class="anchored" data-anchor-id="computing-kd2sfcas-accessibility"><span class="header-section-number">3.0.3</span> Computing KD2SFCA’s accessibility</h3>
-<p>Step 1: The code chunk below calculates KD2SFCA's accessibility using <em>ac()</em> of <strong>SpatialAcc</strong> and <em>data.frame()</em> to save the output in a data frame called <code>acc_KD2SFCA</code>.<br>
-Note: Argument of ac(), family = “KD2SFCA”</p>
+<p>Step 1: The code chunk below calculates KD2SFCA’s accessibility using <em>ac()</em> of <strong>SpatialAcc</strong> and <em>data.frame()</em> to save the output in a data frame called <code>acc_KD2SFCA</code>.<br>
+</p>
+<p>Note: Argument of ac(), family = “KD2SFCA”</p>
 <p>Step 2: You will notice that the default field name is messy by running glimpse() from the dplyr package. For easy referencing, we will rename it to accKD2SFCA</p>
 <p>Step 3: Next, we will convert the data table into a tibble format</p>
 <p>Step 4: Lastly, we will bind columns of hexagons and acc_KD2SFCA by using the bind_cols of dplyr package.</p>
@@ -699,7 +700,8 @@ Note: Argument of ac(), family = “KD2SFCA”</p>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <p>Step 1: The code chunk below calculates SAM’s accessibility using <em>ac()</em> of <strong>SpatialAcc</strong> and <em>data.frame()</em> to save the output in a data frame called <code>acc_SAM</code>.<br>
-Note: Argument of ac(), family = “SAM”</p>
+</p>
+<p>Note: Argument of ac(), family = “SAM”</p>
 <p>Step 2: You will notice that the default field name is messy by running glimpse() from the dplyr package. For easy referencing, we will rename it to accSAM.</p>
 <p>Step 3: Next, we will convert the data table into a tibble format</p>
 <p>Step 4: Lastly, we will bind columns of hexagons and acc_SAM by using the bind_cols of dplyr package.</p>
@@ -716,7 +718,7 @@ Note: Argument of ac(), family = “SAM”</p>
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>hexagon_SAM <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(hexagons, acc_SAM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="visualising-sams-accessibility" class="level3" data-number="3.0.6">
-<h3 data-number="3.0.6" class="anchored" data-anchor-id="visualising-sams-accessibility"><span class="header-section-number">3.0.6</span> Visualising SAM's accessibility</h3>
+<h3 data-number="3.0.6" class="anchored" data-anchor-id="visualising-sams-accessibility"><span class="header-section-number">3.0.6</span> Visualising SAM’s accessibility</h3>
 <section id="extracting-map-extend-2" class="level4" data-number="3.0.6.1">
 <h4 data-number="3.0.6.1" class="anchored" data-anchor-id="extracting-map-extend-2"><span class="header-section-number">3.0.6.1</span> Extracting map extend</h4>
 <p>The code chunk below extract the extend of hexagons sf dataframe by using st_bbox() of sf package.</p>

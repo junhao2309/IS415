@@ -36,7 +36,7 @@ You are also required to compare the performance of the conventional OLS method 
 ## Packages used:
 
 ```{r}
-pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, readxl, GWmodel, SpatialML, rsample)
+pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, readxl, GWmodel, SpatialML, rsample, Metrics)
 ```
 
 ## Data used:
@@ -1424,6 +1424,7 @@ set.seed(1234)
 gwRF_adaptive <- grf(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                      dframe=train_data_nogeo, 
                      bw= bw_adaptive,
+                     ntree = 30,
                      kernel="adaptive",
                      coords=coords_train)
 ```
@@ -1434,9 +1435,8 @@ Let's save the model output below:
 write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
 ```
 
-```{r, eval = FALSE}
+```{r}
 gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
-gwRF_adaptive
 ```
 
 ## Predicting by using test data
@@ -1466,12 +1466,12 @@ gwRF_pred <- gwRF_pred <- predict.grf(gwRF_adaptive,
 We should always save our output into rds since these computations take a really long time.
 
 ```{r, eval = FALSE}
-GRF_pred <- write_rds(gwRF_pred, "data/model/GRF_pred.rds")
+write_rds(gwRF_pred, "data/model/GRF_pred.rds")
 ```
 
 ### Converting predicted output into a data frame
 
-```{r, eval = FALSE}
+```{r}
 GRF_pred_df <- as.data.frame(read_rds("data/model/GRF_pred.rds"))
 ```
 
@@ -1485,19 +1485,34 @@ test_data_p <- cbind(test_data, GRF_pred_df)
 write_rds(test_data_p, "data/model/test_data_p.rds")
 ```
 
+```{r}
+test_data_p <- read_rds("data/model/test_data_p.rds")
+```
+
 ### Calculating Root Mean Square Error
 
 The root mean square error (RMSE) allows us to measure how far predicted values are from observed values in a regression analysis.
 In the code chunk below, rmse() of Metrics package is used to compute the RMSE.
 
-```{r, eval = FALSE}
+```{r}
+glimpse(test_data_p)
+```
+
+We notice that the column name is stated `read_rds("data/model/GRF_pred.rds")`, we will change the name accordingly.
+
+```{r}
+test_data_p <- test_data_p %>%
+  rename(GRF_pred = `read_rds("data/model/GRF_pred.rds")`)
+```
+
+```{r}
 rmse(test_data_p$PRICE, 
      test_data_p$GRF_pred)
 ```
 
 ### Visualisaing the predicted values
 
-```{r, eval = FALSE}
+```{r}
 ggplot(data = test_data_p,
        aes(x = GRF_pred,
            y = PRICE)) +

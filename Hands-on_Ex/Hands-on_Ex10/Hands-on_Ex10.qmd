@@ -154,12 +154,12 @@ We can then convert unit f measurement from metre to kilometre
 distmat_km <- as.matrix(distmat/1000)
 ```
 
-# Modelling and Visualising Accessibility 
+# Modelling and Visualising Accessibility
 
 ::: panel-tabset
 ## Hansen Method
 
-Step 1: The code chunk below calculates Hansen\'s accessibility using *ac()* of **SpatialAcc** and *data.frame()* to save the output in a data frame called `acc_Handsen`.
+Step 1: The code chunk below calculates Hansen's accessibility using *ac()* of **SpatialAcc** and *data.frame()* to save the output in a data frame called `acc_Handsen`.
 
 Note: Argument of ac(), family = "Hansen"
 
@@ -249,8 +249,8 @@ ggplot(data=hexagon_Hansen,
 
 ### Computing KD2SFCA's accessibility
 
-Step 1: The code chunk below calculates KD2SFCA\'s accessibility using *ac()* of **SpatialAcc** and *data.frame()* to save the output in a data frame called `acc_KD2SFCA`.
-\
+Step 1: The code chunk below calculates KD2SFCA's accessibility using *ac()* of **SpatialAcc** and *data.frame()* to save the output in a data frame called `acc_KD2SFCA`.\
+
 Note: Argument of ac(), family = "KD2SFCA"
 
 Step 2: You will notice that the default field name is messy by running glimpse() from the dplyr package.
@@ -334,8 +334,8 @@ ggplot(data=hexagon_KD2SFCA,
 
 ## Spatial Accessibility Measure (SAM)
 
-Step 1: The code chunk below calculates SAM's accessibility using *ac()* of **SpatialAcc** and *data.frame()* to save the output in a data frame called `acc_SAM`.
-\
+Step 1: The code chunk below calculates SAM's accessibility using *ac()* of **SpatialAcc** and *data.frame()* to save the output in a data frame called `acc_SAM`.\
+
 Note: Argument of ac(), family = "SAM"
 
 Step 2: You will notice that the default field name is messy by running glimpse() from the dplyr package.
@@ -358,7 +358,7 @@ acc_SAM <- tbl_df(acc_SAM)
 hexagon_SAM <- bind_cols(hexagons, acc_SAM)
 ```
 
-### Visualising SAM\'s accessibility
+### Visualising SAM's accessibility
 
 #### Extracting map extend
 
