@@ -182,7 +182,7 @@ To make it more automatic, define which variables you want from the onemap datab
 The code chunk runs a for loop that does steps 5 and 6 together and stores them into your folder.
 
 ```{r, eval = FALSE}
-onemap_variables <- c("childcare")
+onemap_variables <- c("childcare", "communityclubs", "eldercare", "family", "hawkercentre", "kindergartens", "nationalparks","registered_pharmacy")
 
 df <- list()
 df_sf <- list()
@@ -243,7 +243,7 @@ MRT <- st_read(dsn = "data/geospatial/lta-mrt-station-exit-kml.kml")
 
 ### Aspatial Data
 
-```{r, eval = FALSE}
+```{r}
 Resale <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
 ```
 
@@ -265,10 +265,86 @@ For the purpose of this take-home exercise, we will only be using five-room flat
 From the output above, the variables we want are:
 
 -   Resale Price
+-   Month
+-   Flat Type
 -   Area of the unit
 -   Floor level
 -   Remaining Lease
--   Age of the unit
+-   Flat Model
+
+### Story and Date adjustents
+
+We will get the unique values of story by running
+
+```{r}
+unique(Resale$storey_range)
+```
+
+The code chunk below will sequence the story levels, assigning value 1 to "01 TO 03", 2 to "04 TO 06", ..., 17 to "49 TO 51".
+
+```{r, eval = FALSE}
+# Define the story levels and ordinal values
+story_levels <- c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", "13 TO 15", "16 TO 18", "19 TO 21", "22 TO 24", "25 TO 27", "28 TO 30", "31 TO 33", "34 TO 36", "37 TO 39", "40 TO 42", "43 TO 45", "46 TO 48", "49 TO 51")
+story_ordinal <- seq_along(story_levels)
+
+# Create the ordinal variable based on the story column
+Resale$Story_Ordinal <- story_ordinal[match(Resale$storey_range, story_levels)]
+
+# Set the labels for the ordinal variable
+levels(Resale$Story_Ordinal) <- story_levels
+```
+
+### Date
+
+Next we will set the Date column as date type and also ensure Story_Ordinal is of numeric type.
+
+```{r, eval = FALSE}
+Resale <- Resale %>%
+  mutate(month = as.Date(paste0(month, "-01"), format ="%Y-%m-%d"),
+         Story_Ordinal = as.numeric(Story_Ordinal))
+```
+
+### Flat Model
+
+Next, we will set Flat Model as a binary variable by running the code chunk below.
+
+```{r, eval = FALSE}
+Resale <- Resale %>%
+  tidyr::pivot_wider(names_from = flat_model,
+              values_from = flat_model, 
+              values_fn = list(flat_model = ~1), 
+              values_fill = 0)
+```
+
+### Remaining Lease
+
+We will settle the remaining lease by running the code chunk below: This turns remaining_lease from chr type to numeric in terms of units, years.
+
+```{r, eval = FALSE}
+# Splits the string by year and month, using str_split from the stringr package
+str_list <- str_split(Resale$remaining_lease, " ")
+
+for (i in 1:length(str_list)) {
+  if (length(unlist(str_list[i])) > 2) {
+      year <- as.numeric(unlist(str_list[i])[1])
+      month <- as.numeric(unlist(str_list[i])[3])
+      Resale$remaining_lease[i] <- year + round(month/12, 2)
+  }
+  else {
+    year <- as.numeric(unlist(str_list[i])[1])
+    Resale$remaining_lease[i] <- year
+  }
+}
+
+Resale <- Resale %>%
+  mutate(remaining_lease =as.numeric(remaining_lease))
+```
+
+We can take a look at the dataframe now by using glimpse() from the dplyr package
+
+```{r}
+glimpse(Resale)
+```
 
 We will first filter out the relevant columns we want by running the code chunk below:
 
@@ -280,73 +356,46 @@ These two functions come from the dplyr package.
 
 ```{r, eval = FALSE}
 Resale_train <- Resale %>%
-  select(1,3,4,5,6,7,10,11) %>%
-  mutate(month = as.Date(paste0(month, "-01"), format ="%Y-%m-%d")) %>%
   filter(month >= "2021-01-01" & month <= "2022-12-01",
-         flat_type == "5 ROOM")
+         flat_type == "5 ROOM") %>%
+  dplyr::select(-2,-3,-6,-8)
 ```
 
-We also notice that the data type for story_range, flat_type and remaining_lease are chr type.
-For story_range and flat_type, we should change them to factor while remaining lease should be made into a numeric.
-
-We will first settle the remaining lease by running the code chunk below:
+We will save Resale_train as a rds file for easy retrieval
 
 ```{r, eval = FALSE}
-# Splits the string by year and month, using str_split from the stringr package
-str_list <- str_split(Resale_train$remaining_lease, " ")
-
-for (i in 1:length(str_list)) {
-  if (length(unlist(str_list[i])) > 2) {
-      year <- as.numeric(unlist(str_list[i])[1])
-      month <- as.numeric(unlist(str_list[i])[3])
-      Resale_train$remaining_lease[i] <- year + round(month/12, 2)
-  }
-  else {
-    year <- as.numeric(unlist(str_list[i])[1])
-    Resale_train$remaining_lease[i] <- year
-  }
-}
+write_rds(Resale_train, "data/aspatial/Resale_train.rds")
 ```
 
-Once done, we will use mutate() to change the remaining two variables to the correct data type.
+```{r}
+Resale_train <- read_rds("data/aspatial/Resale_train.rds")
+```
 
-```{r, eval = FALSE}
-Resale_train <-Resale_train %>%
-  mutate(flat_type = as.factor(flat_type),
-         storey_range = as.factor(storey_range),
-         remaining_lease = as.numeric(remaining_lease))
+```{r}
+glimpse(Resale_train)
 ```
 
 ### Test Data
 
 ```{r, eval = FALSE}
 Resale_test <- Resale %>%
-  select(1,3,4,5,6,7,10,11) %>%
-  mutate(month = as.Date(paste0(month, "-01"), format ="%Y-%m-%d")) %>%
-  filter(month == c("2023-01-01","2023-02-01"),
-         flat_type == "5 ROOM")
+  filter(month >="2023-01-01" & month <="2023-02-01",
+         flat_type == "5 ROOM") %>%
+  dplyr::select(-2,-3,-6,-8)
 ```
 
-We also notice that the data type for story_range, flat_type and remaining_lease are chr type.
-For story_range and flat_type, we should change them to factor while remaining lease should be made into a numeric.
-
-We will first settle the remaining lease by running the code chunk below:
+We will save Resale_train as a rds file for easy retrieval
 
 ```{r, eval = FALSE}
-# Splits the string by year and month, using str_split from the stringr package
-str_list <- str_split(Resale_test$remaining_lease, " ")
+write_rds(Resale_test, "data/aspatial/Resale_test.rds")
+```
 
-for (i in 1:length(str_list)) {
-  if (length(unlist(str_list[i])) > 2) {
-      year <- as.numeric(unlist(str_list[i])[1])
-      month <- as.numeric(unlist(str_list[i])[3])
-      Resale_test$remaining_lease[i] <- year + round(month/12, 2)
-  }
-  else {
-    year <- as.numeric(unlist(str_list[i])[1])
-    Resale_test$remaining_lease[i] <- year
-  }
-}
+```{r}
+Resale_test <- read_rds("data/aspatial/Resale_test.rds")
+```
+
+```{r}
+glimpse(Resale_test)
 ```
 :::
 
@@ -383,7 +432,7 @@ Resale_train$LATITUDE <- 0
 Resale_train$LONGITUDE <- 0
 
 for (i in 1:nrow(Resale_train)){
-  temp_output <- geocode(Resale_train[i, 3], Resale_train[i, 4])
+  temp_output <- geocode(Resale_train[i, 2], Resale_train[i, 3])
   
   Resale_train$LATITUDE[i] <- temp_output$results.LATITUDE
   Resale_train$LONGITUDE[i] <- temp_output$results.LONGITUDE
@@ -397,7 +446,7 @@ Resale_test$LATITUDE <- 0
 Resale_test$LONGITUDE <- 0
 
 for (i in 1:nrow(Resale_test)){
-  temp_output <- geocode(Resale_test[i, 3], Resale_test[i, 4])
+  temp_output <- geocode(Resale_test[i, 2], Resale_test[i, 3])
   
   Resale_test$LATITUDE[i] <- temp_output$results.LATITUDE
   Resale_test$LONGITUDE[i] <- temp_output$results.LONGITUDE
@@ -413,7 +462,7 @@ By using st_as_sf() from the sf package, we can convert Resale_2023 into an sf a
 #### Training Data
 
 ```{r, eval = FALSE}
-Resale_sf <- st_as_sf(Resale_train, 
+Resale_training_sf <- st_as_sf(Resale_train, 
                       coords = c("LONGITUDE", "LATITUDE"),
                       crs = 4326) %>%
   st_transform(crs = 3414)
@@ -422,15 +471,15 @@ Resale_sf <- st_as_sf(Resale_train,
 We can store it as a shapefile for future retrieval.
 
 ```{r,eval = FALSE}
-st_write(Resale_sf, 
+st_write(Resale_training_sf, 
          dsn = "data/aspatial", 
-         layer = "resale",
+         layer = "resale_train_sf",
          driver = "ESRI Shapefile")
 ```
 
 ```{r}
-Resale_training <- st_read(dsn = "data/aspatial",
-                     layer = "resale")
+Resale_training_sf <- st_read(dsn = "data/aspatial",
+                     layer = "resale_train_sf")
 ```
 
 #### Test Data
@@ -447,13 +496,13 @@ We can store it as a shapefile for future retrieval
 ```{r,eval = FALSE}
 st_write(Resale_test_sf, 
          dsn = "data/aspatial", 
-         layer = "resale_test",
+         layer = "Resale_test_sf",
          driver = "ESRI Shapefile")
 ```
 
 ```{r}
-Resale_test <- st_read(dsn = "data/aspatial",
-                     layer = "resale_test")
+Resale_test_sf <- st_read(dsn = "data/aspatial",
+                     layer = "Resale_test_sf")
 ```
 :::
 
@@ -1029,10 +1078,8 @@ proximity <- function(df1, df2, varname) {
   dist_matrix <- st_distance(df1, df2) %>%
     drop_units()
   df1[,varname] <- rowMins(dist_matrix)
-  r
+  return(df1) }
 ```
-
-![](images/bw_adaptive_run.png)eturn(df1) }
 
 ::: panel-tabset
 ## Training Data
@@ -1041,7 +1088,7 @@ proximity <- function(df1, df2, varname) {
 training_resale <- 
   # the columns will be truncated later on when viewing 
   # so we're limiting ourselves to two-character columns for ease of viewing between
-  proximity(Resale_training, cbd_sf, "PROX_CBD") %>%
+  proximity(Resale_training_sf, cbd_sf, "PROX_CBD") %>%
   proximity(.,Bus_stop, "PROX_BUS") %>%
   proximity(., communityclubs, "PROX_CLUBS") %>%
   proximity(., eldercare, "PROX_ELDERCARE") %>%
@@ -1062,9 +1109,7 @@ training_resale <-
 ```{r, eval =FALSE}
 training_resale <- training_resale %>%
   mutate() %>%
-  rename("FLAT_TYPE" = "flt_typ",
-         "STOREY" = "stry_rn",
-         "AREA_SQM" = "flr_r_s",
+  rename("AREA_SQM" = "flr_r_s",
          "PRICE" = "rsl_prc",
          "REMAINING_LEASE" = "rmnng_l") %>%
   relocate(`PRICE`)
@@ -1076,7 +1121,7 @@ training_resale <- training_resale %>%
 test_resale <- 
   # the columns will be truncated later on when viewing 
   # so we're limiting ourselves to two-character columns for ease of viewing between
-  proximity(Resale_test, cbd_sf, "PROX_CBD") %>%
+  proximity(Resale_test_sf, cbd_sf, "PROX_CBD") %>%
   proximity(.,Bus_stop, "PROX_BUS") %>%
   proximity(., communityclubs, "PROX_CLUBS") %>%
   proximity(., eldercare, "PROX_ELDERCARE") %>%
@@ -1097,9 +1142,7 @@ test_resale <-
 ```{r, eval = FALSE}
 test_resale <- test_resale %>%
   mutate() %>%
-  rename("FLAT_TYPE" = "flt_typ",
-         "STOREY" = "stry_rn",
-         "AREA_SQM" = "flr_r_s",
+  rename("AREA_SQM" = "flr_r_s",
          "PRICE" = "rsl_prc",
          "REMAINING_LEASE" = "rmnng_l") %>%
   relocate(`PRICE`)
@@ -1135,7 +1178,7 @@ training_resale <-
 ```
 
 ```{r, eval = FALSE}
-st_write(training_resale, dsn = "data/aspatial/training_resale.shp")
+write_rds(training_resale, "data/aspatial/training_resale.rds")
 ```
 
 ### Test Data
@@ -1150,17 +1193,15 @@ test_resale <-
 ```
 
 ```{r, eval = FALSE}
-st_write(test_resale, dsn = "data/aspatial/test_resale.shp")
+write_rds(test_resale, "data/aspatial/test_resale.rds")
 ```
 :::
 
 # Read Data in
 
 ```{r}
-training_data <- st_read(dsn="data/aspatial",
-                         layer = "training_resale")
-test_data <- st_read(dsn = "data/aspatial",
-                     layer = "test_resale")
+training_data <- read_rds("data/aspatial/training_resale.rds")
+test_data <- read_rds("data/aspatial/test_resale.rds")
 ```
 
 ::: panel-tabset
@@ -1170,12 +1211,12 @@ test_data <- st_read(dsn = "data/aspatial",
 glimpse(training_data)
 ```
 
-We can see that we have forgotten to as.factor the categorical variable columns.
+We can see that we have forgotten to remove Block and street.
+We can also check and confirm that all variables are in the right format.
 
 ```{r}
 training_data <- training_data %>%
-  mutate(FLAT_TY = as.factor(FLAT_TY),
-         STOREY = as.factor(STOREY))
+  select(-block, -strt_nm)
 ```
 
 ### Test Data
@@ -1184,12 +1225,12 @@ training_data <- training_data %>%
 glimpse(test_data)
 ```
 
-We can see that we have forgotten to as.factor the categorical variable columns.
+We can see that we have forgotten to remove Block and street.
+We can also check and confirm that all variables are in the right format.
 
 ```{r}
 test_data <- test_data %>%
-  mutate(FLAT_TY = as.factor(FLAT_TY),
-         STOREY = as.factor(STOREY))
+  select(-block, -strt_nm)
 ```
 :::
 
@@ -1198,30 +1239,59 @@ test_data <- test_data %>%
 ```{r}
 training_data_nogeo <- training_data %>%
   st_drop_geometry()
-corrplot::corrplot(cor(training_data_nogeo[, 7:28]), 
+```
+
+We will first create the correlation matrix and check for any NA or infinite values.
+
+```{r}
+cor_matrix <- cor(training_data_nogeo[,3:47])
+any(is.na(cor_matrix)) # check for missing values
+any(is.infinite(cor_matrix)) # check for infinite values
+```
+
+Since there are missing values, we will fix this by assigning 0 to them
+
+```{r}
+na_value <- is.na(cor_matrix)
+cor_matrix[na_value] <- 0
+```
+
+```{r}
+corrplot::corrplot(cor_matrix, 
                    diag = FALSE, 
                    order = "AOE",
                    tl.pos = "td", 
-                   tl.cex = 0.5, 
+                   tl.cex = 0.2, 
                    method = "number", 
                    type = "upper")
 ```
 
-We can see several correlated variables but they are within acceptable range to be included in the regression.
+We can see several correlated variables above 0.5 but they are within acceptable range to be included in the regression.
 
 # Building a non-spatial multiple linear regression
 
-Since Area and Flat Type are most likely highly correlated, we will drop Flat Type.
-
 ```{r}
-price_mlr <- lm(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+price_mlr <- lm(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + NwGnrtn + DBSS + Standrd + Aprtmnt+ Simplfd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Maisntt + Type.S1 + Type.S2 + ModelA2 + Terrace + Imprv.M + PrmmMsn + MltGnrt + PrmmApL+ X2.room + X3Gen + PROX_CBD + PROX_BUS + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_KINDERGARTENS+ PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_CHILDCARE + PROX_PRISCH + PROX_GOODP + PROX_SECSCH + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = training_data)
 summary(price_mlr)
-                  
+```
+
+We can see that there are 11 singularities.
+This is because when we change from categorical to binary, we need to exclude them to ensure that there are no linear dependency.
+We will exclude NwGnrtn, Aprtmnt, Simplfd, Maisntt, Type.S1, ModelA2, Terrace, PrmmMsn, MltGnrt, X2.room, X3Gen
+
+```{r, eval = FALSE}
+price_mlr1 <- lm(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
+                data = training_data)
+summary(price_mlr1)
 ```
 
 ```{r, eval = FALSE}
 write_rds(price_mlr, "data/model/price_mlr.rds")
+```
+
+```{r, eval = FALSE}
+write_rds(price_mlr1, "data/model/price_mlr1.rds")
 ```
 
 # GWR Predictive Method
@@ -1234,8 +1304,7 @@ train_data_sp
 ```
 
 ```{r, eval = FALSE}
-
-bw_adaptive <- bw.gwr(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+bw_adaptive <- bw.gwr(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = train_data_sp,
                   approach="CV",
                   kernel="gaussian",
@@ -1243,9 +1312,9 @@ bw_adaptive <- bw.gwr(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + P
                   longlat=FALSE)
 ```
 
-![](images/bw_adaptive_run.png)
+![](images/image-1232532573.png)
 
-The smallest CV score is adaptive bandwidth: 372.
+The smallest CV score is adaptive bandwidth: 1005.
 
 ```{r, eval = FALSE}
 write_rds(bw_adaptive, file = "data/model/bw_adaptive.rds")
@@ -1259,8 +1328,8 @@ bw_adaptive
 ```
 
 ```{r, eval = FALSE}
-gwr_adaptive <- gwr.basic(formula = PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
-                          data = train_data_sp,
+gwr_adaptive <- gwr.basic(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
+                data = train_data_sp,
                           bw=bw_adaptive, 
                           kernel = 'gaussian', 
                           adaptive=TRUE,
@@ -1326,7 +1395,7 @@ This is done to calibrate the model, for predicting HDB resale prices.
 
 ```{r}
 set.seed(1234)
-rf <- ranger(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+rf <- ranger(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = train_data_nogeo)
 ```
 
@@ -1335,10 +1404,11 @@ print(rf)
 ```
 
 ```{r, eval = FALSE}
-gwRF_bw <- grf.bw(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+gwRF_bw <- grf.bw(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = train_data_nogeo,
                 kernel = "adaptive",
-                coords = coords_train)
+                coords = coords_train
+                )
 ```
 
 We will save the bandwidth output by using the code chunk below:
@@ -1351,9 +1421,9 @@ write_rds(gwRF_bw, "data/model/gwRF_bw.rds")
 
 ```{r, eval = FALSE}
 set.seed(1234)
-gwRF_adaptive <- grf(PRICE ~ STOREY + AREA_SQ + REMAINI + PROX_CB + PROX_CL + PROX_EL + PROX_FA + PROX_MR + PROX_HA + PROX_PH + PROX_PA + PROX_MA + PROX_SP + PROX_GO + NUM_KND + NUM_CHI +NUM_BUS+NUM_PRI + NUM_SEC,
+gwRF_adaptive <- grf(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                      dframe=train_data_nogeo, 
-                     bw=gwRF_bw,
+                     bw= bw_adaptive,
                      kernel="adaptive",
                      coords=coords_train)
 ```
