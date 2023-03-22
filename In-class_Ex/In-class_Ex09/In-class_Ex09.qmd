@@ -107,6 +107,17 @@ print(rf)
 ```
 
 ```{r, eval = FALSE}
+bw_grf <- grf.bw(formula = resale_price ~ floor_area_sqm +storey_order +
+remaining_lease_mths +PROX_CBD +PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT+
+PROX_PARK + PROX_GOOD_PRISCH+PROX_MALL +PROX_CHAS + PROX_SUPERMARKET + 
+WITHIN_350M_KINDERGARTEN +WITHIN_350M_CHILDCARE +WITHIN_350M_BUS +WITHIN_1KM_PRISCH,
+data = train_data,
+kernel = "adaptive",
+trees = 30,
+coords = coords_train)
+```
+
+```{r, eval = FALSE}
 set.seed(1234)
 gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm +storey_order +
 remaining_lease_mths +PROX_CBD +PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT+

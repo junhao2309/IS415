@@ -317,25 +317,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#read-data-in" id="toc-read-data-in" class="nav-link" data-scroll-target="#read-data-in"><span class="toc-section-number">6</span>  Read Data in</a></li>
   <li><a href="#computing-correlation-matrix" id="toc-computing-correlation-matrix" class="nav-link" data-scroll-target="#computing-correlation-matrix"><span class="toc-section-number">7</span>  Computing Correlation Matrix</a></li>
-  <li><a href="#building-a-non-spatial-multiple-linear-regression" id="toc-building-a-non-spatial-multiple-linear-regression" class="nav-link" data-scroll-target="#building-a-non-spatial-multiple-linear-regression"><span class="toc-section-number">8</span>  Building a non-spatial multiple linear regression</a></li>
+  <li><a href="#building-a-non-spatial-multiple-linear-regression" id="toc-building-a-non-spatial-multiple-linear-regression" class="nav-link" data-scroll-target="#building-a-non-spatial-multiple-linear-regression"><span class="toc-section-number">8</span>  Building a non-spatial multiple linear regression</a>
+  <ul class="collapse">
+  <li><a href="#understanding-the-non-spatial-multiple-linear-regression-model" id="toc-understanding-the-non-spatial-multiple-linear-regression-model" class="nav-link" data-scroll-target="#understanding-the-non-spatial-multiple-linear-regression-model"><span class="toc-section-number">8.1</span>  Understanding the non-spatial multiple linear regression model</a></li>
+  <li><a href="#calculating-predictive-error" id="toc-calculating-predictive-error" class="nav-link" data-scroll-target="#calculating-predictive-error"><span class="toc-section-number">8.2</span>  Calculating predictive error</a></li>
+  </ul></li>
   <li><a href="#gwr-predictive-method" id="toc-gwr-predictive-method" class="nav-link" data-scroll-target="#gwr-predictive-method"><span class="toc-section-number">9</span>  GWR Predictive Method</a>
   <ul class="collapse">
   <li><a href="#converting-sf-dataframe-to-spatialpointdataframe" id="toc-converting-sf-dataframe-to-spatialpointdataframe" class="nav-link" data-scroll-target="#converting-sf-dataframe-to-spatialpointdataframe"><span class="toc-section-number">9.1</span>  Converting sf dataframe to SpatialPointDataframe</a></li>
-  <li><a href="#construct-the-adaptive-bandwidth-gwr" id="toc-construct-the-adaptive-bandwidth-gwr" class="nav-link" data-scroll-target="#construct-the-adaptive-bandwidth-gwr"><span class="toc-section-number">9.2</span>  Construct the adaptive bandwidth gwr</a></li>
-  <li><a href="#preparing-coordinates-data" id="toc-preparing-coordinates-data" class="nav-link" data-scroll-target="#preparing-coordinates-data"><span class="toc-section-number">9.3</span>  Preparing coordinates data</a>
+  <li><a href="#finding-optimal-adaptive-bandwidth" id="toc-finding-optimal-adaptive-bandwidth" class="nav-link" data-scroll-target="#finding-optimal-adaptive-bandwidth"><span class="toc-section-number">9.2</span>  Finding optimal adaptive bandwidth</a></li>
+  <li><a href="#constructing-the-adaptive-bandwidth-gwr" id="toc-constructing-the-adaptive-bandwidth-gwr" class="nav-link" data-scroll-target="#constructing-the-adaptive-bandwidth-gwr"><span class="toc-section-number">9.3</span>  Constructing the adaptive bandwidth GWR</a></li>
+  <li><a href="#calculating-predictive-error-1" id="toc-calculating-predictive-error-1" class="nav-link" data-scroll-target="#calculating-predictive-error-1"><span class="toc-section-number">9.4</span>  Calculating predictive error</a>
   <ul class="collapse">
-  <li><a href="#extracting-coordinates-data" id="toc-extracting-coordinates-data" class="nav-link" data-scroll-target="#extracting-coordinates-data"><span class="toc-section-number">9.3.1</span>  Extracting coordinates data</a></li>
-  <li><a href="#dropping-geometry-field" id="toc-dropping-geometry-field" class="nav-link" data-scroll-target="#dropping-geometry-field"><span class="toc-section-number">9.3.2</span>  Dropping geometry field</a></li>
+  <li><a href="#calculate-prediction-values" id="toc-calculate-prediction-values" class="nav-link" data-scroll-target="#calculate-prediction-values"><span class="toc-section-number">9.4.1</span>  Calculate prediction values</a></li>
   </ul></li>
-  <li><a href="#calibrating-random-forest-model" id="toc-calibrating-random-forest-model" class="nav-link" data-scroll-target="#calibrating-random-forest-model"><span class="toc-section-number">9.4</span>  Calibrating Random Forest Model</a></li>
-  <li><a href="#calibrating-geographical-random-forest-model" id="toc-calibrating-geographical-random-forest-model" class="nav-link" data-scroll-target="#calibrating-geographical-random-forest-model"><span class="toc-section-number">9.5</span>  Calibrating Geographical Random Forest Model</a></li>
-  <li><a href="#predicting-by-using-test-data" id="toc-predicting-by-using-test-data" class="nav-link" data-scroll-target="#predicting-by-using-test-data"><span class="toc-section-number">9.6</span>  Predicting by using test data</a>
+  <li><a href="#preparing-coordinates-data" id="toc-preparing-coordinates-data" class="nav-link" data-scroll-target="#preparing-coordinates-data"><span class="toc-section-number">9.5</span>  Preparing coordinates data</a>
   <ul class="collapse">
-  <li><a href="#preparing-the-test-data" id="toc-preparing-the-test-data" class="nav-link" data-scroll-target="#preparing-the-test-data"><span class="toc-section-number">9.6.1</span>  Preparing the test data</a></li>
-  <li><a href="#predicting-with-test-data" id="toc-predicting-with-test-data" class="nav-link" data-scroll-target="#predicting-with-test-data"><span class="toc-section-number">9.6.2</span>  Predicting with test data</a></li>
-  <li><a href="#converting-predicted-output-into-a-data-frame" id="toc-converting-predicted-output-into-a-data-frame" class="nav-link" data-scroll-target="#converting-predicted-output-into-a-data-frame"><span class="toc-section-number">9.6.3</span>  Converting predicted output into a data frame</a></li>
-  <li><a href="#calculating-root-mean-square-error" id="toc-calculating-root-mean-square-error" class="nav-link" data-scroll-target="#calculating-root-mean-square-error"><span class="toc-section-number">9.6.4</span>  Calculating Root Mean Square Error</a></li>
-  <li><a href="#visualisaing-the-predicted-values" id="toc-visualisaing-the-predicted-values" class="nav-link" data-scroll-target="#visualisaing-the-predicted-values"><span class="toc-section-number">9.6.5</span>  Visualisaing the predicted values</a></li>
+  <li><a href="#extracting-coordinates-data" id="toc-extracting-coordinates-data" class="nav-link" data-scroll-target="#extracting-coordinates-data"><span class="toc-section-number">9.5.1</span>  Extracting coordinates data</a></li>
+  <li><a href="#dropping-geometry-field" id="toc-dropping-geometry-field" class="nav-link" data-scroll-target="#dropping-geometry-field"><span class="toc-section-number">9.5.2</span>  Dropping geometry field</a></li>
+  </ul></li>
+  <li><a href="#calibrating-random-forest-model" id="toc-calibrating-random-forest-model" class="nav-link" data-scroll-target="#calibrating-random-forest-model"><span class="toc-section-number">9.6</span>  Calibrating Random Forest Model</a></li>
+  <li><a href="#calibrating-geographical-random-forest-model" id="toc-calibrating-geographical-random-forest-model" class="nav-link" data-scroll-target="#calibrating-geographical-random-forest-model"><span class="toc-section-number">9.7</span>  Calibrating Geographical Random Forest Model</a></li>
+  <li><a href="#predicting-by-using-test-data" id="toc-predicting-by-using-test-data" class="nav-link" data-scroll-target="#predicting-by-using-test-data"><span class="toc-section-number">9.8</span>  Predicting by using test data</a>
+  <ul class="collapse">
+  <li><a href="#preparing-the-test-data" id="toc-preparing-the-test-data" class="nav-link" data-scroll-target="#preparing-the-test-data"><span class="toc-section-number">9.8.1</span>  Preparing the test data</a></li>
+  <li><a href="#predicting-with-test-data" id="toc-predicting-with-test-data" class="nav-link" data-scroll-target="#predicting-with-test-data"><span class="toc-section-number">9.8.2</span>  Predicting with test data</a></li>
+  <li><a href="#converting-predicted-output-into-a-data-frame" id="toc-converting-predicted-output-into-a-data-frame" class="nav-link" data-scroll-target="#converting-predicted-output-into-a-data-frame"><span class="toc-section-number">9.8.3</span>  Converting predicted output into a data frame</a></li>
+  <li><a href="#calculating-root-mean-square-error" id="toc-calculating-root-mean-square-error" class="nav-link" data-scroll-target="#calculating-root-mean-square-error"><span class="toc-section-number">9.8.4</span>  Calculating Root Mean Square Error</a></li>
+  <li><a href="#visualisaing-the-predicted-values" id="toc-visualisaing-the-predicted-values" class="nav-link" data-scroll-target="#visualisaing-the-predicted-values"><span class="toc-section-number">9.8.5</span>  Visualisaing the predicted values</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -364,7 +373,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 20, 2023</p>
+      <p class="date-modified">March 23, 2023</p>
     </div>
   </div>
     
@@ -2261,103 +2270,111 @@ $ NUM_SECSCH         &lt;dbl&gt; 2, 2, 1, 2, 2, 2, 3, 2, 2, 2, 3, 4, 3, 3, 3, 2,
 </section>
 <section id="building-a-non-spatial-multiple-linear-regression" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Building a non-spatial multiple linear regression</h1>
+<p>We will run the multiple linear regression using the base R function, lm().</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb204"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb204-1"><a href="#cb204-1" aria-hidden="true" tabindex="-1"></a>price_mlr <span class="ot">&lt;-</span> <span class="fu">lm</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> NwGnrtn <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Aprtmnt<span class="sc">+</span> Simplfd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Maisntt <span class="sc">+</span> Type.S1 <span class="sc">+</span> Type.S2 <span class="sc">+</span> ModelA2 <span class="sc">+</span> Terrace <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmMsn <span class="sc">+</span> MltGnrt <span class="sc">+</span> PrmmApL<span class="sc">+</span> X2.room <span class="sc">+</span> X3Gen <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_BUS <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_KINDERGARTENS<span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_CHILDCARE <span class="sc">+</span> PROX_PRISCH <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> PROX_SECSCH <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb204-2"><a href="#cb204-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> training_data)</span>
-<span id="cb204-3"><a href="#cb204-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mlr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb204"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb204-1"><a href="#cb204-1" aria-hidden="true" tabindex="-1"></a>price_mlr1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb204-2"><a href="#cb204-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> training_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can first save the model by running the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb205"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(price_mlr1, <span class="st">"data/model/price_mlr1.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb206"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb206-1"><a href="#cb206-1" aria-hidden="true" tabindex="-1"></a>price_mlr1 <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/price_mlr1.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="understanding-the-non-spatial-multiple-linear-regression-model" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="understanding-the-non-spatial-multiple-linear-regression-model"><span class="header-section-number">8.1</span> Understanding the non-spatial multiple linear regression model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb207"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb207-1"><a href="#cb207-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mlr1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
 lm(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + 
-    NwGnrtn + DBSS + Standrd + Aprtmnt + Simplfd + Model.A + 
-    PrmmApr + Adjndfl + MdlA.Ms + Maisntt + Type.S1 + Type.S2 + 
-    ModelA2 + Terrace + Imprv.M + PrmmMsn + MltGnrt + PrmmApL + 
-    X2.room + X3Gen + PROX_CBD + PROX_BUS + PROX_CLUBS + PROX_ELDERCARE + 
-    PROX_FAM + PROX_MRT + PROX_HAWKER + PROX_KINDERGARTENS + 
-    PROX_PHARMACY + PROX_PARK + PROX_MALL + PROX_SPRMKT + PROX_CHILDCARE + 
-    PROX_PRISCH + PROX_GOODP + PROX_SECSCH + NUM_KNDRGTN + NUM_CHILDCARE + 
+    DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + 
+    Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + 
+    PROX_FAM + PROX_MRT + PROX_HAWKER + PROX_PHARMACY + PROX_PARK + 
+    PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + 
     NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH, data = training_data)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--258788  -48446   -2257   45091  361256 
+-259902  -50073   -2595   45960  697099 
 
-Coefficients: (11 not defined because of singularities)
-                     Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)        -3.227e+05  4.078e+04  -7.914 2.67e-15 ***
-AREA_SQM            6.446e+03  1.516e+02  42.525  &lt; 2e-16 ***
-REMAINING_LEASE     5.999e+03  8.894e+01  67.453  &lt; 2e-16 ***
-Stry_Or             1.771e+04  3.176e+02  55.763  &lt; 2e-16 ***
-Improvd            -4.281e+03  3.322e+04  -0.129   0.8975    
-NwGnrtn                    NA         NA      NA       NA    
-DBSS                1.413e+05  3.343e+04   4.227 2.39e-05 ***
-Standrd             4.273e+04  3.347e+04   1.277   0.2018    
-Aprtmnt                    NA         NA      NA       NA    
-Simplfd                    NA         NA      NA       NA    
-Model.A            -3.342e+04  3.334e+04  -1.002   0.3162    
-PrmmApr             2.423e+02  3.325e+04   0.007   0.9942    
-Adjndfl            -1.520e+04  3.512e+04  -0.433   0.6652    
-MdlA.Ms             2.243e+04  3.397e+04   0.660   0.5092    
-Maisntt                    NA         NA      NA       NA    
-Type.S1                    NA         NA      NA       NA    
-Type.S2             1.615e+05  3.465e+04   4.661 3.17e-06 ***
-ModelA2                    NA         NA      NA       NA    
-Terrace                    NA         NA      NA       NA    
-Imprv.M             4.326e+03  4.698e+04   0.092   0.9266    
-PrmmMsn                    NA         NA      NA       NA    
-MltGnrt                    NA         NA      NA       NA    
-PrmmApL             2.143e+05  4.237e+04   5.058 4.29e-07 ***
-X2.room                    NA         NA      NA       NA    
-X3Gen                      NA         NA      NA       NA    
-PROX_CBD           -1.872e+01  2.528e-01 -74.067  &lt; 2e-16 ***
-PROX_BUS            1.920e+01  1.191e+01   1.612   0.1070    
-PROX_CLUBS          5.562e+00  2.792e+00   1.992   0.0463 *  
-PROX_ELDERCARE      6.710e-01  1.124e+00   0.597   0.5505    
-PROX_FAM           -4.272e+01  1.403e+00 -30.440  &lt; 2e-16 ***
-PROX_MRT           -4.724e+00  1.859e+00  -2.542   0.0110 *  
-PROX_HAWKER        -3.306e+01  1.381e+00 -23.945  &lt; 2e-16 ***
-PROX_KINDERGARTENS -2.304e+00  4.704e+00  -0.490   0.6243    
-PROX_PHARMACY      -1.595e+01  2.410e+00  -6.617 3.79e-11 ***
-PROX_PARK           9.048e+00  1.657e+00   5.462 4.79e-08 ***
-PROX_MALL          -3.300e+01  2.188e+00 -15.082  &lt; 2e-16 ***
-PROX_SPRMKT        -3.386e+01  4.257e+00  -7.952 1.96e-15 ***
-PROX_CHILDCARE      7.968e+01  6.774e+00  11.763  &lt; 2e-16 ***
-PROX_PRISCH         5.192e+01  3.052e+00  17.013  &lt; 2e-16 ***
-PROX_GOODP         -3.871e-01  2.824e-01  -1.371   0.1705    
-PROX_SECSCH         2.761e+01  2.547e+00  10.842  &lt; 2e-16 ***
-NUM_KNDRGTN         1.174e+04  8.023e+02  14.638  &lt; 2e-16 ***
-NUM_CHILDCARE      -5.159e+03  3.403e+02 -15.159  &lt; 2e-16 ***
-NUM_BUS_STOP       -3.499e+02  2.431e+02  -1.439   0.1501    
-NUM_PRISCH         -9.092e+03  5.291e+02 -17.182  &lt; 2e-16 ***
-NUM_SECSCH          1.429e+03  7.118e+02   2.007   0.0447 *  
+Coefficients:
+                  Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)     -3.188e+05  4.201e+04  -7.589 3.41e-14 ***
+AREA_SQM         6.767e+03  1.547e+02  43.734  &lt; 2e-16 ***
+REMAINING_LEASE  5.948e+03  9.011e+01  66.007  &lt; 2e-16 ***
+Stry_Or          1.818e+04  3.270e+02  55.610  &lt; 2e-16 ***
+Improvd         -1.097e+04  3.426e+04  -0.320 0.748883    
+DBSS             1.460e+05  3.447e+04   4.236 2.29e-05 ***
+Standrd          4.393e+04  3.451e+04   1.273 0.203118    
+Model.A         -4.312e+04  3.438e+04  -1.254 0.209755    
+PrmmApr         -5.752e+03  3.428e+04  -0.168 0.866730    
+Adjndfl         -1.602e+04  3.622e+04  -0.442 0.658292    
+MdlA.Ms          1.366e+04  3.502e+04   0.390 0.696473    
+Type.S2          1.642e+05  3.571e+04   4.598 4.30e-06 ***
+Imprv.M          9.382e+03  4.841e+04   0.194 0.846324    
+PrmmApL          1.838e+05  4.367e+04   4.208 2.59e-05 ***
+PROX_CBD        -1.948e+01  2.567e-01 -75.884  &lt; 2e-16 ***
+PROX_CLUBS       2.202e+01  2.801e+00   7.860 4.10e-15 ***
+PROX_ELDERCARE   5.401e+00  1.143e+00   4.726 2.31e-06 ***
+PROX_FAM        -3.407e+01  1.396e+00 -24.397  &lt; 2e-16 ***
+PROX_MRT        -9.855e+00  1.898e+00  -5.193 2.09e-07 ***
+PROX_HAWKER     -2.967e+01  1.417e+00 -20.946  &lt; 2e-16 ***
+PROX_PHARMACY   -8.325e+00  2.463e+00  -3.380 0.000728 ***
+PROX_PARK        1.550e+01  1.666e+00   9.301  &lt; 2e-16 ***
+PROX_MALL       -2.494e+01  2.236e+00 -11.152  &lt; 2e-16 ***
+PROX_SPRMKT     -2.795e+01  4.367e+00  -6.400 1.61e-10 ***
+PROX_GOODP      -4.158e-01  2.891e-01  -1.438 0.150363    
+NUM_KNDRGTN      1.060e+04  7.090e+02  14.949  &lt; 2e-16 ***
+NUM_CHILDCARE   -5.565e+03  3.491e+02 -15.940  &lt; 2e-16 ***
+NUM_BUS_STOP    -1.417e+02  2.304e+02  -0.615 0.538627    
+NUM_PRISCH      -1.068e+04  5.255e+02 -20.319  &lt; 2e-16 ***
+NUM_SECSCH      -2.021e+03  6.474e+02  -3.122 0.001798 ** 
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 74070 on 14473 degrees of freedom
-Multiple R-squared:  0.7436,    Adjusted R-squared:  0.743 
-F-statistic:  1235 on 34 and 14473 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 76410 on 14478 degrees of freedom
+Multiple R-squared:  0.7271,    Adjusted R-squared:  0.7266 
+F-statistic:  1330 on 29 and 14478 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>We can see that there are 11 singularities. This is because when we change from categorical to binary, we need to exclude them to ensure that there are no linear dependency. We will exclude NwGnrtn, Aprtmnt, Simplfd, Maisntt, Type.S1, ModelA2, Terrace, PrmmMsn, MltGnrt, X2.room, X3Gen</p>
+<p>From the multiple linear regression model above, we notice that adjusted R square is at 0.7266. This suggest that the model can explain 0.7266 of the variation in Resale Price. We also notice that majority of the proximity variables are significant at the 1% level. This can also be said for AREASQM, REMAINING LEASE AND STORY OR. The model of the apartment did not have significant impact on the Resale Price. However, two model type, DBSS and Type.S2 are significant.</p>
+</section>
+<section id="calculating-predictive-error" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="calculating-predictive-error"><span class="header-section-number">8.2</span> Calculating predictive error</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb206"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb206-1"><a href="#cb206-1" aria-hidden="true" tabindex="-1"></a>price_mlr1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb206-2"><a href="#cb206-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> training_data)</span>
-<span id="cb206-3"><a href="#cb206-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mlr1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb209"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb209-1"><a href="#cb209-1" aria-hidden="true" tabindex="-1"></a>lm_predicted_value <span class="ot">&lt;-</span> <span class="fu">predict.lm</span>(price_mlr1, <span class="at">newdata =</span> test_data)</span>
+<span id="cb209-2"><a href="#cb209-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb209-3"><a href="#cb209-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate MSE</span></span>
+<span id="cb209-4"><a href="#cb209-4" aria-hidden="true" tabindex="-1"></a>MSE <span class="ot">&lt;-</span> <span class="fu">mean</span>((test_data<span class="sc">$</span>PRICE <span class="sc">-</span> lm_predicted_value)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb209-5"><a href="#cb209-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb209-6"><a href="#cb209-6" aria-hidden="true" tabindex="-1"></a>rmse_lm <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(MSE)</span>
+<span id="cb209-7"><a href="#cb209-7" aria-hidden="true" tabindex="-1"></a>rmse_lm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 87822.93</code></pre>
 </div>
+</div>
+<p>From the square-root of the mean square error is 87822.93. We will take note of this value in the later parts of the regression modelling.</p>
+<p>We can compare models using Akaike information criterion (AIC). The smaller the AIC, the better the model. We will find the AIC by running the code chunk below.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb207"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb207-1"><a href="#cb207-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(price_mlr, <span class="st">"data/model/price_mlr.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb211"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb211-1"><a href="#cb211-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(price_mlr1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 367455.5</code></pre>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb208"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb208-1"><a href="#cb208-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(price_mlr1, <span class="st">"data/model/price_mlr1.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>We will just take note of this number and move along with the other models.</p>
+</section>
 </section>
 <section id="gwr-predictive-method" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> GWR Predictive Method</h1>
 <section id="converting-sf-dataframe-to-spatialpointdataframe" class="level2" data-number="9.1">
 <h2 data-number="9.1" class="anchored" data-anchor-id="converting-sf-dataframe-to-spatialpointdataframe"><span class="header-section-number">9.1</span> Converting sf dataframe to SpatialPointDataframe</h2>
+<p>First, we will need to change the training dataframe into a Spatial point data frame. This is used to calculate the other sections in this portion of the Exercise.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb209"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb209-1"><a href="#cb209-1" aria-hidden="true" tabindex="-1"></a>train_data_sp <span class="ot">&lt;-</span> <span class="fu">as_Spatial</span>(training_data)</span>
-<span id="cb209-2"><a href="#cb209-2" aria-hidden="true" tabindex="-1"></a>train_data_sp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb213"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb213-1"><a href="#cb213-1" aria-hidden="true" tabindex="-1"></a>train_data_sp <span class="ot">&lt;-</span> <span class="fu">as_Spatial</span>(training_data)</span>
+<span id="cb213-2"><a href="#cb213-2" aria-hidden="true" tabindex="-1"></a>train_data_sp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>class       : SpatialPointsDataFrame 
 features    : 14508 
@@ -2369,43 +2386,50 @@ min values  :  350000, 18628,       99,           49.08,       1,       0,      
 max values  : 1418000, 19327,      167,           96.75,      17,       1,       0,    1,       1,       0,       0,       1,       1,       1,       1, ... </code></pre>
 </div>
 </div>
+</section>
+<section id="finding-optimal-adaptive-bandwidth" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="finding-optimal-adaptive-bandwidth"><span class="header-section-number">9.2</span> Finding optimal adaptive bandwidth</h2>
+<p>We will find the optimal adaptive bandwidth of the geospatial weighted regression. The code chunk below uses bw.gwr() from the GWModel package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb211"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb211-1"><a href="#cb211-1" aria-hidden="true" tabindex="-1"></a>bw_adaptive <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb211-2"><a href="#cb211-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_sp,</span>
-<span id="cb211-3"><a href="#cb211-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">approach=</span><span class="st">"CV"</span>,</span>
-<span id="cb211-4"><a href="#cb211-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel=</span><span class="st">"gaussian"</span>,</span>
-<span id="cb211-5"><a href="#cb211-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adaptive=</span><span class="cn">TRUE</span>,</span>
-<span id="cb211-6"><a href="#cb211-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">longlat=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb215"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true" tabindex="-1"></a>bw_adaptive <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb215-2"><a href="#cb215-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_sp,</span>
+<span id="cb215-3"><a href="#cb215-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">approach=</span><span class="st">"CV"</span>,</span>
+<span id="cb215-4"><a href="#cb215-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel=</span><span class="st">"gaussian"</span>,</span>
+<span id="cb215-5"><a href="#cb215-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adaptive=</span><span class="cn">TRUE</span>,</span>
+<span id="cb215-6"><a href="#cb215-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">longlat=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><img src="images/image-1232532573.png" class="img-fluid"></p>
 <p>The smallest CV score is adaptive bandwidth: 1005.</p>
+<p>We will save the adaptive bandwidth as an RDS file for easy retrieval.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb212"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb212-1"><a href="#cb212-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bw_adaptive, <span class="at">file =</span> <span class="st">"data/model/bw_adaptive.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb216"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb216-1"><a href="#cb216-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bw_adaptive, <span class="at">file =</span> <span class="st">"data/model/bw_adaptive.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="construct-the-adaptive-bandwidth-gwr" class="level2" data-number="9.2">
-<h2 data-number="9.2" class="anchored" data-anchor-id="construct-the-adaptive-bandwidth-gwr"><span class="header-section-number">9.2</span> Construct the adaptive bandwidth gwr</h2>
+<section id="constructing-the-adaptive-bandwidth-gwr" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="constructing-the-adaptive-bandwidth-gwr"><span class="header-section-number">9.3</span> Constructing the adaptive bandwidth GWR</h2>
+<p>We will retrieve the adaptive bandwidth by using read_rds from the readr package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb213"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb213-1"><a href="#cb213-1" aria-hidden="true" tabindex="-1"></a>bw_adaptive <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/bw_adaptive.rds"</span>)</span>
-<span id="cb213-2"><a href="#cb213-2" aria-hidden="true" tabindex="-1"></a>bw_adaptive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb217"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb217-1"><a href="#cb217-1" aria-hidden="true" tabindex="-1"></a>bw_adaptive <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/bw_adaptive.rds"</span>)</span>
+<span id="cb217-2"><a href="#cb217-2" aria-hidden="true" tabindex="-1"></a>bw_adaptive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1005</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb215"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true" tabindex="-1"></a>gwr_adaptive <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(<span class="at">formula =</span> PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb215-2"><a href="#cb215-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_sp,</span>
-<span id="cb215-3"><a href="#cb215-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">bw=</span>bw_adaptive, </span>
-<span id="cb215-4"><a href="#cb215-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">kernel =</span> <span class="st">'gaussian'</span>, </span>
-<span id="cb215-5"><a href="#cb215-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">adaptive=</span><span class="cn">TRUE</span>,</span>
-<span id="cb215-6"><a href="#cb215-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb219"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb219-1"><a href="#cb219-1" aria-hidden="true" tabindex="-1"></a>gwr_adaptive <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(<span class="at">formula =</span> PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb219-2"><a href="#cb219-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_sp,</span>
+<span id="cb219-3"><a href="#cb219-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">bw=</span>bw_adaptive, </span>
+<span id="cb219-4"><a href="#cb219-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">kernel =</span> <span class="st">'gaussian'</span>, </span>
+<span id="cb219-5"><a href="#cb219-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">adaptive=</span><span class="cn">TRUE</span>,</span>
+<span id="cb219-6"><a href="#cb219-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Again we will save the the regression model as an rds file.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb220"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb220-1"><a href="#cb220-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwr_adaptive, <span class="st">"data/model/gwr_adaptive.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb216"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb216-1"><a href="#cb216-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwr_adaptive, <span class="st">"data/model/gwr_adaptive.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb217"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb217-1"><a href="#cb217-1" aria-hidden="true" tabindex="-1"></a>gwr_adaptive <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/gwr_adaptive.rds"</span>)</span>
-<span id="cb217-2"><a href="#cb217-2" aria-hidden="true" tabindex="-1"></a>gwr_adaptive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb221"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb221-1"><a href="#cb221-1" aria-hidden="true" tabindex="-1"></a>gwr_adaptive <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/gwr_adaptive.rds"</span>)</span>
+<span id="cb221-2"><a href="#cb221-2" aria-hidden="true" tabindex="-1"></a>gwr_adaptive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
@@ -2536,52 +2560,84 @@ max values  : 1418000, 19327,      167,           96.75,      17,       1,      
    Program stops at: 2023-03-17 12:52:21 </code></pre>
 </div>
 </div>
+<p>From the output above, we see that Adjusted R-square is 0.8352, higher than the non-spatial mulitple linear regression model.</p>
+<p>We will also convert the test_data set into a SpatialPoint dataframe for prediction purposes. The code chunk below does that:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb223"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb223-1"><a href="#cb223-1" aria-hidden="true" tabindex="-1"></a>test_data_sp <span class="ot">&lt;-</span> <span class="fu">as_Spatial</span>(test_data)</span>
+<span id="cb223-2"><a href="#cb223-2" aria-hidden="true" tabindex="-1"></a>test_data_sp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatialPointsDataFrame 
+features    : 998 
+extent      : 6958.193, 42623.63, 28248.87, 48625.64  (xmin, xmax, ymin, ymax)
+crs         : +proj=tmerc +lat_0=1.36666666666667 +lon_0=103.833333333333 +k=1 +x_0=28001.642 +y_0=38744.572 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+variables   : 47
+names       :   PRICE, month, AREA_SQM, REMAINING_LEASE, Stry_Or, Improvd, NwGnrtn, DBSS, Standrd, Aprtmnt, Simplfd, Model.A, PrmmApr, Adjndfl, MdlA.Ms, ... 
+min values  :  450000, 19358,       99,           45.92,       1,       0,       0,    0,       0,       0,       0,       0,       0,       0,       0, ... 
+max values  : 1340000, 19389,      149,           95.25,      14,       1,       0,    1,       1,       0,       0,       1,       1,       1,       1, ... </code></pre>
+</div>
+</div>
 </section>
-<section id="preparing-coordinates-data" class="level2" data-number="9.3">
-<h2 data-number="9.3" class="anchored" data-anchor-id="preparing-coordinates-data"><span class="header-section-number">9.3</span> Preparing coordinates data</h2>
-<section id="extracting-coordinates-data" class="level3" data-number="9.3.1">
-<h3 data-number="9.3.1" class="anchored" data-anchor-id="extracting-coordinates-data"><span class="header-section-number">9.3.1</span> Extracting coordinates data</h3>
+<section id="calculating-predictive-error-1" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="calculating-predictive-error-1"><span class="header-section-number">9.4</span> Calculating predictive error</h2>
+<section id="calculate-prediction-values" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="calculate-prediction-values"><span class="header-section-number">9.4.1</span> Calculate prediction values</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb225"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb225-1"><a href="#cb225-1" aria-hidden="true" tabindex="-1"></a>gwr_pred <span class="ot">&lt;-</span> <span class="fu">gwr.predict</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb225-2"><a href="#cb225-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> train_data_sp,</span>
+<span id="cb225-3"><a href="#cb225-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">predictdata =</span> test_data_sp,</span>
+<span id="cb225-4"><a href="#cb225-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">bw =</span> bw_adaptive,</span>
+<span id="cb225-5"><a href="#cb225-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">kernel =</span> <span class="st">'gaussian'</span>,</span>
+<span id="cb225-6"><a href="#cb225-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">adaptive =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb225-7"><a href="#cb225-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="preparing-coordinates-data" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="preparing-coordinates-data"><span class="header-section-number">9.5</span> Preparing coordinates data</h2>
+<section id="extracting-coordinates-data" class="level3" data-number="9.5.1">
+<h3 data-number="9.5.1" class="anchored" data-anchor-id="extracting-coordinates-data"><span class="header-section-number">9.5.1</span> Extracting coordinates data</h3>
 <p>The code chunk below extract the x, y coordinates of the full, training and test data sets. This is as taught in in-class exercise 9.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb219"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb219-1"><a href="#cb219-1" aria-hidden="true" tabindex="-1"></a>coords_train <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(training_data)</span>
-<span id="cb219-2"><a href="#cb219-2" aria-hidden="true" tabindex="-1"></a>coords_test <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(test_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb226"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb226-1"><a href="#cb226-1" aria-hidden="true" tabindex="-1"></a>coords_train <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(training_data)</span>
+<span id="cb226-2"><a href="#cb226-2" aria-hidden="true" tabindex="-1"></a>coords_test <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(test_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Before we proceed, we should save the output into rds for future uses</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb220"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb220-1"><a href="#cb220-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(coords_train, <span class="st">"data/model/coords_train.rds"</span> )</span>
-<span id="cb220-2"><a href="#cb220-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(coords_test, <span class="st">"data/model/coords_test.rds"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb227"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb227-1"><a href="#cb227-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(coords_train, <span class="st">"data/model/coords_train.rds"</span> )</span>
+<span id="cb227-2"><a href="#cb227-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(coords_test, <span class="st">"data/model/coords_test.rds"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Afterwhich, we can just retrieve the coordinates from the saved files.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb221"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb221-1"><a href="#cb221-1" aria-hidden="true" tabindex="-1"></a>coords_train <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/coords_train.rds"</span>)</span>
-<span id="cb221-2"><a href="#cb221-2" aria-hidden="true" tabindex="-1"></a>coords_test <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/coords_test.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb228"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb228-1"><a href="#cb228-1" aria-hidden="true" tabindex="-1"></a>coords_train <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/coords_train.rds"</span>)</span>
+<span id="cb228-2"><a href="#cb228-2" aria-hidden="true" tabindex="-1"></a>coords_test <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/coords_test.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="dropping-geometry-field" class="level3" data-number="9.3.2">
-<h3 data-number="9.3.2" class="anchored" data-anchor-id="dropping-geometry-field"><span class="header-section-number">9.3.2</span> Dropping geometry field</h3>
+<section id="dropping-geometry-field" class="level3" data-number="9.5.2">
+<h3 data-number="9.5.2" class="anchored" data-anchor-id="dropping-geometry-field"><span class="header-section-number">9.5.2</span> Dropping geometry field</h3>
 <p>We need to drop the geometry column of the sf data.frame by using st_drop_geometry() of the sf package. This is because, in the later parts, we cannot have the geometry columns in the data when running the random forest model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb222"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb222-1"><a href="#cb222-1" aria-hidden="true" tabindex="-1"></a>train_data_nogeo <span class="ot">&lt;-</span> training_data <span class="sc">%&gt;%</span></span>
-<span id="cb222-2"><a href="#cb222-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb229"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true" tabindex="-1"></a>train_data_nogeo <span class="ot">&lt;-</span> training_data <span class="sc">%&gt;%</span></span>
+<span id="cb229-2"><a href="#cb229-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb223"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb223-1"><a href="#cb223-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(train_data_nogeo, <span class="st">"data/model/train_data_nogeo.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb230"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb230-1"><a href="#cb230-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(train_data_nogeo, <span class="st">"data/model/train_data_nogeo.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb224"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb224-1"><a href="#cb224-1" aria-hidden="true" tabindex="-1"></a>train_data_nogeo <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/train_data_nogeo.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb231"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb231-1"><a href="#cb231-1" aria-hidden="true" tabindex="-1"></a>train_data_nogeo <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/train_data_nogeo.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-<section id="calibrating-random-forest-model" class="level2" data-number="9.4">
-<h2 data-number="9.4" class="anchored" data-anchor-id="calibrating-random-forest-model"><span class="header-section-number">9.4</span> Calibrating Random Forest Model</h2>
+<section id="calibrating-random-forest-model" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="calibrating-random-forest-model"><span class="header-section-number">9.6</span> Calibrating Random Forest Model</h2>
 <p>The code chunk below uses ranger() from the ranger package</p>
 <p>This is done to calibrate the model, for predicting HDB resale prices.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb225"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb225-1"><a href="#cb225-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb225-2"><a href="#cb225-2" aria-hidden="true" tabindex="-1"></a>rf <span class="ot">&lt;-</span> <span class="fu">ranger</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb225-3"><a href="#cb225-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_nogeo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb232"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb232-1"><a href="#cb232-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb232-2"><a href="#cb232-2" aria-hidden="true" tabindex="-1"></a>rf <span class="ot">&lt;-</span> <span class="fu">ranger</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb232-3"><a href="#cb232-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_nogeo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb226"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb226-1"><a href="#cb226-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb233"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb233-1"><a href="#cb233-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Ranger result
 
@@ -2601,83 +2657,449 @@ R squared (OOB):                  0.9140025 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb228"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb228-1"><a href="#cb228-1" aria-hidden="true" tabindex="-1"></a>gwRF_bw <span class="ot">&lt;-</span> <span class="fu">grf.bw</span>(<span class="at">formula =</span> PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb228-2"><a href="#cb228-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_nogeo,</span>
-<span id="cb228-3"><a href="#cb228-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">kernel =</span> <span class="st">"adaptive"</span>,</span>
-<span id="cb228-4"><a href="#cb228-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">coords =</span> coords_train</span>
-<span id="cb228-5"><a href="#cb228-5" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb235"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb235-1"><a href="#cb235-1" aria-hidden="true" tabindex="-1"></a>gwRF_bw <span class="ot">&lt;-</span> <span class="fu">grf.bw</span>(<span class="at">formula =</span> PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb235-2"><a href="#cb235-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> train_data_nogeo,</span>
+<span id="cb235-3"><a href="#cb235-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">kernel =</span> <span class="st">"adaptive"</span>,</span>
+<span id="cb235-4"><a href="#cb235-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">trees =</span> <span class="dv">30</span>,</span>
+<span id="cb235-5"><a href="#cb235-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">coords =</span> coords_train</span>
+<span id="cb235-6"><a href="#cb235-6" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We will save the bandwidth output by using the code chunk below:</p>
+<p>Due to long computational time, we will make do with what has been generated.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb229"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwRF_bw, <span class="st">"data/model/gwRF_bw.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Show code</summary>
+<div class="sourceCode cell-code" id="cb236"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb236-1"><a href="#cb236-1" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">725</span></span>
+<span id="cb236-2"><a href="#cb236-2" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830196864620965</span></span>
+<span id="cb236-3"><a href="#cb236-3" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">726</span></span>
+<span id="cb236-4"><a href="#cb236-4" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831511354240713</span></span>
+<span id="cb236-5"><a href="#cb236-5" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">727</span></span>
+<span id="cb236-6"><a href="#cb236-6" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.825814193350772</span></span>
+<span id="cb236-7"><a href="#cb236-7" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">728</span></span>
+<span id="cb236-8"><a href="#cb236-8" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833117627936025</span></span>
+<span id="cb236-9"><a href="#cb236-9" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">729</span></span>
+<span id="cb236-10"><a href="#cb236-10" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831542049422668</span></span>
+<span id="cb236-11"><a href="#cb236-11" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">730</span></span>
+<span id="cb236-12"><a href="#cb236-12" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832690759328841</span></span>
+<span id="cb236-13"><a href="#cb236-13" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">731</span></span>
+<span id="cb236-14"><a href="#cb236-14" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831409189031434</span></span>
+<span id="cb236-15"><a href="#cb236-15" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">732</span></span>
+<span id="cb236-16"><a href="#cb236-16" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833478593806476</span></span>
+<span id="cb236-17"><a href="#cb236-17" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">733</span></span>
+<span id="cb236-18"><a href="#cb236-18" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828881217358686</span></span>
+<span id="cb236-19"><a href="#cb236-19" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">734</span></span>
+<span id="cb236-20"><a href="#cb236-20" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833837568289313</span></span>
+<span id="cb236-21"><a href="#cb236-21" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">735</span></span>
+<span id="cb236-22"><a href="#cb236-22" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830944546212957</span></span>
+<span id="cb236-23"><a href="#cb236-23" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">736</span></span>
+<span id="cb236-24"><a href="#cb236-24" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829109016792875</span></span>
+<span id="cb236-25"><a href="#cb236-25" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">737</span></span>
+<span id="cb236-26"><a href="#cb236-26" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832693746938043</span></span>
+<span id="cb236-27"><a href="#cb236-27" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">738</span></span>
+<span id="cb236-28"><a href="#cb236-28" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830609753683569</span></span>
+<span id="cb236-29"><a href="#cb236-29" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">739</span></span>
+<span id="cb236-30"><a href="#cb236-30" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828506606657883</span></span>
+<span id="cb236-31"><a href="#cb236-31" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">740</span></span>
+<span id="cb236-32"><a href="#cb236-32" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829942324327648</span></span>
+<span id="cb236-33"><a href="#cb236-33" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">741</span></span>
+<span id="cb236-34"><a href="#cb236-34" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829673050758191</span></span>
+<span id="cb236-35"><a href="#cb236-35" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">742</span></span>
+<span id="cb236-36"><a href="#cb236-36" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.834731888959398</span></span>
+<span id="cb236-37"><a href="#cb236-37" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">743</span></span>
+<span id="cb236-38"><a href="#cb236-38" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831271390847821</span></span>
+<span id="cb236-39"><a href="#cb236-39" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">744</span></span>
+<span id="cb236-40"><a href="#cb236-40" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830326788690227</span></span>
+<span id="cb236-41"><a href="#cb236-41" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">745</span></span>
+<span id="cb236-42"><a href="#cb236-42" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832112671503318</span></span>
+<span id="cb236-43"><a href="#cb236-43" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">746</span></span>
+<span id="cb236-44"><a href="#cb236-44" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832734247748836</span></span>
+<span id="cb236-45"><a href="#cb236-45" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">747</span></span>
+<span id="cb236-46"><a href="#cb236-46" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831818201150335</span></span>
+<span id="cb236-47"><a href="#cb236-47" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">748</span></span>
+<span id="cb236-48"><a href="#cb236-48" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831135316402252</span></span>
+<span id="cb236-49"><a href="#cb236-49" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">749</span></span>
+<span id="cb236-50"><a href="#cb236-50" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832132102303099</span></span>
+<span id="cb236-51"><a href="#cb236-51" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">750</span></span>
+<span id="cb236-52"><a href="#cb236-52" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83134136735134</span></span>
+<span id="cb236-53"><a href="#cb236-53" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">751</span></span>
+<span id="cb236-54"><a href="#cb236-54" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.8306802097722</span></span>
+<span id="cb236-55"><a href="#cb236-55" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">752</span></span>
+<span id="cb236-56"><a href="#cb236-56" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829479547542639</span></span>
+<span id="cb236-57"><a href="#cb236-57" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">753</span></span>
+<span id="cb236-58"><a href="#cb236-58" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833479383819347</span></span>
+<span id="cb236-59"><a href="#cb236-59" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">754</span></span>
+<span id="cb236-60"><a href="#cb236-60" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83099893981291</span></span>
+<span id="cb236-61"><a href="#cb236-61" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">755</span></span>
+<span id="cb236-62"><a href="#cb236-62" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830071154250661</span></span>
+<span id="cb236-63"><a href="#cb236-63" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">756</span></span>
+<span id="cb236-64"><a href="#cb236-64" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830529200273976</span></span>
+<span id="cb236-65"><a href="#cb236-65" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">757</span></span>
+<span id="cb236-66"><a href="#cb236-66" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831649054301567</span></span>
+<span id="cb236-67"><a href="#cb236-67" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">758</span></span>
+<span id="cb236-68"><a href="#cb236-68" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831735899098526</span></span>
+<span id="cb236-69"><a href="#cb236-69" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">759</span></span>
+<span id="cb236-70"><a href="#cb236-70" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830897778940034</span></span>
+<span id="cb236-71"><a href="#cb236-71" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">760</span></span>
+<span id="cb236-72"><a href="#cb236-72" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831347886646916</span></span>
+<span id="cb236-73"><a href="#cb236-73" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">761</span></span>
+<span id="cb236-74"><a href="#cb236-74" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828948414511987</span></span>
+<span id="cb236-75"><a href="#cb236-75" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">762</span></span>
+<span id="cb236-76"><a href="#cb236-76" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831341467830645</span></span>
+<span id="cb236-77"><a href="#cb236-77" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">763</span></span>
+<span id="cb236-78"><a href="#cb236-78" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830232601893768</span></span>
+<span id="cb236-79"><a href="#cb236-79" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">764</span></span>
+<span id="cb236-80"><a href="#cb236-80" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831059678585006</span></span>
+<span id="cb236-81"><a href="#cb236-81" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">765</span></span>
+<span id="cb236-82"><a href="#cb236-82" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828842780381122</span></span>
+<span id="cb236-83"><a href="#cb236-83" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">766</span></span>
+<span id="cb236-84"><a href="#cb236-84" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833282210197786</span></span>
+<span id="cb236-85"><a href="#cb236-85" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">767</span></span>
+<span id="cb236-86"><a href="#cb236-86" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82944064674115</span></span>
+<span id="cb236-87"><a href="#cb236-87" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">768</span></span>
+<span id="cb236-88"><a href="#cb236-88" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832924358100198</span></span>
+<span id="cb236-89"><a href="#cb236-89" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">769</span></span>
+<span id="cb236-90"><a href="#cb236-90" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830805294691046</span></span>
+<span id="cb236-91"><a href="#cb236-91" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">770</span></span>
+<span id="cb236-92"><a href="#cb236-92" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831274836665161</span></span>
+<span id="cb236-93"><a href="#cb236-93" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">771</span></span>
+<span id="cb236-94"><a href="#cb236-94" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830376397878408</span></span>
+<span id="cb236-95"><a href="#cb236-95" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">772</span></span>
+<span id="cb236-96"><a href="#cb236-96" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832604789981756</span></span>
+<span id="cb236-97"><a href="#cb236-97" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">773</span></span>
+<span id="cb236-98"><a href="#cb236-98" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829576028459974</span></span>
+<span id="cb236-99"><a href="#cb236-99" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">774</span></span>
+<span id="cb236-100"><a href="#cb236-100" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830796112836969</span></span>
+<span id="cb236-101"><a href="#cb236-101" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">775</span></span>
+<span id="cb236-102"><a href="#cb236-102" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831481002981783</span></span>
+<span id="cb236-103"><a href="#cb236-103" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">776</span></span>
+<span id="cb236-104"><a href="#cb236-104" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831676908866007</span></span>
+<span id="cb236-105"><a href="#cb236-105" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">777</span></span>
+<span id="cb236-106"><a href="#cb236-106" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82931315042137</span></span>
+<span id="cb236-107"><a href="#cb236-107" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">778</span></span>
+<span id="cb236-108"><a href="#cb236-108" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828951603116439</span></span>
+<span id="cb236-109"><a href="#cb236-109" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">779</span></span>
+<span id="cb236-110"><a href="#cb236-110" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831139055149746</span></span>
+<span id="cb236-111"><a href="#cb236-111" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">780</span></span>
+<span id="cb236-112"><a href="#cb236-112" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830316739537019</span></span>
+<span id="cb236-113"><a href="#cb236-113" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">781</span></span>
+<span id="cb236-114"><a href="#cb236-114" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830458930586156</span></span>
+<span id="cb236-115"><a href="#cb236-115" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">782</span></span>
+<span id="cb236-116"><a href="#cb236-116" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833230662394588</span></span>
+<span id="cb236-117"><a href="#cb236-117" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">783</span></span>
+<span id="cb236-118"><a href="#cb236-118" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832973909576033</span></span>
+<span id="cb236-119"><a href="#cb236-119" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">784</span></span>
+<span id="cb236-120"><a href="#cb236-120" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831423925116023</span></span>
+<span id="cb236-121"><a href="#cb236-121" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">785</span></span>
+<span id="cb236-122"><a href="#cb236-122" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829803683418786</span></span>
+<span id="cb236-123"><a href="#cb236-123" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">786</span></span>
+<span id="cb236-124"><a href="#cb236-124" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828531421840785</span></span>
+<span id="cb236-125"><a href="#cb236-125" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">787</span></span>
+<span id="cb236-126"><a href="#cb236-126" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830345759971399</span></span>
+<span id="cb236-127"><a href="#cb236-127" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">788</span></span>
+<span id="cb236-128"><a href="#cb236-128" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830471339400124</span></span>
+<span id="cb236-129"><a href="#cb236-129" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">789</span></span>
+<span id="cb236-130"><a href="#cb236-130" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832798840438387</span></span>
+<span id="cb236-131"><a href="#cb236-131" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">790</span></span>
+<span id="cb236-132"><a href="#cb236-132" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83113249780185</span></span>
+<span id="cb236-133"><a href="#cb236-133" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">791</span></span>
+<span id="cb236-134"><a href="#cb236-134" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.827034393025223</span></span>
+<span id="cb236-135"><a href="#cb236-135" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">792</span></span>
+<span id="cb236-136"><a href="#cb236-136" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829133703096098</span></span>
+<span id="cb236-137"><a href="#cb236-137" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">793</span></span>
+<span id="cb236-138"><a href="#cb236-138" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831933812229025</span></span>
+<span id="cb236-139"><a href="#cb236-139" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">794</span></span>
+<span id="cb236-140"><a href="#cb236-140" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830849224075565</span></span>
+<span id="cb236-141"><a href="#cb236-141" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">795</span></span>
+<span id="cb236-142"><a href="#cb236-142" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830321144305101</span></span>
+<span id="cb236-143"><a href="#cb236-143" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">796</span></span>
+<span id="cb236-144"><a href="#cb236-144" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829138641042415</span></span>
+<span id="cb236-145"><a href="#cb236-145" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">797</span></span>
+<span id="cb236-146"><a href="#cb236-146" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830608786109532</span></span>
+<span id="cb236-147"><a href="#cb236-147" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">798</span></span>
+<span id="cb236-148"><a href="#cb236-148" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831307623612618</span></span>
+<span id="cb236-149"><a href="#cb236-149" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">799</span></span>
+<span id="cb236-150"><a href="#cb236-150" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833242600852963</span></span>
+<span id="cb236-151"><a href="#cb236-151" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">800</span></span>
+<span id="cb236-152"><a href="#cb236-152" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832427578593409</span></span>
+<span id="cb236-153"><a href="#cb236-153" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">801</span></span>
+<span id="cb236-154"><a href="#cb236-154" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83096960265283</span></span>
+<span id="cb236-155"><a href="#cb236-155" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">802</span></span>
+<span id="cb236-156"><a href="#cb236-156" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.8301887673541</span></span>
+<span id="cb236-157"><a href="#cb236-157" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">803</span></span>
+<span id="cb236-158"><a href="#cb236-158" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.834255445238142</span></span>
+<span id="cb236-159"><a href="#cb236-159" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">804</span></span>
+<span id="cb236-160"><a href="#cb236-160" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832521588463182</span></span>
+<span id="cb236-161"><a href="#cb236-161" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">805</span></span>
+<span id="cb236-162"><a href="#cb236-162" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831715300054422</span></span>
+<span id="cb236-163"><a href="#cb236-163" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">806</span></span>
+<span id="cb236-164"><a href="#cb236-164" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831639594906041</span></span>
+<span id="cb236-165"><a href="#cb236-165" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">807</span></span>
+<span id="cb236-166"><a href="#cb236-166" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83115606975791</span></span>
+<span id="cb236-167"><a href="#cb236-167" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">808</span></span>
+<span id="cb236-168"><a href="#cb236-168" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833148579276595</span></span>
+<span id="cb236-169"><a href="#cb236-169" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">809</span></span>
+<span id="cb236-170"><a href="#cb236-170" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831414942555648</span></span>
+<span id="cb236-171"><a href="#cb236-171" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">810</span></span>
+<span id="cb236-172"><a href="#cb236-172" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833719784150672</span></span>
+<span id="cb236-173"><a href="#cb236-173" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">811</span></span>
+<span id="cb236-174"><a href="#cb236-174" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828375723575394</span></span>
+<span id="cb236-175"><a href="#cb236-175" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">812</span></span>
+<span id="cb236-176"><a href="#cb236-176" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830543845828127</span></span>
+<span id="cb236-177"><a href="#cb236-177" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">813</span></span>
+<span id="cb236-178"><a href="#cb236-178" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832240311900002</span></span>
+<span id="cb236-179"><a href="#cb236-179" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">814</span></span>
+<span id="cb236-180"><a href="#cb236-180" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831434839902126</span></span>
+<span id="cb236-181"><a href="#cb236-181" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">815</span></span>
+<span id="cb236-182"><a href="#cb236-182" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828803556504407</span></span>
+<span id="cb236-183"><a href="#cb236-183" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">816</span></span>
+<span id="cb236-184"><a href="#cb236-184" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829547281428623</span></span>
+<span id="cb236-185"><a href="#cb236-185" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">817</span></span>
+<span id="cb236-186"><a href="#cb236-186" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831058937941818</span></span>
+<span id="cb236-187"><a href="#cb236-187" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">818</span></span>
+<span id="cb236-188"><a href="#cb236-188" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82938891796316</span></span>
+<span id="cb236-189"><a href="#cb236-189" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">819</span></span>
+<span id="cb236-190"><a href="#cb236-190" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830405198798365</span></span>
+<span id="cb236-191"><a href="#cb236-191" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">820</span></span>
+<span id="cb236-192"><a href="#cb236-192" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832115866093099</span></span>
+<span id="cb236-193"><a href="#cb236-193" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">821</span></span>
+<span id="cb236-194"><a href="#cb236-194" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830412735051787</span></span>
+<span id="cb236-195"><a href="#cb236-195" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">822</span></span>
+<span id="cb236-196"><a href="#cb236-196" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828572195678903</span></span>
+<span id="cb236-197"><a href="#cb236-197" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">823</span></span>
+<span id="cb236-198"><a href="#cb236-198" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830266787825573</span></span>
+<span id="cb236-199"><a href="#cb236-199" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">824</span></span>
+<span id="cb236-200"><a href="#cb236-200" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83184289974954</span></span>
+<span id="cb236-201"><a href="#cb236-201" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">825</span></span>
+<span id="cb236-202"><a href="#cb236-202" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829420782829894</span></span>
+<span id="cb236-203"><a href="#cb236-203" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">826</span></span>
+<span id="cb236-204"><a href="#cb236-204" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831359754548764</span></span>
+<span id="cb236-205"><a href="#cb236-205" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">827</span></span>
+<span id="cb236-206"><a href="#cb236-206" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830368557576751</span></span>
+<span id="cb236-207"><a href="#cb236-207" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">828</span></span>
+<span id="cb236-208"><a href="#cb236-208" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832429361513429</span></span>
+<span id="cb236-209"><a href="#cb236-209" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">829</span></span>
+<span id="cb236-210"><a href="#cb236-210" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829330567671406</span></span>
+<span id="cb236-211"><a href="#cb236-211" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">830</span></span>
+<span id="cb236-212"><a href="#cb236-212" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833664185213611</span></span>
+<span id="cb236-213"><a href="#cb236-213" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">831</span></span>
+<span id="cb236-214"><a href="#cb236-214" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829605680296404</span></span>
+<span id="cb236-215"><a href="#cb236-215" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">832</span></span>
+<span id="cb236-216"><a href="#cb236-216" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833311778486311</span></span>
+<span id="cb236-217"><a href="#cb236-217" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">833</span></span>
+<span id="cb236-218"><a href="#cb236-218" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830353478426326</span></span>
+<span id="cb236-219"><a href="#cb236-219" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">834</span></span>
+<span id="cb236-220"><a href="#cb236-220" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82977377053556</span></span>
+<span id="cb236-221"><a href="#cb236-221" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">835</span></span>
+<span id="cb236-222"><a href="#cb236-222" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829937703219876</span></span>
+<span id="cb236-223"><a href="#cb236-223" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">836</span></span>
+<span id="cb236-224"><a href="#cb236-224" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831846806163151</span></span>
+<span id="cb236-225"><a href="#cb236-225" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">837</span></span>
+<span id="cb236-226"><a href="#cb236-226" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829895075127843</span></span>
+<span id="cb236-227"><a href="#cb236-227" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">838</span></span>
+<span id="cb236-228"><a href="#cb236-228" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833262019160109</span></span>
+<span id="cb236-229"><a href="#cb236-229" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">839</span></span>
+<span id="cb236-230"><a href="#cb236-230" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829433660783203</span></span>
+<span id="cb236-231"><a href="#cb236-231" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">840</span></span>
+<span id="cb236-232"><a href="#cb236-232" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.827531432547631</span></span>
+<span id="cb236-233"><a href="#cb236-233" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">841</span></span>
+<span id="cb236-234"><a href="#cb236-234" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82975712679373</span></span>
+<span id="cb236-235"><a href="#cb236-235" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">842</span></span>
+<span id="cb236-236"><a href="#cb236-236" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832414617979685</span></span>
+<span id="cb236-237"><a href="#cb236-237" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">843</span></span>
+<span id="cb236-238"><a href="#cb236-238" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830781131471392</span></span>
+<span id="cb236-239"><a href="#cb236-239" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">844</span></span>
+<span id="cb236-240"><a href="#cb236-240" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829109261064835</span></span>
+<span id="cb236-241"><a href="#cb236-241" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">845</span></span>
+<span id="cb236-242"><a href="#cb236-242" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832406223647478</span></span>
+<span id="cb236-243"><a href="#cb236-243" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">846</span></span>
+<span id="cb236-244"><a href="#cb236-244" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.834708366156922</span></span>
+<span id="cb236-245"><a href="#cb236-245" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">847</span></span>
+<span id="cb236-246"><a href="#cb236-246" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833191760455706</span></span>
+<span id="cb236-247"><a href="#cb236-247" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">848</span></span>
+<span id="cb236-248"><a href="#cb236-248" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831812936634274</span></span>
+<span id="cb236-249"><a href="#cb236-249" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">849</span></span>
+<span id="cb236-250"><a href="#cb236-250" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832387913503154</span></span>
+<span id="cb236-251"><a href="#cb236-251" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">850</span></span>
+<span id="cb236-252"><a href="#cb236-252" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833075377352126</span></span>
+<span id="cb236-253"><a href="#cb236-253" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">851</span></span>
+<span id="cb236-254"><a href="#cb236-254" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830123177762137</span></span>
+<span id="cb236-255"><a href="#cb236-255" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">852</span></span>
+<span id="cb236-256"><a href="#cb236-256" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831841299216412</span></span>
+<span id="cb236-257"><a href="#cb236-257" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">853</span></span>
+<span id="cb236-258"><a href="#cb236-258" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831365701551992</span></span>
+<span id="cb236-259"><a href="#cb236-259" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">854</span></span>
+<span id="cb236-260"><a href="#cb236-260" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830989278187555</span></span>
+<span id="cb236-261"><a href="#cb236-261" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">855</span></span>
+<span id="cb236-262"><a href="#cb236-262" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.834752901702268</span></span>
+<span id="cb236-263"><a href="#cb236-263" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">856</span></span>
+<span id="cb236-264"><a href="#cb236-264" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832148011460522</span></span>
+<span id="cb236-265"><a href="#cb236-265" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">857</span></span>
+<span id="cb236-266"><a href="#cb236-266" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830067314893585</span></span>
+<span id="cb236-267"><a href="#cb236-267" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">858</span></span>
+<span id="cb236-268"><a href="#cb236-268" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83078531914217</span></span>
+<span id="cb236-269"><a href="#cb236-269" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">859</span></span>
+<span id="cb236-270"><a href="#cb236-270" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830479327296697</span></span>
+<span id="cb236-271"><a href="#cb236-271" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">860</span></span>
+<span id="cb236-272"><a href="#cb236-272" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.834880676239004</span></span>
+<span id="cb236-273"><a href="#cb236-273" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">861</span></span>
+<span id="cb236-274"><a href="#cb236-274" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833506472321838</span></span>
+<span id="cb236-275"><a href="#cb236-275" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">862</span></span>
+<span id="cb236-276"><a href="#cb236-276" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830843082210954</span></span>
+<span id="cb236-277"><a href="#cb236-277" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">863</span></span>
+<span id="cb236-278"><a href="#cb236-278" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830132630677842</span></span>
+<span id="cb236-279"><a href="#cb236-279" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">864</span></span>
+<span id="cb236-280"><a href="#cb236-280" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828704486734575</span></span>
+<span id="cb236-281"><a href="#cb236-281" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">865</span></span>
+<span id="cb236-282"><a href="#cb236-282" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.8293732367072</span></span>
+<span id="cb236-283"><a href="#cb236-283" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">866</span></span>
+<span id="cb236-284"><a href="#cb236-284" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829996086927068</span></span>
+<span id="cb236-285"><a href="#cb236-285" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">867</span></span>
+<span id="cb236-286"><a href="#cb236-286" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83288312812145</span></span>
+<span id="cb236-287"><a href="#cb236-287" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">868</span></span>
+<span id="cb236-288"><a href="#cb236-288" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831467621740344</span></span>
+<span id="cb236-289"><a href="#cb236-289" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">869</span></span>
+<span id="cb236-290"><a href="#cb236-290" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829259249144337</span></span>
+<span id="cb236-291"><a href="#cb236-291" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">870</span></span>
+<span id="cb236-292"><a href="#cb236-292" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830770774516278</span></span>
+<span id="cb236-293"><a href="#cb236-293" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">871</span></span>
+<span id="cb236-294"><a href="#cb236-294" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828837075909044</span></span>
+<span id="cb236-295"><a href="#cb236-295" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">872</span></span>
+<span id="cb236-296"><a href="#cb236-296" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829758111980732</span></span>
+<span id="cb236-297"><a href="#cb236-297" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">873</span></span>
+<span id="cb236-298"><a href="#cb236-298" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829557855443734</span></span>
+<span id="cb236-299"><a href="#cb236-299" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">874</span></span>
+<span id="cb236-300"><a href="#cb236-300" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830523982844196</span></span>
+<span id="cb236-301"><a href="#cb236-301" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">875</span></span>
+<span id="cb236-302"><a href="#cb236-302" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831009886895258</span></span>
+<span id="cb236-303"><a href="#cb236-303" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">876</span></span>
+<span id="cb236-304"><a href="#cb236-304" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82944013294738</span></span>
+<span id="cb236-305"><a href="#cb236-305" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">877</span></span>
+<span id="cb236-306"><a href="#cb236-306" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832028294836151</span></span>
+<span id="cb236-307"><a href="#cb236-307" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">878</span></span>
+<span id="cb236-308"><a href="#cb236-308" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.833992472427127</span></span>
+<span id="cb236-309"><a href="#cb236-309" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">879</span></span>
+<span id="cb236-310"><a href="#cb236-310" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828809446103142</span></span>
+<span id="cb236-311"><a href="#cb236-311" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">880</span></span>
+<span id="cb236-312"><a href="#cb236-312" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.827440566241794</span></span>
+<span id="cb236-313"><a href="#cb236-313" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">881</span></span>
+<span id="cb236-314"><a href="#cb236-314" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83157952544884</span></span>
+<span id="cb236-315"><a href="#cb236-315" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">882</span></span>
+<span id="cb236-316"><a href="#cb236-316" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829294634223024</span></span>
+<span id="cb236-317"><a href="#cb236-317" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">883</span></span>
+<span id="cb236-318"><a href="#cb236-318" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832394559788004</span></span>
+<span id="cb236-319"><a href="#cb236-319" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">884</span></span>
+<span id="cb236-320"><a href="#cb236-320" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831141692432181</span></span>
+<span id="cb236-321"><a href="#cb236-321" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">885</span></span>
+<span id="cb236-322"><a href="#cb236-322" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831071687513164</span></span>
+<span id="cb236-323"><a href="#cb236-323" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">886</span></span>
+<span id="cb236-324"><a href="#cb236-324" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828715571246103</span></span>
+<span id="cb236-325"><a href="#cb236-325" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">887</span></span>
+<span id="cb236-326"><a href="#cb236-326" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829535263164816</span></span>
+<span id="cb236-327"><a href="#cb236-327" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">888</span></span>
+<span id="cb236-328"><a href="#cb236-328" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831319756325194</span></span>
+<span id="cb236-329"><a href="#cb236-329" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">889</span></span>
+<span id="cb236-330"><a href="#cb236-330" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831550952889957</span></span>
+<span id="cb236-331"><a href="#cb236-331" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">890</span></span>
+<span id="cb236-332"><a href="#cb236-332" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829990162602387</span></span>
+<span id="cb236-333"><a href="#cb236-333" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">891</span></span>
+<span id="cb236-334"><a href="#cb236-334" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.834388880202844</span></span>
+<span id="cb236-335"><a href="#cb236-335" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">892</span></span>
+<span id="cb236-336"><a href="#cb236-336" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831444356778861</span></span>
+<span id="cb236-337"><a href="#cb236-337" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">893</span></span>
+<span id="cb236-338"><a href="#cb236-338" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.829154145538292</span></span>
+<span id="cb236-339"><a href="#cb236-339" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">894</span></span>
+<span id="cb236-340"><a href="#cb236-340" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831118924732515</span></span>
+<span id="cb236-341"><a href="#cb236-341" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">895</span></span>
+<span id="cb236-342"><a href="#cb236-342" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832741630646768</span></span>
+<span id="cb236-343"><a href="#cb236-343" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">896</span></span>
+<span id="cb236-344"><a href="#cb236-344" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828300969146387</span></span>
+<span id="cb236-345"><a href="#cb236-345" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">897</span></span>
+<span id="cb236-346"><a href="#cb236-346" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.831320866320787</span></span>
+<span id="cb236-347"><a href="#cb236-347" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">898</span></span>
+<span id="cb236-348"><a href="#cb236-348" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828244750811946</span></span>
+<span id="cb236-349"><a href="#cb236-349" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">899</span></span>
+<span id="cb236-350"><a href="#cb236-350" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.832772387332717</span></span>
+<span id="cb236-351"><a href="#cb236-351" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">900</span></span>
+<span id="cb236-352"><a href="#cb236-352" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828538098204589</span></span>
+<span id="cb236-353"><a href="#cb236-353" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">901</span></span>
+<span id="cb236-354"><a href="#cb236-354" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.82750095108753</span></span>
+<span id="cb236-355"><a href="#cb236-355" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">902</span></span>
+<span id="cb236-356"><a href="#cb236-356" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.828826070773062</span></span>
+<span id="cb236-357"><a href="#cb236-357" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">903</span></span>
+<span id="cb236-358"><a href="#cb236-358" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830187793236362</span></span>
+<span id="cb236-359"><a href="#cb236-359" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">904</span></span>
+<span id="cb236-360"><a href="#cb236-360" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.83278488113049</span></span>
+<span id="cb236-361"><a href="#cb236-361" aria-hidden="true" tabindex="-1"></a>Bandwidth<span class="sc">:</span> <span class="dv">905</span></span>
+<span id="cb236-362"><a href="#cb236-362" aria-hidden="true" tabindex="-1"></a>R2 of Local Model<span class="sc">:</span> <span class="fl">0.830157433907511</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
+<p>Base on the output, we will pick the best bandwidth that has the largest R2 of Local Model. The best bandwidth would be 860 with a R2 of 0.834880676239004.</p>
 </section>
-<section id="calibrating-geographical-random-forest-model" class="level2" data-number="9.5">
-<h2 data-number="9.5" class="anchored" data-anchor-id="calibrating-geographical-random-forest-model"><span class="header-section-number">9.5</span> Calibrating Geographical Random Forest Model</h2>
+<section id="calibrating-geographical-random-forest-model" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="calibrating-geographical-random-forest-model"><span class="header-section-number">9.7</span> Calibrating Geographical Random Forest Model</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb230"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb230-1"><a href="#cb230-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb230-2"><a href="#cb230-2" aria-hidden="true" tabindex="-1"></a>gwRF_adaptive <span class="ot">&lt;-</span> <span class="fu">grf</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
-<span id="cb230-3"><a href="#cb230-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">dframe=</span>train_data_nogeo, </span>
-<span id="cb230-4"><a href="#cb230-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">bw=</span> bw_adaptive,</span>
-<span id="cb230-5"><a href="#cb230-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ntree =</span> <span class="dv">30</span>,</span>
-<span id="cb230-6"><a href="#cb230-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">kernel=</span><span class="st">"adaptive"</span>,</span>
-<span id="cb230-7"><a href="#cb230-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coords=</span>coords_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb237"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb237-1"><a href="#cb237-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb237-2"><a href="#cb237-2" aria-hidden="true" tabindex="-1"></a>gwRF_adaptive <span class="ot">&lt;-</span> <span class="fu">grf</span>(PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> REMAINING_LEASE <span class="sc">+</span> Stry_Or <span class="sc">+</span> Improvd <span class="sc">+</span> DBSS <span class="sc">+</span> Standrd <span class="sc">+</span> Model.A <span class="sc">+</span> PrmmApr <span class="sc">+</span> Adjndfl <span class="sc">+</span> MdlA.Ms <span class="sc">+</span> Type.S2 <span class="sc">+</span> Imprv.M <span class="sc">+</span> PrmmApL <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CLUBS <span class="sc">+</span> PROX_ELDERCARE <span class="sc">+</span> PROX_FAM <span class="sc">+</span> PROX_MRT <span class="sc">+</span>PROX_HAWKER <span class="sc">+</span> PROX_PHARMACY <span class="sc">+</span>PROX_PARK<span class="sc">+</span>PROX_MALL <span class="sc">+</span> PROX_SPRMKT <span class="sc">+</span> PROX_GOODP <span class="sc">+</span> NUM_KNDRGTN <span class="sc">+</span> NUM_CHILDCARE <span class="sc">+</span> NUM_BUS_STOP <span class="sc">+</span> NUM_PRISCH <span class="sc">+</span> NUM_SECSCH,</span>
+<span id="cb237-3"><a href="#cb237-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">dframe=</span>train_data_nogeo, </span>
+<span id="cb237-4"><a href="#cb237-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">bw=</span> <span class="dv">860</span>,</span>
+<span id="cb237-5"><a href="#cb237-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ntree =</span> <span class="dv">30</span>,</span>
+<span id="cb237-6"><a href="#cb237-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">kernel=</span><span class="st">"adaptive"</span>,</span>
+<span id="cb237-7"><a href="#cb237-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coords=</span>coords_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s save the model output below:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb231"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb231-1"><a href="#cb231-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwRF_adaptive, <span class="st">"data/model/gwRF_adaptive.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb238"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb238-1"><a href="#cb238-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwRF_adaptive, <span class="st">"data/model/grf_adaptive_30.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb232"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb232-1"><a href="#cb232-1" aria-hidden="true" tabindex="-1"></a>gwRF_adaptive <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/gwRF_adaptive.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb239"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb239-1"><a href="#cb239-1" aria-hidden="true" tabindex="-1"></a>gwRF_adaptive <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/grf_adaptive_30.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="predicting-by-using-test-data" class="level2" data-number="9.6">
-<h2 data-number="9.6" class="anchored" data-anchor-id="predicting-by-using-test-data"><span class="header-section-number">9.6</span> Predicting by using test data</h2>
-<section id="preparing-the-test-data" class="level3" data-number="9.6.1">
-<h3 data-number="9.6.1" class="anchored" data-anchor-id="preparing-the-test-data"><span class="header-section-number">9.6.1</span> Preparing the test data</h3>
+<section id="predicting-by-using-test-data" class="level2" data-number="9.8">
+<h2 data-number="9.8" class="anchored" data-anchor-id="predicting-by-using-test-data"><span class="header-section-number">9.8</span> Predicting by using test data</h2>
+<section id="preparing-the-test-data" class="level3" data-number="9.8.1">
+<h3 data-number="9.8.1" class="anchored" data-anchor-id="preparing-the-test-data"><span class="header-section-number">9.8.1</span> Preparing the test data</h3>
 <p>The code chunk below will be used to combine the test data with its corresponding coordinates data</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb233"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb233-1"><a href="#cb233-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">cbind</span>(test_data, coords_test) <span class="sc">%&gt;%</span></span>
-<span id="cb233-2"><a href="#cb233-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb240"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb240-1"><a href="#cb240-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">cbind</span>(test_data, coords_test) <span class="sc">%&gt;%</span></span>
+<span id="cb240-2"><a href="#cb240-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="predicting-with-test-data" class="level3" data-number="9.6.2">
-<h3 data-number="9.6.2" class="anchored" data-anchor-id="predicting-with-test-data"><span class="header-section-number">9.6.2</span> Predicting with test data</h3>
+<section id="predicting-with-test-data" class="level3" data-number="9.8.2">
+<h3 data-number="9.8.2" class="anchored" data-anchor-id="predicting-with-test-data"><span class="header-section-number">9.8.2</span> Predicting with test data</h3>
 <p>Next, predict.grf() of spatialML package will be used to predict the resale value by using the test data and gwRF_adaptive model calibrated earlier.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb234"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb234-1"><a href="#cb234-1" aria-hidden="true" tabindex="-1"></a>gwRF_pred <span class="ot">&lt;-</span> gwRF_pred <span class="ot">&lt;-</span> <span class="fu">predict.grf</span>(gwRF_adaptive, </span>
-<span id="cb234-2"><a href="#cb234-2" aria-hidden="true" tabindex="-1"></a>                           test_data, </span>
-<span id="cb234-3"><a href="#cb234-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">x.var.name=</span><span class="st">"X"</span>,</span>
-<span id="cb234-4"><a href="#cb234-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y.var.name=</span><span class="st">"Y"</span>, </span>
-<span id="cb234-5"><a href="#cb234-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">local.w=</span><span class="dv">1</span>,</span>
-<span id="cb234-6"><a href="#cb234-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">global.w=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb241"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb241-1"><a href="#cb241-1" aria-hidden="true" tabindex="-1"></a>gwRF_pred <span class="ot">&lt;-</span> <span class="fu">predict.grf</span>(gwRF_adaptive, </span>
+<span id="cb241-2"><a href="#cb241-2" aria-hidden="true" tabindex="-1"></a>                           test_data, </span>
+<span id="cb241-3"><a href="#cb241-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">x.var.name=</span><span class="st">"X"</span>,</span>
+<span id="cb241-4"><a href="#cb241-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y.var.name=</span><span class="st">"Y"</span>, </span>
+<span id="cb241-5"><a href="#cb241-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">local.w=</span><span class="dv">1</span>,</span>
+<span id="cb241-6"><a href="#cb241-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">global.w=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We should always save our output into rds since these computations take a really long time.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb235"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb235-1"><a href="#cb235-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwRF_pred, <span class="st">"data/model/GRF_pred.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb242"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb242-1"><a href="#cb242-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gwRF_pred, <span class="st">"data/model/GRF_pred.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="converting-predicted-output-into-a-data-frame" class="level3" data-number="9.6.3">
-<h3 data-number="9.6.3" class="anchored" data-anchor-id="converting-predicted-output-into-a-data-frame"><span class="header-section-number">9.6.3</span> Converting predicted output into a data frame</h3>
+<section id="converting-predicted-output-into-a-data-frame" class="level3" data-number="9.8.3">
+<h3 data-number="9.8.3" class="anchored" data-anchor-id="converting-predicted-output-into-a-data-frame"><span class="header-section-number">9.8.3</span> Converting predicted output into a data frame</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb236"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb236-1"><a href="#cb236-1" aria-hidden="true" tabindex="-1"></a>GRF_pred_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">read_rds</span>(<span class="st">"data/model/GRF_pred.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb243"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb243-1"><a href="#cb243-1" aria-hidden="true" tabindex="-1"></a>GRF_pred_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">read_rds</span>(<span class="st">"data/model/GRF_pred.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, we will use cbind() to append the predicted values onto the test data</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb237"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb237-1"><a href="#cb237-1" aria-hidden="true" tabindex="-1"></a>test_data_p <span class="ot">&lt;-</span> <span class="fu">cbind</span>(test_data, GRF_pred_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb244"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb244-1"><a href="#cb244-1" aria-hidden="true" tabindex="-1"></a>test_data_p <span class="ot">&lt;-</span> <span class="fu">cbind</span>(test_data, GRF_pred_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb238"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb238-1"><a href="#cb238-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(test_data_p, <span class="st">"data/model/test_data_p.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb245"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb245-1"><a href="#cb245-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(test_data_p, <span class="st">"data/model/test_data_p.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb239"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb239-1"><a href="#cb239-1" aria-hidden="true" tabindex="-1"></a>test_data_p <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/test_data_p.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb246"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb246-1"><a href="#cb246-1" aria-hidden="true" tabindex="-1"></a>test_data_p <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/model/test_data_p.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="calculating-root-mean-square-error" class="level3" data-number="9.6.4">
-<h3 data-number="9.6.4" class="anchored" data-anchor-id="calculating-root-mean-square-error"><span class="header-section-number">9.6.4</span> Calculating Root Mean Square Error</h3>
+<section id="calculating-root-mean-square-error" class="level3" data-number="9.8.4">
+<h3 data-number="9.8.4" class="anchored" data-anchor-id="calculating-root-mean-square-error"><span class="header-section-number">9.8.4</span> Calculating Root Mean Square Error</h3>
 <p>The root mean square error (RMSE) allows us to measure how far predicted values are from observed values in a regression analysis. In the code chunk below, rmse() of Metrics package is used to compute the RMSE.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb240"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb240-1"><a href="#cb240-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(test_data_p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb247"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb247-1"><a href="#cb247-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(test_data_p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 998
 Columns: 50
@@ -2735,26 +3157,26 @@ $ `read_rds("data/model/GRF_pred.rds")` &lt;dbl&gt; 694987.6, 674191.5, 670978.4
 </div>
 <p>We notice that the column name is stated <code>read_rds("data/model/GRF_pred.rds")</code>, we will change the name accordingly.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb242"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb242-1"><a href="#cb242-1" aria-hidden="true" tabindex="-1"></a>test_data_p <span class="ot">&lt;-</span> test_data_p <span class="sc">%&gt;%</span></span>
-<span id="cb242-2"><a href="#cb242-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">GRF_pred =</span> <span class="st">`</span><span class="at">read_rds("data/model/GRF_pred.rds")</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb249"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb249-1"><a href="#cb249-1" aria-hidden="true" tabindex="-1"></a>test_data_p <span class="ot">&lt;-</span> test_data_p <span class="sc">%&gt;%</span></span>
+<span id="cb249-2"><a href="#cb249-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">GRF_pred =</span> <span class="st">`</span><span class="at">read_rds("data/model/GRF_pred.rds")</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb243"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb243-1"><a href="#cb243-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rmse</span>(test_data_p<span class="sc">$</span>PRICE, </span>
-<span id="cb243-2"><a href="#cb243-2" aria-hidden="true" tabindex="-1"></a>     test_data_p<span class="sc">$</span>GRF_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb250"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb250-1"><a href="#cb250-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rmse</span>(test_data_p<span class="sc">$</span>PRICE, </span>
+<span id="cb250-2"><a href="#cb250-2" aria-hidden="true" tabindex="-1"></a>     test_data_p<span class="sc">$</span>GRF_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 56235.78</code></pre>
 </div>
 </div>
 </section>
-<section id="visualisaing-the-predicted-values" class="level3" data-number="9.6.5">
-<h3 data-number="9.6.5" class="anchored" data-anchor-id="visualisaing-the-predicted-values"><span class="header-section-number">9.6.5</span> Visualisaing the predicted values</h3>
+<section id="visualisaing-the-predicted-values" class="level3" data-number="9.8.5">
+<h3 data-number="9.8.5" class="anchored" data-anchor-id="visualisaing-the-predicted-values"><span class="header-section-number">9.8.5</span> Visualisaing the predicted values</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb245"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb245-1"><a href="#cb245-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> test_data_p,</span>
-<span id="cb245-2"><a href="#cb245-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> GRF_pred,</span>
-<span id="cb245-3"><a href="#cb245-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> PRICE)) <span class="sc">+</span></span>
-<span id="cb245-4"><a href="#cb245-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb252"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb252-1"><a href="#cb252-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> test_data_p,</span>
+<span id="cb252-2"><a href="#cb252-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> GRF_pred,</span>
+<span id="cb252-3"><a href="#cb252-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> PRICE)) <span class="sc">+</span></span>
+<span id="cb252-4"><a href="#cb252-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Take-Home_Ex03_files/figure-html/unnamed-chunk-171-1.png" class="img-fluid" width="672"></p>
+<p><img src="Take-Home_Ex03_files/figure-html/unnamed-chunk-175-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 

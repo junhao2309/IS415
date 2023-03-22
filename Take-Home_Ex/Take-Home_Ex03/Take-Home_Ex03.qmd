@@ -1270,39 +1270,60 @@ We can see several correlated variables above 0.5 but they are within acceptable
 
 # Building a non-spatial multiple linear regression
 
-```{r}
-price_mlr <- lm(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + NwGnrtn + DBSS + Standrd + Aprtmnt+ Simplfd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Maisntt + Type.S1 + Type.S2 + ModelA2 + Terrace + Imprv.M + PrmmMsn + MltGnrt + PrmmApL+ X2.room + X3Gen + PROX_CBD + PROX_BUS + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_KINDERGARTENS+ PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_CHILDCARE + PROX_PRISCH + PROX_GOODP + PROX_SECSCH + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
-                data = training_data)
-summary(price_mlr)
-```
-
-We can see that there are 11 singularities.
-This is because when we change from categorical to binary, we need to exclude them to ensure that there are no linear dependency.
-We will exclude NwGnrtn, Aprtmnt, Simplfd, Maisntt, Type.S1, ModelA2, Terrace, PrmmMsn, MltGnrt, X2.room, X3Gen
+We will run the multiple linear regression using the base R function, lm().
 
 ```{r, eval = FALSE}
 price_mlr1 <- lm(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = training_data)
-summary(price_mlr1)
 ```
 
-```{r, eval = FALSE}
-write_rds(price_mlr, "data/model/price_mlr.rds")
-```
-
+We can first save the model by running the code chunk below.
 ```{r, eval = FALSE}
 write_rds(price_mlr1, "data/model/price_mlr1.rds")
 ```
 
+```{r}
+price_mlr1 <- read_rds("data/model/price_mlr1.rds")
+```
+
+## Understanding the non-spatial multiple linear regression model
+```{r}
+summary(price_mlr1)
+```
+From the multiple linear regression model above, we notice that adjusted R square is at 0.7266. This suggest that the model can explain 0.7266 of the variation in Resale Price. 
+We also notice that majority of the proximity variables are significant at the 1% level. This can also be said for AREASQM, REMAINING LEASE AND STORY OR. The model of the apartment did not have significant impact on the Resale Price. However, two model type, DBSS and Type.S2 are significant.
+
+## Calculating predictive error
+```{r}
+lm_predicted_value <- predict.lm(price_mlr1, newdata = test_data)
+
+# Calculate MSE
+MSE <- mean((test_data$PRICE - lm_predicted_value)^2)
+
+rmse_lm <- sqrt(MSE)
+rmse_lm
+```
+
+From the square-root of the mean square error is 87822.93. We will take note of this value in the later parts of the regression modelling.
+
+We can compare models using Akaike information criterion (AIC). The smaller the AIC, the better the model. We will find the AIC by running the code chunk below.
+```{r}
+AIC(price_mlr1)
+```
+We will just take note of this number and move along with the other models.
+
 # GWR Predictive Method
 
 ## Converting sf dataframe to SpatialPointDataframe
-
+First, we will need to change the training dataframe into a Spatial point data frame. This is used to calculate the other sections in this portion of the Exercise.
 ```{r}
 train_data_sp <- as_Spatial(training_data)
 train_data_sp
 ```
 
+## Finding optimal adaptive bandwidth
+We will find the optimal adaptive bandwidth of the geospatial weighted regression.
+The code chunk below uses bw.gwr() from the GWModel package:
 ```{r, eval = FALSE}
 bw_adaptive <- bw.gwr(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = train_data_sp,
@@ -1316,12 +1337,14 @@ bw_adaptive <- bw.gwr(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + D
 
 The smallest CV score is adaptive bandwidth: 1005.
 
+We will save the adaptive bandwidth as an RDS file for easy retrieval.
 ```{r, eval = FALSE}
 write_rds(bw_adaptive, file = "data/model/bw_adaptive.rds")
 ```
 
-## Construct the adaptive bandwidth gwr
+## Constructing the adaptive bandwidth GWR
 
+We will retrieve the adaptive bandwidth by using read_rds from the readr package.
 ```{r}
 bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
 bw_adaptive
@@ -1336,6 +1359,7 @@ gwr_adaptive <- gwr.basic(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or
                           longlat = FALSE)
 ```
 
+Again we will save the the regression model as an rds file.
 ```{r, eval = FALSE}
 write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
 ```
@@ -1343,6 +1367,26 @@ write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
 ```{r}
 gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
 gwr_adaptive
+```
+From the output above, we see that Adjusted R-square is 0.8352, higher than the non-spatial mulitple linear regression model.
+
+We will also convert the test_data set into a SpatialPoint dataframe for prediction purposes.
+The code chunk below does that: 
+```{r}
+test_data_sp <- as_Spatial(test_data)
+test_data_sp
+```
+
+## Calculating predictive error
+### Calculate prediction values
+```{r, eval = FALSE}
+gwr_pred <- gwr.predict(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
+                        data = train_data_sp,
+                        predictdata = test_data_sp,
+                        bw = bw_adaptive,
+                        kernel = 'gaussian',
+                        adaptive = TRUE,
+                        longlat = FALSE)
 ```
 
 ## Preparing coordinates data
@@ -1364,6 +1408,7 @@ write_rds(coords_train, "data/model/coords_train.rds" )
 write_rds(coords_test, "data/model/coords_test.rds" )
 ```
 
+Afterwhich, we can just retrieve the coordinates from the saved files.
 ```{r}
 coords_train <- read_rds("data/model/coords_train.rds")
 coords_test <- read_rds("data/model/coords_test.rds")
@@ -1407,15 +1452,378 @@ print(rf)
 gwRF_bw <- grf.bw(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = train_data_nogeo,
                 kernel = "adaptive",
+                trees = 30,
                 coords = coords_train
                 )
 ```
-
-We will save the bandwidth output by using the code chunk below:
-
+Due to long computational time, we will make do with what has been generated.
 ```{r, eval = FALSE}
-write_rds(gwRF_bw, "data/model/gwRF_bw.rds")
+#| code-fold: true
+#| code-summary: "Show code"
+Bandwidth: 725
+R2 of Local Model: 0.830196864620965
+Bandwidth: 726
+R2 of Local Model: 0.831511354240713
+Bandwidth: 727
+R2 of Local Model: 0.825814193350772
+Bandwidth: 728
+R2 of Local Model: 0.833117627936025
+Bandwidth: 729
+R2 of Local Model: 0.831542049422668
+Bandwidth: 730
+R2 of Local Model: 0.832690759328841
+Bandwidth: 731
+R2 of Local Model: 0.831409189031434
+Bandwidth: 732
+R2 of Local Model: 0.833478593806476
+Bandwidth: 733
+R2 of Local Model: 0.828881217358686
+Bandwidth: 734
+R2 of Local Model: 0.833837568289313
+Bandwidth: 735
+R2 of Local Model: 0.830944546212957
+Bandwidth: 736
+R2 of Local Model: 0.829109016792875
+Bandwidth: 737
+R2 of Local Model: 0.832693746938043
+Bandwidth: 738
+R2 of Local Model: 0.830609753683569
+Bandwidth: 739
+R2 of Local Model: 0.828506606657883
+Bandwidth: 740
+R2 of Local Model: 0.829942324327648
+Bandwidth: 741
+R2 of Local Model: 0.829673050758191
+Bandwidth: 742
+R2 of Local Model: 0.834731888959398
+Bandwidth: 743
+R2 of Local Model: 0.831271390847821
+Bandwidth: 744
+R2 of Local Model: 0.830326788690227
+Bandwidth: 745
+R2 of Local Model: 0.832112671503318
+Bandwidth: 746
+R2 of Local Model: 0.832734247748836
+Bandwidth: 747
+R2 of Local Model: 0.831818201150335
+Bandwidth: 748
+R2 of Local Model: 0.831135316402252
+Bandwidth: 749
+R2 of Local Model: 0.832132102303099
+Bandwidth: 750
+R2 of Local Model: 0.83134136735134
+Bandwidth: 751
+R2 of Local Model: 0.8306802097722
+Bandwidth: 752
+R2 of Local Model: 0.829479547542639
+Bandwidth: 753
+R2 of Local Model: 0.833479383819347
+Bandwidth: 754
+R2 of Local Model: 0.83099893981291
+Bandwidth: 755
+R2 of Local Model: 0.830071154250661
+Bandwidth: 756
+R2 of Local Model: 0.830529200273976
+Bandwidth: 757
+R2 of Local Model: 0.831649054301567
+Bandwidth: 758
+R2 of Local Model: 0.831735899098526
+Bandwidth: 759
+R2 of Local Model: 0.830897778940034
+Bandwidth: 760
+R2 of Local Model: 0.831347886646916
+Bandwidth: 761
+R2 of Local Model: 0.828948414511987
+Bandwidth: 762
+R2 of Local Model: 0.831341467830645
+Bandwidth: 763
+R2 of Local Model: 0.830232601893768
+Bandwidth: 764
+R2 of Local Model: 0.831059678585006
+Bandwidth: 765
+R2 of Local Model: 0.828842780381122
+Bandwidth: 766
+R2 of Local Model: 0.833282210197786
+Bandwidth: 767
+R2 of Local Model: 0.82944064674115
+Bandwidth: 768
+R2 of Local Model: 0.832924358100198
+Bandwidth: 769
+R2 of Local Model: 0.830805294691046
+Bandwidth: 770
+R2 of Local Model: 0.831274836665161
+Bandwidth: 771
+R2 of Local Model: 0.830376397878408
+Bandwidth: 772
+R2 of Local Model: 0.832604789981756
+Bandwidth: 773
+R2 of Local Model: 0.829576028459974
+Bandwidth: 774
+R2 of Local Model: 0.830796112836969
+Bandwidth: 775
+R2 of Local Model: 0.831481002981783
+Bandwidth: 776
+R2 of Local Model: 0.831676908866007
+Bandwidth: 777
+R2 of Local Model: 0.82931315042137
+Bandwidth: 778
+R2 of Local Model: 0.828951603116439
+Bandwidth: 779
+R2 of Local Model: 0.831139055149746
+Bandwidth: 780
+R2 of Local Model: 0.830316739537019
+Bandwidth: 781
+R2 of Local Model: 0.830458930586156
+Bandwidth: 782
+R2 of Local Model: 0.833230662394588
+Bandwidth: 783
+R2 of Local Model: 0.832973909576033
+Bandwidth: 784
+R2 of Local Model: 0.831423925116023
+Bandwidth: 785
+R2 of Local Model: 0.829803683418786
+Bandwidth: 786
+R2 of Local Model: 0.828531421840785
+Bandwidth: 787
+R2 of Local Model: 0.830345759971399
+Bandwidth: 788
+R2 of Local Model: 0.830471339400124
+Bandwidth: 789
+R2 of Local Model: 0.832798840438387
+Bandwidth: 790
+R2 of Local Model: 0.83113249780185
+Bandwidth: 791
+R2 of Local Model: 0.827034393025223
+Bandwidth: 792
+R2 of Local Model: 0.829133703096098
+Bandwidth: 793
+R2 of Local Model: 0.831933812229025
+Bandwidth: 794
+R2 of Local Model: 0.830849224075565
+Bandwidth: 795
+R2 of Local Model: 0.830321144305101
+Bandwidth: 796
+R2 of Local Model: 0.829138641042415
+Bandwidth: 797
+R2 of Local Model: 0.830608786109532
+Bandwidth: 798
+R2 of Local Model: 0.831307623612618
+Bandwidth: 799
+R2 of Local Model: 0.833242600852963
+Bandwidth: 800
+R2 of Local Model: 0.832427578593409
+Bandwidth: 801
+R2 of Local Model: 0.83096960265283
+Bandwidth: 802
+R2 of Local Model: 0.8301887673541
+Bandwidth: 803
+R2 of Local Model: 0.834255445238142
+Bandwidth: 804
+R2 of Local Model: 0.832521588463182
+Bandwidth: 805
+R2 of Local Model: 0.831715300054422
+Bandwidth: 806
+R2 of Local Model: 0.831639594906041
+Bandwidth: 807
+R2 of Local Model: 0.83115606975791
+Bandwidth: 808
+R2 of Local Model: 0.833148579276595
+Bandwidth: 809
+R2 of Local Model: 0.831414942555648
+Bandwidth: 810
+R2 of Local Model: 0.833719784150672
+Bandwidth: 811
+R2 of Local Model: 0.828375723575394
+Bandwidth: 812
+R2 of Local Model: 0.830543845828127
+Bandwidth: 813
+R2 of Local Model: 0.832240311900002
+Bandwidth: 814
+R2 of Local Model: 0.831434839902126
+Bandwidth: 815
+R2 of Local Model: 0.828803556504407
+Bandwidth: 816
+R2 of Local Model: 0.829547281428623
+Bandwidth: 817
+R2 of Local Model: 0.831058937941818
+Bandwidth: 818
+R2 of Local Model: 0.82938891796316
+Bandwidth: 819
+R2 of Local Model: 0.830405198798365
+Bandwidth: 820
+R2 of Local Model: 0.832115866093099
+Bandwidth: 821
+R2 of Local Model: 0.830412735051787
+Bandwidth: 822
+R2 of Local Model: 0.828572195678903
+Bandwidth: 823
+R2 of Local Model: 0.830266787825573
+Bandwidth: 824
+R2 of Local Model: 0.83184289974954
+Bandwidth: 825
+R2 of Local Model: 0.829420782829894
+Bandwidth: 826
+R2 of Local Model: 0.831359754548764
+Bandwidth: 827
+R2 of Local Model: 0.830368557576751
+Bandwidth: 828
+R2 of Local Model: 0.832429361513429
+Bandwidth: 829
+R2 of Local Model: 0.829330567671406
+Bandwidth: 830
+R2 of Local Model: 0.833664185213611
+Bandwidth: 831
+R2 of Local Model: 0.829605680296404
+Bandwidth: 832
+R2 of Local Model: 0.833311778486311
+Bandwidth: 833
+R2 of Local Model: 0.830353478426326
+Bandwidth: 834
+R2 of Local Model: 0.82977377053556
+Bandwidth: 835
+R2 of Local Model: 0.829937703219876
+Bandwidth: 836
+R2 of Local Model: 0.831846806163151
+Bandwidth: 837
+R2 of Local Model: 0.829895075127843
+Bandwidth: 838
+R2 of Local Model: 0.833262019160109
+Bandwidth: 839
+R2 of Local Model: 0.829433660783203
+Bandwidth: 840
+R2 of Local Model: 0.827531432547631
+Bandwidth: 841
+R2 of Local Model: 0.82975712679373
+Bandwidth: 842
+R2 of Local Model: 0.832414617979685
+Bandwidth: 843
+R2 of Local Model: 0.830781131471392
+Bandwidth: 844
+R2 of Local Model: 0.829109261064835
+Bandwidth: 845
+R2 of Local Model: 0.832406223647478
+Bandwidth: 846
+R2 of Local Model: 0.834708366156922
+Bandwidth: 847
+R2 of Local Model: 0.833191760455706
+Bandwidth: 848
+R2 of Local Model: 0.831812936634274
+Bandwidth: 849
+R2 of Local Model: 0.832387913503154
+Bandwidth: 850
+R2 of Local Model: 0.833075377352126
+Bandwidth: 851
+R2 of Local Model: 0.830123177762137
+Bandwidth: 852
+R2 of Local Model: 0.831841299216412
+Bandwidth: 853
+R2 of Local Model: 0.831365701551992
+Bandwidth: 854
+R2 of Local Model: 0.830989278187555
+Bandwidth: 855
+R2 of Local Model: 0.834752901702268
+Bandwidth: 856
+R2 of Local Model: 0.832148011460522
+Bandwidth: 857
+R2 of Local Model: 0.830067314893585
+Bandwidth: 858
+R2 of Local Model: 0.83078531914217
+Bandwidth: 859
+R2 of Local Model: 0.830479327296697
+Bandwidth: 860
+R2 of Local Model: 0.834880676239004
+Bandwidth: 861
+R2 of Local Model: 0.833506472321838
+Bandwidth: 862
+R2 of Local Model: 0.830843082210954
+Bandwidth: 863
+R2 of Local Model: 0.830132630677842
+Bandwidth: 864
+R2 of Local Model: 0.828704486734575
+Bandwidth: 865
+R2 of Local Model: 0.8293732367072
+Bandwidth: 866
+R2 of Local Model: 0.829996086927068
+Bandwidth: 867
+R2 of Local Model: 0.83288312812145
+Bandwidth: 868
+R2 of Local Model: 0.831467621740344
+Bandwidth: 869
+R2 of Local Model: 0.829259249144337
+Bandwidth: 870
+R2 of Local Model: 0.830770774516278
+Bandwidth: 871
+R2 of Local Model: 0.828837075909044
+Bandwidth: 872
+R2 of Local Model: 0.829758111980732
+Bandwidth: 873
+R2 of Local Model: 0.829557855443734
+Bandwidth: 874
+R2 of Local Model: 0.830523982844196
+Bandwidth: 875
+R2 of Local Model: 0.831009886895258
+Bandwidth: 876
+R2 of Local Model: 0.82944013294738
+Bandwidth: 877
+R2 of Local Model: 0.832028294836151
+Bandwidth: 878
+R2 of Local Model: 0.833992472427127
+Bandwidth: 879
+R2 of Local Model: 0.828809446103142
+Bandwidth: 880
+R2 of Local Model: 0.827440566241794
+Bandwidth: 881
+R2 of Local Model: 0.83157952544884
+Bandwidth: 882
+R2 of Local Model: 0.829294634223024
+Bandwidth: 883
+R2 of Local Model: 0.832394559788004
+Bandwidth: 884
+R2 of Local Model: 0.831141692432181
+Bandwidth: 885
+R2 of Local Model: 0.831071687513164
+Bandwidth: 886
+R2 of Local Model: 0.828715571246103
+Bandwidth: 887
+R2 of Local Model: 0.829535263164816
+Bandwidth: 888
+R2 of Local Model: 0.831319756325194
+Bandwidth: 889
+R2 of Local Model: 0.831550952889957
+Bandwidth: 890
+R2 of Local Model: 0.829990162602387
+Bandwidth: 891
+R2 of Local Model: 0.834388880202844
+Bandwidth: 892
+R2 of Local Model: 0.831444356778861
+Bandwidth: 893
+R2 of Local Model: 0.829154145538292
+Bandwidth: 894
+R2 of Local Model: 0.831118924732515
+Bandwidth: 895
+R2 of Local Model: 0.832741630646768
+Bandwidth: 896
+R2 of Local Model: 0.828300969146387
+Bandwidth: 897
+R2 of Local Model: 0.831320866320787
+Bandwidth: 898
+R2 of Local Model: 0.828244750811946
+Bandwidth: 899
+R2 of Local Model: 0.832772387332717
+Bandwidth: 900
+R2 of Local Model: 0.828538098204589
+Bandwidth: 901
+R2 of Local Model: 0.82750095108753
+Bandwidth: 902
+R2 of Local Model: 0.828826070773062
+Bandwidth: 903
+R2 of Local Model: 0.830187793236362
+Bandwidth: 904
+R2 of Local Model: 0.83278488113049
+Bandwidth: 905
+R2 of Local Model: 0.830157433907511
 ```
+Base on the output, we will pick the best bandwidth that has the largest R2 of Local Model. The best bandwidth would be 860 with a R2 of 0.834880676239004.
 
 ## Calibrating Geographical Random Forest Model
 
@@ -1423,7 +1831,7 @@ write_rds(gwRF_bw, "data/model/gwRF_bw.rds")
 set.seed(1234)
 gwRF_adaptive <- grf(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                      dframe=train_data_nogeo, 
-                     bw= bw_adaptive,
+                     bw= 860,
                      ntree = 30,
                      kernel="adaptive",
                      coords=coords_train)
@@ -1432,11 +1840,11 @@ gwRF_adaptive <- grf(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DB
 Let's save the model output below:
 
 ```{r, eval = FALSE}
-write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+write_rds(gwRF_adaptive, "data/model/grf_adaptive_30.rds")
 ```
 
 ```{r}
-gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+gwRF_adaptive <- read_rds("data/model/grf_adaptive_30.rds")
 ```
 
 ## Predicting by using test data
@@ -1455,7 +1863,7 @@ test_data <- cbind(test_data, coords_test) %>%
 Next, predict.grf() of spatialML package will be used to predict the resale value by using the test data and gwRF_adaptive model calibrated earlier.
 
 ```{r, eval = FALSE}
-gwRF_pred <- gwRF_pred <- predict.grf(gwRF_adaptive, 
+gwRF_pred <- predict.grf(gwRF_adaptive, 
                            test_data, 
                            x.var.name="X",
                            y.var.name="Y", 
