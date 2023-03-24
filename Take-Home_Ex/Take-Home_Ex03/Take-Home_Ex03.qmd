@@ -29,45 +29,85 @@ In view of this limitation, **Geographical Weighted Models** were introduced for
 
 ## The Task
 
-In this take-home exercise, you are tasked to predict HDB resale prices at the sub-market level (i.e. HDB 3-room, HDB 4-room and HDB 5-room) for the month of January and February 2023 in Singapore.
+In this take-home exercise, I am tasked to predict HDB resale prices at the sub-market level (HDB 5-room) for the month of January and February 2023 in Singapore.
 The predictive models must be built by using by using conventional OLS method and GWR methods.
-You are also required to compare the performance of the conventional OLS method versus the geographical weighted methods.
+The data set used to train the model is from January 2021 to December 2022.
 
 ## Packages used:
 
+**The R packages we'll use for this analysis are:**
+
+-   [**sf**](https://cran.r-project.org/web/packages/sf/index.html): used for importing, managing, and processing geospatial data
+
+-   [**tidyverse**](https://www.tidyverse.org/): a collection of packages for data science tasks
+
+-   [**tmap**](https://cran.r-project.org/web/packages/tmap/index.html): used for creating thematic maps, such as choropleth and bubble maps
+
+-   [**spdep**](https://cran.r-project.org/web/packages/spdep/index.html): used to create spatial weights matrix objects, global and local spatial autocorrelation statistics and related calculations (e.g. spatially lag attributes)
+
+-   [**onemapsgapi**](https://cran.r-project.org/web/packages/onemapsgapi/index.html): used to query Singapore-specific spatial data, alongside additional functionalities.
+    Recommended readings: [Vignette](https://cran.r-project.org/web/packages/onemapsgapi/vignettes/onemapsgapi_vignette.html) and [Documentation](https://www.onemap.gov.sg/docs/)
+
+-   [**httr**](https://cran.r-project.org/web/packages/httr/) **: used to make API calls, such as a GET request**
+
+-   [**units**](https://cran.r-project.org/web/packages/units/index.html): used to for manipulating numeric vectors that have physical measurement units associated with them
+
+-   [**matrixStats**](https://cran.r-project.org/web/packages/matrixStats/index.html): a set of high-performing functions for operating on rows and columns of matrices
+
+-   [**jsonlite**](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html): a JSON parser that can convert from JSON to the appropraite R data types
+
+-   [**coorplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) + [**ggpubr**](https://cran.r-project.org/web/packages/ggpubr/index.html): both are used for multivariate data visualisation & analysis
+
+-   [**GWmodel**](https://cran.r-project.org/web/packages/GWmodel/index.html): provides a collection of localised spatial statistical methods, such as summary statistics, principal components analysis, discriminant analysis and various forms of GW regression
+
+-   [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html): used for installing any R packages which is not available in RCRAN.
+    In this context, it'll be used to download the [**xaringanExtra**](https://pkg.garrickadenbuie.com/xaringanExtra/#/) package for [panelsets](https://pkg.garrickadenbuie.com/xaringanExtra/#/panelset)
+
+-   [**kableExtra**](https://haozhu233.github.io/kableExtra/): an extension of kable, used for table customisation
+
+**The following tidyverse packages will be used:**
+
+-   **readr** for importing delimited files (.csv)
+
+-   **tidyr** for manipulating and tidying data
+
+-   **dplyr** for wrangling and transforming data
+
+-   **ggplot2** for visualising data
+
 ```{r}
-pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, readxl, GWmodel, SpatialML, rsample, Metrics)
+pacman::p_load(tidyverse, sf, sfdep, tmap, httr, jsonlite, matrixStats, readr, GWmodel, SpatialML, rsample, Metrics)
 ```
 
 ## Data used:
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show code"
 # initialise a dataframe of our aspatial and geospatial dataset details
 datasets <- data.frame(
   Type=c("Aspatial",
          "Geospatial",
          "Geospatial",
          "Geospatial",
-         "Geospatial",
          
-         "Geospatial - Extracted",
-         "Geospatial - Extracted",
-         "Geospatial - Extracted",
-         "Geospatial - Extracted",
-         "Geospatial - Extracted",
-         "Geospatial - Extracted",
-         "Geospatial - Extracted",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
+         "Geospatial - Onemap",
          
-         "Geospatial - Selfsourced",
-         "Geospatial - Selfsourced",
-         "Geospatial - Selfsourced",
-         "Geospatial - Selfsourced"),
+         "Aspatial - Self-Sourced",
+         "Aspatial - Self-Sourced"),
   
   Name=c("Resale Flat Prices",
-         "Singapore National Boundary",
-         "Master Plan 2014 Subzone Boundary (Web)",
-         "MRT & LRT Locations Aug 2021",
-         "Bus Stop Locations Aug 2021",
+         "Master Plan 2019 Subzone Boundary (Web)",
+         "MRT & LRT Exit Locations",
+         "Bus Stop Locations",
          
          "Childcare Services",
          "Eldercare Services",
@@ -75,18 +115,17 @@ datasets <- data.frame(
          "Kindergartens",
          "Parks",
          "Supermarkets",
-         "Primary Schools",
+         "Community Clubs",
+         "Family Services",
+         "Registered Pharmacies",
          
-         "Community Health Assistance Scheme (CHAS) Clinics",
-         "Integrated Screening Programme (ISP) Clinics",
-         "Public, Private and Non-for-profit Hospitals",
+         "Schools",
          "Shopping Mall SVY21 Coordinates`"),
   
   Format=c(".csv", 
            ".shp", 
            ".shp", 
            ".shp", 
-           ".shp",
            
            ".shp", 
            ".shp", 
@@ -95,15 +134,14 @@ datasets <- data.frame(
            ".shp", 
            ".shp",
            ".shp",
-           
-           ".kml",
            ".shp",
-           ".xlsx",
+           ".shp",
+           
+           ".csv",
            ".csv"),
   
   Source=c("[data.gov.sg](https://data.gov.sg/dataset/resale-flat-prices)",
-           "[data.gov.sg](https://data.gov.sg/dataset/national-map-polygon)",
-           "[data.gov.sg](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)",
+           "data.gov.sg",
            "[LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=Train)",
            "[LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop)",
            
@@ -114,10 +152,10 @@ datasets <- data.frame(
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
-           
-           "[data.gov.sg](https://data.gov.sg/dataset/chas-clinics)",
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
-           "Self-sourced and collated (section 2.3)",
+           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           
+           "[data.gov.sg](https://data.gov.sg/dataset/school-directory-and-information)",
            "[Mall SVY21 Coordinates Web Scaper](https://github.com/ValaryLim/Mall-Coordinates-Web-Scraper)")
   )
 
@@ -182,7 +220,7 @@ To make it more automatic, define which variables you want from the onemap datab
 The code chunk runs a for loop that does steps 5 and 6 together and stores them into your folder.
 
 ```{r, eval = FALSE}
-onemap_variables <- c("childcare", "communityclubs", "eldercare", "family", "hawkercentre", "kindergartens", "nationalparks","registered_pharmacy")
+onemap_variables <- c("childcare", "communityclubs", "eldercare", "family", "hawkercentre", "kindergartens", "nationalparks","registered_pharmacy","supermarkets")
 
 df <- list()
 df_sf <- list()
@@ -204,6 +242,8 @@ st_write(obj = df_sf[[i]],
 
 ::: panel-tabset
 ### One-Map
+
+We will make use of st_read() from the sf package to load the data in
 
 ```{r}
 pharmacy <- st_read(dsn = "data/geospatial/Onemap",
@@ -228,12 +268,16 @@ childcare <- st_read(dsn = "data/geospatial/Onemap",
 
 ### Geospatial Map
 
+We will make use of st_read() from the sf package to load the data in
+
 ```{r}
 mpsz <- st_read(dsn = "data/geospatial",
                 layer = "MP14_SUBZONE_WEB_PL")
 ```
 
 ### DATA.GOV
+
+We will make use of st_read() from the sf package to load the data in
 
 ```{r}
 Bus_stop <- st_read(dsn = "data/geospatial",
@@ -242,6 +286,8 @@ MRT <- st_read(dsn = "data/geospatial/lta-mrt-station-exit-kml.kml")
 ```
 
 ### Aspatial Data
+
+We will make use of read_csv() from the readr package to read the csv file into Rstudio
 
 ```{r}
 Resale <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
@@ -260,7 +306,7 @@ Malls <- read_csv("data/aspatial/mall_coordinates_updated.csv")
 
 ## HDB Resale Price
 
-For the purpose of this take-home exercise, we will only be using five-room flat and transaction period should be January and February 2023.
+For the purpose of this take-home exercise, we will only be using five-room flat and training transaction period should be from January 2021 and December 2022.
 
 From the output above, the variables we want are:
 
@@ -274,11 +320,23 @@ From the output above, the variables we want are:
 
 ### Story and Date adjustents
 
-We will get the unique values of story by running
+We will see the unique values of story by running the code chunk below.
 
 ```{r}
 unique(Resale$storey_range)
 ```
+
+As we can see, there are 17 factor levels.
+
+When dealing with categorical variables, there are several ways to manipulate the data.
+
+These are some ways to deal with categorical variables:
+
+1.  Set it as a factor, to which R will recognize them as binary variables automatically.
+2.  Set categorical variable as multiple binary variable columns, assigning values 1 and 0.
+3.  Set categorical variables as ordinal numbers.
+
+In the case of story levels, as they are ascending in nature, we can use No. 3, which is to set them as ordinal variables.
 
 The code chunk below will sequence the story levels, assigning value 1 to "01 TO 03", 2 to "04 TO 06", ..., 17 to "49 TO 51".
 
@@ -297,6 +355,8 @@ levels(Resale$Story_Ordinal) <- story_levels
 ### Date
 
 Next we will set the Date column as date type and also ensure Story_Ordinal is of numeric type.
+
+To check the data set, you can run glimpse() from the dplyr package to see the data types of each variable.
 
 ```{r, eval = FALSE}
 Resale <- Resale %>%
@@ -387,6 +447,8 @@ Resale_test <- Resale %>%
 We will save Resale_train as a rds file for easy retrieval
 
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(Resale_test, "data/aspatial/Resale_test.rds")
 ```
 
@@ -399,9 +461,17 @@ glimpse(Resale_test)
 ```
 :::
 
+You may be wondering why I had removed LeaseBegin as that denotes the age of the apartment.
+This is due to the issue of high multicollinearity in statistics.
+Intuitively, HDB only has 99year lease and as such, remaining_lease has a perfect inverse relationship to LeaseBegin.
+For example a 9 year old apartment would have a remaining lease of (99-9) = 90 years.
+
 ### Inserting geometries
 
+Next, once our data set has been cleaned to its relevant variables, we will insert the geometries of the resale apartment location.
+
 To do this, we will have to obtain the geometries from this [url](https://developers.onemap.sg/commonapi/search).
+
 This code is referenced from [Megan's work](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/).
 
 ```{r, eval = FALSE}
@@ -423,6 +493,10 @@ geocode <- function(block, streetname) {
   return(output)
 }
 ```
+
+In both Training and Test Data, we will use this function and a for loop that iterates between each row of the dataframe.
+
+This is done to input the block and street number into the function, geocode() and inputs the results into the LATITUDE and LONGITUDE columns.
 
 ::: panel-tabset
 #### Training Data
@@ -456,7 +530,7 @@ for (i in 1:nrow(Resale_test)){
 
 ### Convert into Resale_2023 dataframe into sf
 
-By using st_as_sf() from the sf package, we can convert Resale_2023 into an sf and then transform the crs to EPSG:: 3414 which is the coordinate reference system for Singapore
+By using st_as_sf() from the sf package, we can convert Resale_2023 into an sf and then transform the crs to EPSG:: 3414 which is the coordinate reference system for Singapore.
 
 ::: panel-tabset
 #### Training Data
@@ -559,6 +633,8 @@ for (i in 1:nrow(Primary)){
 ```
 
 ```{r, eval =FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(Primary, "data/aspatial/Primary.rds")
 ```
 
@@ -574,7 +650,9 @@ Secondary <- Schools %>%
   select(school_name,postal_code)
 ```
 
-After running the geocode loop on secondary school, we notice that [ZHENGHUA SECONDARY SCHOOL](https://www.moe.gov.sg/schoolfinder/schooldetail?schoolname=zhenghua-secondary-school) has a wrong postal code.
+Next, we will change the postal code of [ZHENGHUA SECONDARY SCHOOL](https://www.moe.gov.sg/schoolfinder/schooldetail?schoolname=zhenghua-secondary-school) as it has the wrong postal code.
+We found out about this after checking that there was an error after running the geocode.
+Hence, it is a good habit to check on your dataframe for any missing geometries before moving forward.
 
 ```{r, eval = FALSE}
 Secondary[137,2]<- "679962"
@@ -595,6 +673,8 @@ for (i in 1:nrow(Secondary)){
 ```
 
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(Secondary, file = "data/aspatial/Secondary.rds")
 ```
 
@@ -653,6 +733,8 @@ malls <- Malls %>%
 
 CBD Area:
 
+As for the CBD area, we will use a centre point coordinate to illustrate proximity to CBD Area.
+
 ```{r}
 lat <- 1.287953
 lng <- 103.851784
@@ -670,8 +752,9 @@ Aside from the onemap variables, we need to check the geospatial data and the ot
 st_crs(mpsz) ; st_crs(Bus_stop) ; st_crs(MRT) ; st_crs(supermarkets)
 ```
 
-We notice that the CRS for these 3 geospatial data is not correct.
-We will use st_transformed as taught previously to convert it to EPSG:3414
+We notice that the CRS for these 3 geospatial data are not correct.
+
+We will use st_transformed as taught previously to convert it to EPSG:3414.
 
 ```{r}
 mpsz <- mpsz %>%
@@ -695,7 +778,7 @@ supermarkets <- supermarkets %>%
 
 ## Checking invalid geometries
 
-We should also check for any invalid geometries
+We should also check for any invalid geometries in our data.
 
 ::: panel-tabset
 ### Onemap variable checks
@@ -778,6 +861,8 @@ There is no invalid geometries in the aspatial data set.
 :::
 
 ## Removing Unnecessary columns
+
+We will only need the name and the geometries so we can exclude the rest of the columns
 
 ::: panel-tabset
 ### Onemap
@@ -930,11 +1015,16 @@ length(which(is.na(Secondary_sf) == TRUE))
 ```{r}
 length(which(is.na(malls) == TRUE))
 ```
+
+There is no NA values in the aspatial data
 :::
 
 # Visualisation
 
-## Initial Mapping
+We will visualize each variable on its own to see how they are being scattered.
+
+This is done by using tm_shape(), tm_polygons, tm_dots() from the tmap package.
+Since these maps are set to "plot", mpsz sets the Singapore boundaries while tm_dots plots the points onto the polygon.
 
 ::: panel-tabset
 ### Subzone
@@ -947,8 +1037,7 @@ tm_shape(mpsz) +
 
 ### MRT Stations
 
-```{r, eval = FALSE}
-# Error
+```{r}
 tmap_mode("plot")
 tm_shape(mpsz) +
   tm_polygons() +
@@ -1071,6 +1160,10 @@ tm_shape(Secondary_sf) +
 
 # Proximity distance calculator
 
+Here, we will need to calculate the distance between each variable to the resale apartment.
+
+The code below creates a function called proximity() that takes in 3 values.
+
 ```{r, eval = FALSE}
 library(units)
 library(matrixStats)
@@ -1080,6 +1173,9 @@ proximity <- function(df1, df2, varname) {
   df1[,varname] <- rowMins(dist_matrix)
   return(df1) }
 ```
+
+The code chunks in training and test data essentially calculates the proximity between Resale flats and the variable.
+This is piped each time, creating a new column with the 3rd input name and assigned to the object, training_resale/test_resale.
 
 ::: panel-tabset
 ## Training Data
@@ -1105,6 +1201,9 @@ training_resale <-
   proximity(., Good_Prisch, "PROX_GOODP") %>%
   proximity(., Secondary_sf, "PROX_SECSCH") 
 ```
+
+We will change the names of the column for easy recognition and referencing.
+This is done using mutate() and rename() from the dplyr package
 
 ```{r, eval =FALSE}
 training_resale <- training_resale %>%
@@ -1138,6 +1237,9 @@ test_resale <-
   proximity(., Good_Prisch, "PROX_GOODP") %>%
   proximity(., Secondary_sf, "PROX_SECSCH") 
 ```
+
+We will change the names of the columns for easy recognition and referencing.
+This is done using mutate() and rename() from the dplyr package
 
 ```{r, eval = FALSE}
 test_resale <- test_resale %>%
@@ -1177,7 +1279,11 @@ training_resale <-
   num_radius(., Secondary_sf, "NUM_SECSCH", 1000)
 ```
 
+Always make sure to save the object as an rds file for future referencing.
+
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(training_resale, "data/aspatial/training_resale.rds")
 ```
 
@@ -1191,6 +1297,8 @@ test_resale <-
   num_radius(., Primary_sf, "NUM_PRISCH", 1000) %>%
   num_radius(., Secondary_sf, "NUM_SECSCH", 1000)
 ```
+
+Always make sure to save the object as an rds file for future referencing.
 
 ```{r, eval = FALSE}
 write_rds(test_resale, "data/aspatial/test_resale.rds")
@@ -1267,6 +1375,9 @@ corrplot::corrplot(cor_matrix,
 ```
 
 We can see several correlated variables above 0.5 but they are within acceptable range to be included in the regression.
+However, it would be better to remove PROX_KINDERGARTENS, PROX_CHILDCARE, PROX_BUS, PROX_PRISCH and PROX_SECSCH.
+This is because the effects from these 5 variables would have been captured in the facility count, NUM\_ .
+While the correlation matrix suggest no high correlation, it could create bias in our estimator should the variables be correlated.
 
 # Building a non-spatial multiple linear regression
 
@@ -1278,7 +1389,10 @@ price_mlr1 <- lm(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS +
 ```
 
 We can first save the model by running the code chunk below.
+
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(price_mlr1, "data/model/price_mlr1.rds")
 ```
 
@@ -1287,13 +1401,25 @@ price_mlr1 <- read_rds("data/model/price_mlr1.rds")
 ```
 
 ## Understanding the non-spatial multiple linear regression model
+
 ```{r}
 summary(price_mlr1)
 ```
-From the multiple linear regression model above, we notice that adjusted R square is at 0.7266. This suggest that the model can explain 0.7266 of the variation in Resale Price. 
-We also notice that majority of the proximity variables are significant at the 1% level. This can also be said for AREASQM, REMAINING LEASE AND STORY OR. The model of the apartment did not have significant impact on the Resale Price. However, two model type, DBSS and Type.S2 are significant.
+
+We can visualise the regression as a table by using gtsummary package.
+
+```{r}
+gtsummary::tbl_regression(price_mlr1)
+```
+
+From the multiple linear regression model above, we notice that adjusted R square is at 0.7266.
+This suggest that the model can explain 0.7266 of the variation in Resale Price.
+We also notice that majority of the proximity variables are significant at the 1% level.
+This can also be said for AREASQM, REMAINING LEASE AND STORY OR. The model of the apartment did not have significant impact on the Resale Price.
+However, two model type, DBSS and Type.S2 are significant.
 
 ## Calculating predictive error
+
 ```{r}
 lm_predicted_value <- predict.lm(price_mlr1, newdata = test_data)
 
@@ -1304,26 +1430,36 @@ rmse_lm <- sqrt(MSE)
 rmse_lm
 ```
 
-From the square-root of the mean square error is 87822.93. We will take note of this value in the later parts of the regression modelling.
+From the square-root of the mean square error is 87822.93.
+We will take note of this value in the later parts of the regression modelling.
 
-We can compare models using Akaike information criterion (AIC). The smaller the AIC, the better the model. We will find the AIC by running the code chunk below.
+We can compare models using Akaike information criterion (AIC).
+The smaller the AIC, the better the model.
+We will find the AIC by running the code chunk below.
+
 ```{r}
 AIC(price_mlr1)
 ```
+
 We will just take note of this number and move along with the other models.
 
 # GWR Predictive Method
 
 ## Converting sf dataframe to SpatialPointDataframe
-First, we will need to change the training dataframe into a Spatial point data frame. This is used to calculate the other sections in this portion of the Exercise.
+
+First, we will need to change the training dataframe into a Spatial point data frame.
+This is used to calculate the other sections in this portion of the Exercise.
+
 ```{r}
 train_data_sp <- as_Spatial(training_data)
 train_data_sp
 ```
 
 ## Finding optimal adaptive bandwidth
+
 We will find the optimal adaptive bandwidth of the geospatial weighted regression.
 The code chunk below uses bw.gwr() from the GWModel package:
+
 ```{r, eval = FALSE}
 bw_adaptive <- bw.gwr(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
                 data = train_data_sp,
@@ -1338,6 +1474,7 @@ bw_adaptive <- bw.gwr(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + D
 The smallest CV score is adaptive bandwidth: 1005.
 
 We will save the adaptive bandwidth as an RDS file for easy retrieval.
+
 ```{r, eval = FALSE}
 write_rds(bw_adaptive, file = "data/model/bw_adaptive.rds")
 ```
@@ -1345,6 +1482,7 @@ write_rds(bw_adaptive, file = "data/model/bw_adaptive.rds")
 ## Constructing the adaptive bandwidth GWR
 
 We will retrieve the adaptive bandwidth by using read_rds from the readr package.
+
 ```{r}
 bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
 bw_adaptive
@@ -1360,6 +1498,7 @@ gwr_adaptive <- gwr.basic(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or
 ```
 
 Again we will save the the regression model as an rds file.
+
 ```{r, eval = FALSE}
 write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
 ```
@@ -1368,26 +1507,8 @@ write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
 gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
 gwr_adaptive
 ```
-From the output above, we see that Adjusted R-square is 0.8352, higher than the non-spatial mulitple linear regression model.
 
-We will also convert the test_data set into a SpatialPoint dataframe for prediction purposes.
-The code chunk below does that: 
-```{r}
-test_data_sp <- as_Spatial(test_data)
-test_data_sp
-```
-
-## Calculating predictive error
-### Calculate prediction values
-```{r, eval = FALSE}
-gwr_pred <- gwr.predict(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DBSS + Standrd + Model.A + PrmmApr + Adjndfl + MdlA.Ms + Type.S2 + Imprv.M + PrmmApL + PROX_CBD + PROX_CLUBS + PROX_ELDERCARE + PROX_FAM + PROX_MRT +PROX_HAWKER + PROX_PHARMACY +PROX_PARK+PROX_MALL + PROX_SPRMKT + PROX_GOODP + NUM_KNDRGTN + NUM_CHILDCARE + NUM_BUS_STOP + NUM_PRISCH + NUM_SECSCH,
-                        data = train_data_sp,
-                        predictdata = test_data_sp,
-                        bw = bw_adaptive,
-                        kernel = 'gaussian',
-                        adaptive = TRUE,
-                        longlat = FALSE)
-```
+From the output above, we see that Adjusted R-square is 0.8352, higher than the non-spatial mulitiple linear regression model.
 
 ## Preparing coordinates data
 
@@ -1409,6 +1530,7 @@ write_rds(coords_test, "data/model/coords_test.rds" )
 ```
 
 Afterwhich, we can just retrieve the coordinates from the saved files.
+
 ```{r}
 coords_train <- read_rds("data/model/coords_train.rds")
 coords_test <- read_rds("data/model/coords_test.rds")
@@ -1425,6 +1547,8 @@ train_data_nogeo <- training_data %>%
 ```
 
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(train_data_nogeo, "data/model/train_data_nogeo.rds")
 ```
 
@@ -1456,7 +1580,9 @@ gwRF_bw <- grf.bw(formula = PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Impro
                 coords = coords_train
                 )
 ```
+
 Due to long computational time, we will make do with what has been generated.
+
 ```{r, eval = FALSE}
 #| code-fold: true
 #| code-summary: "Show code"
@@ -1823,9 +1949,15 @@ R2 of Local Model: 0.83278488113049
 Bandwidth: 905
 R2 of Local Model: 0.830157433907511
 ```
-Base on the output, we will pick the best bandwidth that has the largest R2 of Local Model. The best bandwidth would be 860 with a R2 of 0.834880676239004.
+
+Base on the output, we will pick the best bandwidth that has the largest R2 of Local Model.
+The best bandwidth would be 860 with a R2 of 0.834880676239004.
 
 ## Calibrating Geographical Random Forest Model
+
+We will use grf() from the SpatialML package to calibrate our GRF Model.
+It takes in the formula which is the same as the non-spatial regression.
+We will use the bandwidth calculated from the above section and generate base on ntree =30.
 
 ```{r, eval = FALSE}
 set.seed(1234)
@@ -1840,11 +1972,18 @@ gwRF_adaptive <- grf(PRICE ~ AREA_SQM + REMAINING_LEASE + Stry_Or + Improvd + DB
 Let's save the model output below:
 
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(gwRF_adaptive, "data/model/grf_adaptive_30.rds")
 ```
 
 ```{r}
 gwRF_adaptive <- read_rds("data/model/grf_adaptive_30.rds")
+```
+
+```{r}
+glimpse(gwRF_adaptive$Local.Variable.Importance)
+gwRF_adaptive$Global.Model
 ```
 
 ## Predicting by using test data
@@ -1860,7 +1999,7 @@ test_data <- cbind(test_data, coords_test) %>%
 
 ### Predicting with test data
 
-Next, predict.grf() of spatialML package will be used to predict the resale value by using the test data and gwRF_adaptive model calibrated earlier.
+Next, predict.grf() of SpatialML package will be used to predict the resale value by using the test data and gwRF_adaptive model calibrated earlier.
 
 ```{r, eval = FALSE}
 gwRF_pred <- predict.grf(gwRF_adaptive, 
@@ -1874,12 +2013,15 @@ gwRF_pred <- predict.grf(gwRF_adaptive,
 We should always save our output into rds since these computations take a really long time.
 
 ```{r, eval = FALSE}
+#| code-fold: true
+#| code-summary: "Show code"
 write_rds(gwRF_pred, "data/model/GRF_pred.rds")
 ```
 
 ### Converting predicted output into a data frame
 
 ```{r}
+#reads the data in and makes it a dataframe
 GRF_pred_df <- as.data.frame(read_rds("data/model/GRF_pred.rds"))
 ```
 
@@ -1914,11 +2056,16 @@ test_data_p <- test_data_p %>%
 ```
 
 ```{r}
-rmse(test_data_p$PRICE, 
+rmse_grf<- rmse(test_data_p$PRICE, 
      test_data_p$GRF_pred)
+rmse_grf
 ```
 
-### Visualisaing the predicted values
+We notice from the rmse is 56235.78, which is lower than the OLS rmse.
+Furthermore, Rsquare of the gwRF is 0.91 which is much higher than the OLS model.
+Hence, this is a better model in terms if its prediction accuracy.
+
+### Visualising the predicted values
 
 ```{r}
 ggplot(data = test_data_p,
@@ -1926,3 +2073,85 @@ ggplot(data = test_data_p,
            y = PRICE)) +
   geom_point()
 ```
+
+# Conclusion
+
+Lastly, we were task to compare the performance of the conventional OLS method versus the geographical weighted methods.
+
+## Differences between the two models
+
+1.  OLS does not take into account the spatial autocorrelation whereas GRF does.
+2.  Conventional OLS is generally good for exploratory data analysis but even so, more needs to be done to improve the model if it is meant to be used for prediction
+
+We will compare the two models base on RMSE and on the visual plot.
+
+::: panel-tabset
+## Non-Spatial Multiple linear Regression
+
+```{r}
+rmse_lm
+```
+
+```{r}
+test_data_lm <- cbind(test_data, lm_predicted_value)
+```
+
+```{r}
+ggplot(data = test_data_lm,
+       aes(x = lm_predicted_value,
+           y = PRICE)) +
+  geom_point() +
+  geom_abline(col = "Red")
+```
+
+## Geographical Random Forest Model
+
+```{r}
+rmse_grf
+```
+
+```{r}
+ggplot(data = test_data_p,
+       aes(x = GRF_pred,
+           y = PRICE)) +
+  geom_point()+
+  geom_abline(col = "Red")
+```
+:::
+
+## Predictive Power
+
+By comparing the two models, we can see the RMSE for GRF, 56235.78, is lower than the RMSE for non-spatial regression, 87822.93.
+This suggest that the GRF Model is better at predicting the resale price.
+
+Furthermore, we also notice that the points scattered in the GRF Model are clustered around the red line more than the non-spatial regression.
+
+## Limitations of Analysis
+
+1.  One obvious limitation is the "sub-optimal" bandwidth generated for the GRF Model. This is due to the lack of computational power our devices have.
+2.  Second is the number of trees that can be generated. Again for the same reason, I was only able to do ntree = 30. Having more trees may have better predictive power.
+
+## Possible Improvements to the model
+
+One way to improve the model could be the use of interactive variables.
+
+Interactive variables helps to showcase the combined effects between two variables.
+For example, story_ordinal and NUM of primary school as an interactive variable.
+The intuition behind this is that primary schools generally contribute to higher noise-pollution and the higher the story level, the better as it can reduce the amount of noise that reaches the apartment.
+Such combined effects may improve the predictive power the model have.
+
+Another example could be PROX_Parks and Story_Order.
+The closer one is to parks may signify better views.
+Higher story may allow residents to have better views and thus raise the price of the apartment.
+Again this is a useful variable to consider in our modelling.
+
+# References
+
+-   [Megan's work](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/)
+
+Much was referenced to Megan's work on how to wrangle the data.
+Her work revolves around create hedonic model and it is a good read to understand how she goes through her assignment.
+
+-   [In-class Exercise 9](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex09/in-class_ex09_gwml)
+
+Prof Kam taught us several techniques on how to create the non-spatial regression as well as doing up the GRF modelling.
