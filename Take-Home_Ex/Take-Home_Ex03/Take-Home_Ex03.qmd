@@ -54,14 +54,11 @@ The data set used to train the model is from January 2021 to December 2022.
 
 -   [**matrixStats**](https://cran.r-project.org/web/packages/matrixStats/index.html): a set of high-performing functions for operating on rows and columns of matrices
 
--   [**jsonlite**](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html): a JSON parser that can convert from JSON to the appropraite R data types
+-   [**jsonlite**](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html): a JSON parser that can convert from JSON to the appropriate R data types
 
--   [**coorplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) + [**ggpubr**](https://cran.r-project.org/web/packages/ggpubr/index.html): both are used for multivariate data visualisation & analysis
+-   [**corrplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) + [**ggpubr**](https://cran.r-project.org/web/packages/ggpubr/index.html): both are used for multivariate data visualisation & analysis
 
 -   [**GWmodel**](https://cran.r-project.org/web/packages/GWmodel/index.html): provides a collection of localised spatial statistical methods, such as summary statistics, principal components analysis, discriminant analysis and various forms of GW regression
-
--   [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html): used for installing any R packages which is not available in RCRAN.
-    In this context, it'll be used to download the [**xaringanExtra**](https://pkg.garrickadenbuie.com/xaringanExtra/#/) package for [panelsets](https://pkg.garrickadenbuie.com/xaringanExtra/#/panelset)
 
 -   [**kableExtra**](https://haozhu233.github.io/kableExtra/): an extension of kable, used for table customisation
 
@@ -145,7 +142,7 @@ datasets <- data.frame(
            "[LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=Train)",
            "[LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop)",
            
-           "[OneMap API](https://www.onemap.gov.sg/docs/)",
+           "[OneMap API]",
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
            "[OneMap API](https://www.onemap.gov.sg/docs/)",
@@ -2133,7 +2130,7 @@ Furthermore, we also notice that the points scattered in the GRF Model are clust
 
 ## Possible Improvements to the model
 
-One way to improve the model could be the use of interactive variables.
+1.  One way to improve the model could be the use of interactive variables.
 
 Interactive variables helps to showcase the combined effects between two variables.
 For example, story_ordinal and NUM of primary school as an interactive variable.
@@ -2144,6 +2141,15 @@ Another example could be PROX_Parks and Story_Order.
 The closer one is to parks may signify better views.
 Higher story may allow residents to have better views and thus raise the price of the apartment.
 Again this is a useful variable to consider in our modelling.
+
+2.  Removing outliers
+
+While the regression helps us explain more than 90% of the variation in the Resale Price, there may be other reasons not captured affect the price.
+This could include sellers recent renovation of apartment, internal problems of the apartment and many others.
+Removing outliers may better fit the regression and reduce the prediction error.
+
+However, outliers may have significant effect on the regression and may hold important information about the resale price.
+Hence, if the goal is to form a regression that is able to predict resale prices approximately, removing outliers in the training data may improve the model.
 
 # References
 
