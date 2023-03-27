@@ -10,3 +10,246 @@ execute:
   warning: false
 editor: visual
 ---
+
+# Getting Started
+
+```{r}
+pacman::p_load(tmap, sf, sp, caret, stplanr, reshape2, broom, tidyverse)
+```
+
+# Preparing the Flow Data
+
+## Importing OD Data
+
+Firstly, we will import the Passenger Volume by Origin Destination Bus stops data set downloaded from LTA Datamall by using read_csv() of readr package.
+
+```{r, eval = FALSE}
+odbus <- read_csv("data/aspatial/origin_destination_bus_202210.csv")
+```
+
+```{r, eval = FALSE}
+odbus$ORIGIN_PT_CODE <- 
+  as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- 
+  as.factor(odbus$DESTINATION_PT_CODE)
+```
+
+```{r, eval = FALSE}
+odbus7_9 <- odbus %>%
+  filter(DAY_TYPE == "WEEKDAY") %>%
+  filter(TIME_PER_HOUR >= 7 &
+           TIME_PER_HOUR <= 9) %>%
+  group_by(ORIGIN_PT_CODE,
+           DESTINATION_PT_CODE) %>%
+  summarise(TRIPS = sum(TOTAL_TRIPS))
+```
+
+```{r, eval = FALSE}
+write_rds(odbus7_9, "data/rds/odbus7_9.rds")
+```
+
+```{r}
+odbus7_9 <- read_rds("data/rds/odbus7_9.rds")
+```
+
+## Extracting the study area
+
+```{r}
+busstop <- st_read(dsn = "data/geospatial",
+                   layer = "BusStop") %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial",
+                layer = "MPSZ-2019") %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+busstop_mpsz <- st_intersection(busstop, mpsz) %>%
+  select(BUS_STOP_N, SUBZONE_C) %>%
+  st_drop_geometry()
+```
+
+```{r}
+od_data <- left_join(odbus7_9, busstop_mpsz,
+                     by = c("ORIGIN_PT_CODE"="BUS_STOP_N")) %>%
+  rename(ORIGIN_BS = ORIGIN_PT_CODE,
+         ORIGIN_SZ = SUBZONE_C,
+         DESTIN_BS = DESTINATION_PT_CODE)
+```
+
+Before continuing, it is a good practice to check for duplicate records
+
+```{r}
+duplicate <- od_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+```{r}
+od_data <- unique(od_data)
+```
+
+## Combining Busstop and od_data
+
+```{r}
+od_data <- left_join(od_data, busstop_mpsz,
+                     by = c("DESTIN_BS"= "BUS_STOP_N"))
+```
+
+```{r}
+duplicate <- od_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+glimpse(duplicate)
+```
+
+```{r, eval = FALSE}
+od_data <- unique(od_data)
+```
+
+```{r, eval = FALSE}
+od_data <- od_data %>%
+  rename(DESTIN_SZ = SUBZONE_C) %>%
+  drop_na()
+```
+
+Save the output into an rds file format
+
+```{r, eval = FALSE}
+write_rds(od_data, "data/rds/od_data.rds")
+```
+
+```{r}
+od_data <- read_rds("data/rds/od_data.rds")
+```
+
+# Visualising Geospatial
+
+```{r}
+tmap_mode("plot")
+tmap_options(check.and.fix = TRUE)
+  qtm(mpsz)
+```
+
+# Isolating SUBZONE_C into new DF
+
+```{r}
+mpsz<-mpsz[order(mpsz$SUBZONE_C),]
+head(mpsz,10)
+```
+
+# Computing Distance matrix
+
+```{r}
+mpsz_sp <- as(mpsz, "Spatial")
+```
+
+```{r}
+dist <- spDists(mpsz_sp)
+dist
+```
+
+## Sorting the distance matrix to subzone
+
+```{r}
+sz_names <- mpsz$SUBZONE_C
+```
+
+```{r}
+colnames(dist) <- paste0(sz_names)
+rownames(dist) <- paste0(sz_names)
+```
+
+### Pivoting distance value by Subzone_C
+
+```{r}
+distPair <- melt(dist) %>%
+  rename(dist = value)
+head(distPair, 10)
+```
+
+### Updating intra-zonal distances
+
+```{r}
+distPair %>%
+  filter(dist > 0) %>%
+  summary()
+```
+
+```{r, eval = FALSE}
+distPair$dist <- ifelse(distPair$dist ==0,
+                        50, distPair$dist)
+```
+
+```{r, eval = FALSE}
+distPair <- distPair %>% 
+  rename(orig = Var1, 
+         dest = Var2)
+```
+
+```{r, eval = FALSE}
+write_rds(distPair, "data/rds/distPair.rds")
+```
+
+```{r}
+flow_data <- od_data %>%
+  group_by(ORIGIN_SZ, DESTIN_SZ) %>%
+  summarize(TRIPS = sum(TRIPS))
+```
+
+```{r}
+pop <- read_csv("data/aspatial/pop.csv")
+```
+
+```{r}
+pop <- pop %>%
+  left_join(mpsz,
+            by = c("PA"="PLN_AREA_N",
+                   "SZ" = "SUBZONE_N")) %>%
+  select(1:6) %>%
+  rename(SZ_NAME = SZ,
+         SZ = SUBZONE_C)
+
+```
+
+```{r, eval = FALSE}
+flow_data1 <- flow_data %>%
+  left_join(distPair,
+            by = c("ORIGIN_SZ"= "orig",
+                   "DESTIN_SZ" = "dest"))
+```
+
+```{r, eval = FALSE}
+# Origin version
+flow_data1 <- flow_data1 %>%
+  left_join(pop,
+            by = c(ORIGIN_SZ = "SZ")) %>%
+  rename(ORIGIN_AGE7_12 = AGE7_12,
+         ORIGIN_AGE13_24 = AGE13_24,
+         ORIGIN_AGE25_64 = AGE25_64) %>%
+  select(-c(PA,SZ_NAME))
+```
+
+```{r, eval = FALSE}
+flow_data1 <- flow_data1 %>%
+  left_join(pop,
+            by = c(DESTIN_SZ = "SZ")) %>%
+  rename(DESTIN_AGE7_12 = AGE7_12,
+         DESTIN_AGE13_24 = AGE13_24,
+         DESTIN_AGE25_64 = AGE25_64) %>%
+  select(-c(PA,SZ_NAME))
+```
+
+```{r, eval = FALSE}
+write_rds(flow_data1, "data/rds/flow_data1.rds")
+```
+
+```{r}
+flow_data1 <- read_rds("data/rds/flow_data1.rds")
+glimpse(flow_data1)
+```
