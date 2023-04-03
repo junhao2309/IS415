@@ -25,7 +25,7 @@ In this section, you will learn how to calibrate Spatial Interaction Models by u
 
 ### **Importing the modelling data**
 
-Firstly, let us import the modelling data by using the code chunk below.
+The code chunk below reads the modelling data into object SIM_data
 
 ```{r}
 SIM_data <- read_rds("data/rds/SIM_data.rds")
