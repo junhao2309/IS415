@@ -1,0 +1,13 @@
+---
+title: "Group Project: Spatial Point Pattern Analysis Application"
+---
+
+For IS415 GAA, one of our coursework is working in a group of 3 to create an application using Rshiny that can contribute to the geospatial analytics community.
+\
+Our group decided on the theme "Spatial Point Pattern Analysis Application" and used Seoul as our study area and motivation for building the application.\
+We have also documented our progress through a separate website.
+Click the link [here](https://gaa-g10.netlify.app/).
+
+To access our Rshiny application directly, click [here](https://junhaoteo.shinyapps.io/is415_gaa_Hospital_Playlist/).
+
+Our files related to the building and documentation of the application can be found on our group's github [here](https://github.com/IS415-GAA-G10/Geospatial-Analytics-Project-KR).
